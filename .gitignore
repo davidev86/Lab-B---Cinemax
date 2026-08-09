@@ -1,0 +1,12 @@
+# Escludi le configurazioni del workspace Eclipse
+.metadata/
+
+# Escludi i file compilati di Java e build tool
+**/bin/
+**/target/
+**/build/
+
+# Escludi log ed eventuali file temporanei
+*.log
+.DS_Store
+Thumbs.db
