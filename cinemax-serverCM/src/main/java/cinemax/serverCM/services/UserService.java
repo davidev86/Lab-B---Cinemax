@@ -1,12 +1,9 @@
 package cinemax.serverCM.services;
 
-import cinemax.contracts.interfaces.ProjectionRequest;
 import cinemax.contracts.interfaces.Response;
-import cinemax.contracts.queries.GetProjections;
-import cinemax.contracts.queries.GetProjectionsByFilmIdAndDate;
-import cinemax.contracts.responses.GetProjectionResponse;
-import cinemax.contracts.responses.StoreProjectionResponse;
-import cinemax.contracts.commands.StoreProjection;
+import cinemax.contracts.interfaces.UserRequest;
+import cinemax.contracts.queries.GetUserByCredentials;
+import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.contracts.dto.*;
 import cinemax.serverCM.services.Utils.DbHelper;
 import cinemax.serverCM.services.Utils.SqlInsertBuilder;
@@ -14,27 +11,25 @@ import cinemax.serverCM.services.Utils.SqlQueryBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.time.LocalDateTime;
 
-public class ProjectionService {
+public class UserService {
 
 	private Connection _connection; 
 
-	public ProjectionService(Connection connection) {
+	public UserService(Connection connection) {
 		_connection = connection;
 	}
 
 	//il tipo di ritorno deve essere
-	public Response Find(ProjectionRequest req) {
+	public Response Find(UserRequest req) {
 
 		Response response = null;
 		try {
 
 			switch (req) {
-			case GetProjections u  -> response = Find(u);  
-			case GetProjectionsByFilmIdAndDate u  -> response = Find(u);  
+			case GetUserByCredentials u  -> response =  Find(u);  
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -43,43 +38,38 @@ public class ProjectionService {
 			e.printStackTrace();
 		}
 
+
 		return response;
 	}
 
 
 
-	public Response Find(GetProjections req) {
-	
-		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
+	public Response Find(GetUserByCredentials req) {	
+
+		String baseQuery = "SELECT * FROM public.\"Utenti\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
-		sqb.and("titolo ILIKE ?", req.getTitolo())
-		.and("genere ILIKE ?", req.getGenere())
-		.and("data_ora_proiezione >= ?", req.getDaDataProiezione())
-		.and("data_ora_proiezione < ?", req.getaDataProiezione())
-		.and("prezzo_biglietto >= ?", req.getDaCosto())
-		.and("prezzo_biglietto < ?", req.getaCosto());				
+		sqb.and("username = ?", req.getUsername())
+		.and("password ILIKE ?", req.getMd5Password());				
 
 		try {
 
-			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
-				ProjectionDetails dto = new ProjectionDetails();
-				dto.setId(rs.getInt("id_proiezione"));
-				dto.setIdFilm(rs.getInt("id_film"));
-				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
-				dto.setTitoloFilm(rs.getString("titolofilm"));
-				dto.setGenere(rs.getString("genere"));
-				dto.setRegista(rs.getString("regista"));
-				dto.setAnno(rs.getInt("anno"));
-				dto.setDurataMinuti(rs.getInt("durataminuti"));
-				dto.setEtaMinima(rs.getInt("etaminima"));
-				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
+			//one user is expected
+			List<UserMinInfos> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+				UserMinInfos dto = new UserMinInfos();
+				dto.setId(rs.getInt("id"));
+				dto.setUsername(rs.getString("username"));
+				dto.setNome(rs.getString("nome"));
+				dto.setCognome(rs.getString("cognome"));		
+								
 				return dto;
-			} );
+			} ); 
+			
+			if(users.size() == 0)
+				return null;
 
-			return new GetProjectionResponse(projs);
-
+			return new GetUserByCredentialResponse(users.getFirst());
 		}
 		catch (SQLException e) {
 			// TODO Auto-generated catch block

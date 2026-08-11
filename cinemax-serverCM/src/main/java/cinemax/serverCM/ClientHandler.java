@@ -1,17 +1,20 @@
 package cinemax.serverCM;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import cinemax.contracts.commands.StoreProjection;
+import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.ProjectionRequest;
 import cinemax.contracts.interfaces.Query;
-import cinemax.contracts.requests.*;
-import cinemax.contracts.interfaces.*;
+import cinemax.contracts.interfaces.Response;
 import cinemax.serverCM.services.ProjectionService;
 
 public class ClientHandler implements Runnable {
@@ -29,59 +32,82 @@ public class ClientHandler implements Runnable {
 
 	@Override
 	public void run() {
+		// 1. Inizializza PRIMA ObjectOutputStream e poi ObjectInputStream per evitare deadlock sull'header
 		try (
-				// Stream per ricevere gli oggetti dal client
-				ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-				// Stream (opzionale ma consigliato) per inviare la Response indietro al client
-				ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream())
-				) {
-			// 1. Legge l'oggetto inviato dal client e lo casta all'interfaccia comune
-			Object received = ois.readObject();
+				ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
+				ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream())
+		) {
+			oos.flush(); // Invia l'header al client
 
-			if (received instanceof Query) {
-				Query request = (Query) received;
-				System.out.println("Ricevuta richiesta di tipo: " + request.getClass().getSimpleName());
-
-				try (Connection conn = GetConnection()) {
-					// 2. Esegui il controllo del tipo per gestire la specifica richiesta
-					if (request instanceof ProjectionRequest) {
-
-						ProjectionService service = new ProjectionService(conn);
-						Response response = service.Find((ProjectionRequest) request);
-
-						// TODO: Interroga il database usando dbHost, dbUser, dbPassword
-						// TODO: Crea la Response corrispondente e inviala al client con oos.writeObject(response);
-						oos.writeObject(response);
-					}
-				} catch (SQLException e) {
-					System.err.println("Errore SQL durante la gestione della proiezione: " + e.getMessage());
-					e.printStackTrace();
+			// 2. Ciclo continuo per gestire più richieste consecutive sulla stessa socket
+			while (!clientSocket.isClosed()) {
+				Object received;
+				try {
+					received = ois.readObject();
+				} catch (EOFException | SocketException e) {
+					// Il client ha chiuso la connessione normalmente
+					System.out.println("Client disconnesso.");
+					break;
 				}
 
+				// --- GESTIONE QUERY ---
+				if (received instanceof Query) {
+					Query request = (Query) received;
+					System.out.println("Ricevuta richiesta (Query) di tipo: " + request.getClass().getSimpleName());
 
+					try (Connection conn = getConnection()) {
+						if (request instanceof ProjectionRequest) {
+							ProjectionService service = new ProjectionService(conn);
+							Response response = service.Find((ProjectionRequest) request);
+							
+							oos.writeObject(response);
+							oos.flush();
+						}
+					} catch (SQLException e) {
+						System.err.println("Errore SQL durante la gestione della Query: " + e.getMessage());
+						e.printStackTrace();
+					}
+				} 
+				// --- GESTIONE COMMAND ---
+				else if (received instanceof Command) {
+					Command command = (Command) received;
+					System.out.println("Ricevuto comando (Command) di tipo: " + command.getClass().getSimpleName());
+
+					try (Connection conn = getConnection()) {
+						if (command instanceof StoreProjection) {
+							ProjectionService service = new ProjectionService(conn);
+							Response response = service.Store((StoreProjection) command);
+
+							oos.writeObject(response);
+							oos.flush();
+						}
+					} catch (SQLException e) {
+						System.err.println("Errore SQL durante la gestione del Command: " + e.getMessage());
+						e.printStackTrace();
+					}
+				}
 			}
 
 		} catch (Exception e) {
-			System.err.println("Errore nella gestione del client: " + e.getMessage());
-			e.printStackTrace();
+			System.err.println("Errore nella gestione della socket del client: " + e.getMessage());
 		} finally {
 			try {
-				clientSocket.close();
+				if (clientSocket != null && !clientSocket.isClosed()) {
+					clientSocket.close();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	private Connection GetConnection() {
-		String url = "jdbc:postgresql://localhost:5432/Cinemax";
-		try {
-			return DriverManager.getConnection(url, "postgres", "personalSpace");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private Connection getConnection() throws SQLException {
 
-		return null;
+		//TODO:DA CAMBIARE PRIMA DI CONSEGNARE!!!
+		String url = "jdbc:postgresql://localhost:5432/Cinemax";
+		return DriverManager.getConnection(url, "postgres", "personalSpace");
+		
+		//String url = "jdbc:postgresql://" + dbHost + "/Cinemax";
+		//return DriverManager.getConnection(url, dbUser, dbPassword);
 	}
 }

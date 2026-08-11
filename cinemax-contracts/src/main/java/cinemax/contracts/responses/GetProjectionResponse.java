@@ -2,22 +2,22 @@ package cinemax.contracts.responses;
 
 import java.util.List;
 
-import cinemax.contracts.dto.Projection;
+import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.interfaces.Response;
 
 public class GetProjectionResponse implements Response {
 
-	public GetProjectionResponse(List<Projection> projections) {
+	public GetProjectionResponse(List<ProjectionDetails> projections) {
 		this.projections = projections;
 	}
 	
-	private List<Projection> projections;
+	private List<ProjectionDetails> projections;
 
-	public List<Projection> getProjections() {
+	public List<ProjectionDetails> getProjections() {
 		return projections;
 	}
 
-	public void setProjections(List<Projection> projections) {
+	public void setProjections(List<ProjectionDetails> projections) {
 		this.projections = projections;
 	}
 }

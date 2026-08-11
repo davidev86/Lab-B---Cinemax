@@ -1,1 +1,0 @@
-package cinemax.contracts.requests;

@@ -14,4 +14,44 @@
         <module>cinemax-gui</module>
         <module>cinemax-serverCM</module>
     </modules>
+
+    <!-- 1. Configurazione proprietà globali -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <!-- Imposta la versione Java 25 -->
+        <maven.compiler.release>25</maven.compiler.release>
+        
+        <!-- Versione centralizzata per PostgreSQL JDBC -->
+        <postgresql.version>42.7.3</postgresql.version>
+    </properties>
+
+    <!-- 2. Gestione centralizzata delle dipendenze per i sotto-moduli -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Driver JDBC di PostgreSQL per la connessione al database -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 3. Configurazione dei plugin di build per tutti i moduli -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

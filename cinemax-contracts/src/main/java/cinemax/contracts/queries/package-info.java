@@ -1,0 +1,1 @@
+package cinemax.contracts.queries;

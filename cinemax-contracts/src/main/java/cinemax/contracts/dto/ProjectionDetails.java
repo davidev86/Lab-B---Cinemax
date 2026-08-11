@@ -1,11 +1,15 @@
 package cinemax.contracts.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Projection implements Serializable {
+
+public class ProjectionDetails implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private Integer id;
+    private Integer idFilm;
     private LocalDateTime dataOraProiezione;
     private String titoloFilm;
     private String genere;
@@ -13,14 +17,17 @@ public class Projection implements Serializable {
     private Integer anno;
     private Integer durataMinuti;
     private Integer etaMinima;
+    private BigDecimal costo;
 
     // Costruttore vuoto (indispensabile per la serializzazione/deserializzazione)
-    public Projection() {
+    public ProjectionDetails() {
     }
 
     // Costruttore con campi (opzionale ma comodo)
-    public Projection(LocalDateTime dataOraProiezione, String titoloFilm, String genere, 
+    public ProjectionDetails(Integer id, Integer idFilm, LocalDateTime dataOraProiezione, String titoloFilm, String genere, 
                                     String regista, Integer anno, Integer durataMinuti, Integer etaMinima) {
+    	this.id = id;
+    	this.idFilm = idFilm;
         this.dataOraProiezione = dataOraProiezione;
         this.titoloFilm = titoloFilm;
         this.genere = genere;
@@ -86,4 +93,28 @@ public class Projection implements Serializable {
     public void setEtaMinima(Integer etaMinima) {
         this.etaMinima = etaMinima;
     }
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getIdFilm() {
+		return idFilm;
+	}
+
+	public void setIdFilm(Integer idFilm) {
+		this.idFilm = idFilm;
+	}
+
+	public BigDecimal getCosto() {
+		return costo;
+	}
+
+	public void setCosto(BigDecimal costo) {
+		this.costo = costo;
+	}
 }
