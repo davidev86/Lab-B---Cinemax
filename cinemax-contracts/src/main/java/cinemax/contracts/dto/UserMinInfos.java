@@ -1,10 +1,11 @@
 package cinemax.contracts.dto;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import cinemax.contracts.dto.Enums.Ruolo;
 
-public class UserMinInfos {
+public class UserMinInfos implements Serializable  {
 
     private Integer id; // Integer per supportare il valore null prima dell'inserimento nel DB
     private String nome;

@@ -3,8 +3,11 @@ package cinemax.serverCM.services;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.interfaces.UserRequest;
 import cinemax.contracts.queries.GetUserByCredentials;
+import cinemax.contracts.queries.GetUserDetails;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
+import cinemax.contracts.responses.GetUserDetailsResponse;
 import cinemax.contracts.dto.*;
+import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.serverCM.services.Utils.DbHelper;
 import cinemax.serverCM.services.Utils.SqlInsertBuilder;
 import cinemax.serverCM.services.Utils.SqlQueryBuilder;
@@ -79,33 +82,51 @@ public class UserService {
 		return null;
 	}
 	
-	public Response Find(GetProjectionsByFilmIdAndDate req) {		
+	public Response Find(GetUserDetails req) {		
 
-		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
+		String baseQuery = "SELECT * FROM public.\"Utenti\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
-		sqb.and("idFilm = ?", req.getFilm())	
-		.and("data_ora_proiezione <= ?", req.getMaxDataPrenotazione());				
+		sqb.and("id = ?", req.getUserId());				
 
-		try {
+		sqb.and("id = ?", req.getUserId());				
 
-			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
-				ProjectionDetails dto = new ProjectionDetails();
-				dto.setId(rs.getInt("id_proiezione"));
-				dto.setIdFilm(rs.getInt("id_film"));
-				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
-				dto.setTitoloFilm(rs.getString("titolofilm"));
-				dto.setGenere(rs.getString("genere"));
-				dto.setRegista(rs.getString("regista"));
-				dto.setAnno(rs.getInt("anno"));
-				dto.setDurataMinuti(rs.getInt("durataminuti"));
-				dto.setEtaMinima(rs.getInt("etaminima"));
-				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
-				return dto;
-			} );
+	    try {
 
-			return new GetProjectionResponse(projs);
+	        List<UserDetails> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+	            UserDetails dto = new UserDetails();
+	            
+	            // 1. ID (Corretto da 'id_proiezione' a 'id')
+	            dto.setId(rs.getInt("id"));
+	            
+	            // 2. Anagrafica e Credenziali
+	            dto.setNome(rs.getString("nome"));
+	            dto.setCognome(rs.getString("cognome"));
+	            dto.setUsername(rs.getString("username"));
+	            
+	            // 3. Domicilio e Ruolo
+	            dto.setDomicilio(rs.getString("domicilio"));
+	        
+	            // Ruolo (conversione da String del DB a Enum Java)
+	            String ruoloStr = rs.getString("ruolo");
+	            if (ruoloStr != null) {
+	                dto.setRuolo(Ruolo.valueOf(ruoloStr)); 
+	            }
+	            
+	            // 4. Data di nascita (gestisce eventuali valori NULL sul DB)
+	            java.sql.Date sqlDate = rs.getDate("data_nascita");
+	            if (sqlDate != null) {
+	                dto.setDataNascita(sqlDate.toLocalDate()); // Se in UserDetails usi LocalDate
+	                // dto.setDataNascita(sqlDate);             // Se in UserDetails usi java.util.Date / java.sql.Date
+	            }
+	            
+	            return dto;
+	        });
+
+	        return new GetUserDetailsResponse(users.getFirst());
+
+	    	
 
 		}
 		catch (SQLException e) {
@@ -116,6 +137,7 @@ public class UserService {
 		return null;
 	}
 
+	/*
 	public Response Store(StoreProjection req) {
 
 		if(req.getId() == null ) {
@@ -144,4 +166,5 @@ public class UserService {
 
 		return null;
 	}
+	*/
 }
