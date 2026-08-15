@@ -13,6 +13,7 @@
         <module>cinemax-contracts</module>
         <module>cinemax-gui</module>
         <module>cinemax-serverCM</module>
+        <module>cinemax-application</module>
     </modules>
 
     <!-- 1. Configurazione proprietà globali -->

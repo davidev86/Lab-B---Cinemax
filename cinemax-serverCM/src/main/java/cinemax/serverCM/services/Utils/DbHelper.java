@@ -50,5 +50,14 @@ public class DbHelper {
 			}
 		}
 	}
+	
+	public static int executeUpdate(Connection conn, String sql, List<Object> params) throws SQLException {
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			for (int i = 0; i < params.size(); i++) {
+				pstmt.setObject(i + 1, params.get(i));
+			}
 
+			return pstmt.executeUpdate();
+		}
+	}
 }

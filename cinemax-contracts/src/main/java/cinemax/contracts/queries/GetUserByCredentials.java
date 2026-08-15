@@ -6,7 +6,15 @@ public class GetUserByCredentials implements Query, UserRequest  {
 
 	private String username;	
 	private String md5Password;
+
+	public GetUserByCredentials() {
+	}
 	
+	public GetUserByCredentials(String username, String md5Password) {
+		this.username = username;
+		this.md5Password = md5Password;
+	}
+
 	public String getUsername() {
 		return username;
 	}

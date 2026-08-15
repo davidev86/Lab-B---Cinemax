@@ -14,7 +14,7 @@ import cinemax.contracts.responses.StoreProjectionResponse;
 public class TestClientTCP {
     public static void main(String[] args) {
         String serverIP = "127.0.0.1"; // localhost
-        int serverPort = 12345;
+		int serverPort = 12345;
 
         System.out.println("Tentativo di connessione al server " + serverIP + ":" + serverPort + "...");
 

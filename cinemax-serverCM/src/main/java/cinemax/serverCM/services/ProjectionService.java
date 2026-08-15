@@ -11,6 +11,7 @@ import cinemax.contracts.dto.*;
 import cinemax.serverCM.services.Utils.DbHelper;
 import cinemax.serverCM.services.Utils.SqlInsertBuilder;
 import cinemax.serverCM.services.Utils.SqlQueryBuilder;
+import cinemax.serverCM.services.Utils.SqlUpdateBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -128,30 +129,50 @@ public class ProjectionService {
 
 	public Response Store(StoreProjection req) {
 
-		if(req.getId() == null ) {
-
-			//CASO INSERT
-			SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Proiezioni\"");
-
-			sib.set("data_ora_proiezione", req.getDataOraProiezione())
-			.set("prezzo_biglietto", req.getPrezzoBiglietto())
-			.set("id_film", req.getIdFilm());	       
-
-			try {
-				// Esegue l'insert e recupera l'ID generato da PostgreSQL
-				Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
-				System.out.println("Nuova proiezione inserita con ID: " + newId);
-
-				return new StoreProjectionResponse(newId);
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return null;
-			}		
-		}
+		//CASO INSERT
+		if(req.getId() == null ) return insertProjection(req);		
 		//CASO UPDATE
+		else return updateProjection(req);			
+	}
 
+	private Response updateProjection(StoreProjection req) {
+		SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Proiezioni\"");
+		
+		sub.set("data_ora_proiezione", req.getDataOraProiezione());
+		sub.set("prezzo_biglietto", req.getPrezzoBiglietto());
+		sub.set("id_film", req.getIdFilm());
+		
+		sub.where("id", req.getId());
+		
+		try {
+			int rowsAffected = DbHelper.executeUpdate(_connection, sub.getSql(), sub.getParams());
+			System.out.println("Proiezione aggiornata, righe modificate: " + rowsAffected);
 
-		return null;
+			return new StoreProjectionResponse(req.getId());
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}		
+	}
+
+	private Response insertProjection(StoreProjection req) {
+		SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Proiezioni\"");
+
+		sib.set("data_ora_proiezione", req.getDataOraProiezione())
+		.set("prezzo_biglietto", req.getPrezzoBiglietto())
+		.set("id_film", req.getIdFilm());	       
+
+		try {
+			// Esegue l'insert e recupera l'ID generato da PostgreSQL
+			Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
+			System.out.println("Nuova proiezione inserita con ID: " + newId);
+
+			return new StoreProjectionResponse(newId);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

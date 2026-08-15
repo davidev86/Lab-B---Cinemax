@@ -6,11 +6,16 @@ import cinemax.contracts.queries.GetUserByCredentials;
 import cinemax.contracts.queries.GetUserDetails;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.contracts.responses.GetUserDetailsResponse;
+import cinemax.contracts.responses.StoreProjectionResponse;
+import cinemax.contracts.responses.StoreUserResponse;
+import cinemax.contracts.commands.StoreProjection;
+import cinemax.contracts.commands.StoreUser;
 import cinemax.contracts.dto.*;
 import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.serverCM.services.Utils.DbHelper;
 import cinemax.serverCM.services.Utils.SqlInsertBuilder;
 import cinemax.serverCM.services.Utils.SqlQueryBuilder;
+import cinemax.serverCM.services.Utils.SqlUpdateBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,6 +38,7 @@ public class UserService {
 
 			switch (req) {
 			case GetUserByCredentials u  -> response =  Find(u);  
+			case GetUserDetails u  -> response = Find(u);
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -47,7 +53,7 @@ public class UserService {
 
 
 
-	public Response Find(GetUserByCredentials req) {	
+	private Response Find(GetUserByCredentials req) {	
 
 		String baseQuery = "SELECT * FROM public.\"Utenti\"";
 
@@ -82,13 +88,11 @@ public class UserService {
 		return null;
 	}
 	
-	public Response Find(GetUserDetails req) {		
+	private Response Find(GetUserDetails req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Utenti\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
-
-		sqb.and("id = ?", req.getUserId());				
 
 		sqb.and("id = ?", req.getUserId());				
 
@@ -137,34 +141,64 @@ public class UserService {
 		return null;
 	}
 
-	/*
-	public Response Store(StoreProjection req) {
+	
+	public Response Store(StoreUser req) {
 
-		if(req.getId() == null ) {
-
-			//CASO INSERT
-			SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Proiezioni\"");
-
-			sib.set("data_ora_proiezione", req.getDataOraProiezione())
-			.set("prezzo_biglietto", req.getPrezzoBiglietto())
-			.set("id_film", req.getIdFilm());	       
-
-			try {
-				// Esegue l'insert e recupera l'ID generato da PostgreSQL
-				Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
-				System.out.println("Nuova proiezione inserita con ID: " + newId);
-
-				return new StoreProjectionResponse(newId);
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return null;
-			}		
-		}
+		//CASO INSERT
+		if(req.getId() == null ) return insertUser(req);
 		//CASO UPDATE
+		else return updateUser(req);
+	}	
+	
+	private Response updateUser(StoreUser req) {
+		SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Utenti\"");
+		
+		sub.set("username", req.getUsername())
+		   .set("md5Password", req.getMd5Password())
+		   .set("nome", req.getNome())
+		   .set("cognome", req.getCognome())
+		   .set("dataNascita", req.getDataNascita())
+		   .set("domicilio", req.getDomicilio())
+		   .set("ruolo", req.getRuolo() != null ? req.getRuolo().name() : null);			
 
+		
+		sub.where("id", req.getId());
+		
+		try {
+			int rowsAffected = DbHelper.executeUpdate(_connection, sub.getSql(), sub.getParams());
+			System.out.println("Proiezione aggiornata, righe modificate: " + rowsAffected);
 
-		return null;
+			return new StoreProjectionResponse(req.getId());
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}		
 	}
-	*/
+	
+	private Response insertUser(StoreUser req) {
+		//CASO INSERT
+		SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Utenti\"");
+
+		sib.set("username", req.getUsername())
+		   .set("md5Password", req.getMd5Password())
+		   .set("nome", req.getNome())
+		   .set("cognome", req.getCognome())
+		   .set("dataNascita", req.getDataNascita())
+		   .set("domicilio", req.getDomicilio())
+		   .set("ruolo", req.getRuolo() != null ? req.getRuolo().name() : null);			
+
+		try {
+			// Esegue l'insert e recupera l'ID generato da PostgreSQL
+			Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
+			System.out.println("Nuova proiezione inserita con ID: " + newId);
+
+			return new StoreUserResponse(newId);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}		
+		
+	}
 }
