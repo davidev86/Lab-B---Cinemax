@@ -49,6 +49,7 @@ public class ClientHandler implements Runnable {
 
 				// --- GESTIONE QUERY ---
 				if (received instanceof Query) {
+					Query request = (Query) received;
 					System.out.println("Ricevuta richiesta (Query) di tipo: " + received.getClass().getSimpleName());
 
 					try (Connection conn = getConnection()) {
@@ -59,7 +60,7 @@ public class ClientHandler implements Runnable {
 						oos.writeObject(response);
 						oos.flush();
 						
-					} catch (SQLException e) {
+					} catch (SQLException e) { 
 						System.err.println("Errore SQL durante la gestione della Query: " + e.getMessage());
 						e.printStackTrace();
 					}
