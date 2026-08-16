@@ -1,41 +1,43 @@
-package cinemax.serverCM.services;
+package cinemax.serverCM.dao;
 
-import cinemax.contracts.interfaces.ProjectionRequest;
+import cinemax.contracts.interfaces.Command;
+
+import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmIdAndDate;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
+import cinemax.serverCM.dao.Utils.DbHelper;
+import cinemax.serverCM.dao.Utils.SqlInsertBuilder;
+import cinemax.serverCM.dao.Utils.SqlQueryBuilder;
+import cinemax.serverCM.dao.Utils.SqlUpdateBuilder;
 import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.dto.*;
-import cinemax.serverCM.services.Utils.DbHelper;
-import cinemax.serverCM.services.Utils.SqlInsertBuilder;
-import cinemax.serverCM.services.Utils.SqlQueryBuilder;
-import cinemax.serverCM.services.Utils.SqlUpdateBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.time.LocalDateTime;
 
-public class ProjectionService {
+public class ProjectionDao implements Dao {
 
 	private Connection _connection; 
 
-	public ProjectionService(Connection connection) {
+	public ProjectionDao(Connection connection) {
 		_connection = connection;
 	}
 
 	//il tipo di ritorno deve essere
-	public Response Find(ProjectionRequest req) {
+	@Override
+	public Response find(Query req){
 
 		Response response = null;
 		try { 
 
 			switch (req) {
-			case GetProjections u  -> response = Find(u);  
-			case GetProjectionsByFilmIdAndDate u  -> response = Find(u);  
+			case GetProjections u  -> response =find(u);  
+			case GetProjectionsByFilmIdAndDate u  -> response = find(u);  
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -49,7 +51,7 @@ public class ProjectionService {
 
 
 
-	public Response Find(GetProjections req) {
+	private Response find(GetProjections req) {
 	
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
 
@@ -90,7 +92,7 @@ public class ProjectionService {
 		return null;
 	}
 	
-	public Response Find(GetProjectionsByFilmIdAndDate req) {		
+	private Response find(GetProjectionsByFilmIdAndDate req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
 
@@ -127,12 +129,13 @@ public class ProjectionService {
 		return null;
 	}
 
-	public Response Store(StoreProjection req) {
+	@Override
+	public Response store(Command req) {
 
 		//CASO INSERT
-		if(req.getId() == null ) return insertProjection(req);		
+		if(req.getId() == null ) return insertProjection((StoreProjection) req);		
 		//CASO UPDATE
-		else return updateProjection(req);			
+		else return updateProjection((StoreProjection)req);			
 	}
 
 	private Response updateProjection(StoreProjection req) {

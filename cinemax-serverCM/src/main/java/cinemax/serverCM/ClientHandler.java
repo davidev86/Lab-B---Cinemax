@@ -10,12 +10,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import cinemax.contracts.commands.StoreProjection;
-import cinemax.contracts.interfaces.Command;
-import cinemax.contracts.interfaces.ProjectionRequest;
-import cinemax.contracts.interfaces.Query;
-import cinemax.contracts.interfaces.Response;
-import cinemax.serverCM.services.ProjectionService;
+import cinemax.contracts.interfaces.*;
+import cinemax.serverCM.dao.*;
+
 
 public class ClientHandler implements Runnable {
 	private Socket clientSocket;
@@ -52,17 +49,16 @@ public class ClientHandler implements Runnable {
 
 				// --- GESTIONE QUERY ---
 				if (received instanceof Query) {
-					Query request = (Query) received;
-					System.out.println("Ricevuta richiesta (Query) di tipo: " + request.getClass().getSimpleName());
+					System.out.println("Ricevuta richiesta (Query) di tipo: " + received.getClass().getSimpleName());
 
 					try (Connection conn = getConnection()) {
-						if (request instanceof ProjectionRequest) {
-							ProjectionService service = new ProjectionService(conn);
-							Response response = service.Find((ProjectionRequest) request);
-							
-							oos.writeObject(response);
-							oos.flush();
-						}
+						
+						Dao service = getEntityDao(received, conn);
+						Response response = service.find(request);
+						
+						oos.writeObject(response);
+						oos.flush();
+						
 					} catch (SQLException e) {
 						System.err.println("Errore SQL durante la gestione della Query: " + e.getMessage());
 						e.printStackTrace();
@@ -73,14 +69,12 @@ public class ClientHandler implements Runnable {
 					Command command = (Command) received;
 					System.out.println("Ricevuto comando (Command) di tipo: " + command.getClass().getSimpleName());
 
-					try (Connection conn = getConnection()) {
-						if (command instanceof StoreProjection) {
-							ProjectionService service = new ProjectionService(conn);
-							Response response = service.Store((StoreProjection) command);
+					try (Connection conn = getConnection()) {						
+						Dao service = getEntityDao(received, conn);
+						Response response = service.store(command);
 
-							oos.writeObject(response);
-							oos.flush();
-						}
+						oos.writeObject(response);
+						oos.flush();						
 					} catch (SQLException e) {
 						System.err.println("Errore SQL durante la gestione del Command: " + e.getMessage());
 						e.printStackTrace();
@@ -100,6 +94,15 @@ public class ClientHandler implements Runnable {
 			}
 		}
 	}
+	
+	private Dao getEntityDao(Object req , Connection conn ) {
+		if (req instanceof ProjectionRequest) return new ProjectionDao(conn);
+		if (req instanceof UserRequest) return new UserDao(conn);
+		
+		return null;
+	}
+	
+	
 
 	private Connection getConnection() throws SQLException {
 

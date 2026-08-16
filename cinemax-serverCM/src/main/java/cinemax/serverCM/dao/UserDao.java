@@ -1,37 +1,37 @@
-package cinemax.serverCM.services;
+package cinemax.serverCM.dao;
 
+import cinemax.contracts.interfaces.Command;
+import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
-import cinemax.contracts.interfaces.UserRequest;
 import cinemax.contracts.queries.GetUserByCredentials;
 import cinemax.contracts.queries.GetUserDetails;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.contracts.responses.GetUserDetailsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.contracts.responses.StoreUserResponse;
-import cinemax.contracts.commands.StoreProjection;
+import cinemax.serverCM.dao.Utils.DbHelper;
+import cinemax.serverCM.dao.Utils.SqlInsertBuilder;
+import cinemax.serverCM.dao.Utils.SqlQueryBuilder;
+import cinemax.serverCM.dao.Utils.SqlUpdateBuilder;
 import cinemax.contracts.commands.StoreUser;
 import cinemax.contracts.dto.*;
 import cinemax.contracts.dto.Enums.Ruolo;
-import cinemax.serverCM.services.Utils.DbHelper;
-import cinemax.serverCM.services.Utils.SqlInsertBuilder;
-import cinemax.serverCM.services.Utils.SqlQueryBuilder;
-import cinemax.serverCM.services.Utils.SqlUpdateBuilder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.time.LocalDateTime;
 
-public class UserService {
+public class UserDao implements Dao {
 
 	private Connection _connection; 
 
-	public UserService(Connection connection) {
+	public UserDao(Connection connection) {
 		_connection = connection;
 	}
 
 	//il tipo di ritorno deve essere
-	public Response Find(UserRequest req) {
+	@Override
+	public Response find(Query req){
 
 		Response response = null;
 		try {
@@ -142,12 +142,13 @@ public class UserService {
 	}
 
 	
-	public Response Store(StoreUser req) {
-
+	@Override
+	public Response store(Command cmd) {	
+		
 		//CASO INSERT
-		if(req.getId() == null ) return insertUser(req);
+		if(cmd.getId() == null ) return insertUser((StoreUser)cmd);
 		//CASO UPDATE
-		else return updateUser(req);
+		else return updateUser((StoreUser)cmd);
 	}	
 	
 	private Response updateUser(StoreUser req) {
@@ -198,7 +199,6 @@ public class UserService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
-		}		
-		
+		}			
 	}
 }

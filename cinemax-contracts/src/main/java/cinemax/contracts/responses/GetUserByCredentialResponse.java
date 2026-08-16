@@ -12,7 +12,7 @@ public class GetUserByCredentialResponse  implements Response  {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -4349621583380646402L;
+	private static final long serialVersionUID = 1L;
 	private UserMinInfos user;
 
 	public UserMinInfos getUser() {

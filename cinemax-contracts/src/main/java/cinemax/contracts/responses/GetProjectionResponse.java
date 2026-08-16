@@ -7,6 +7,11 @@ import cinemax.contracts.interfaces.Response;
 
 public class GetProjectionResponse implements Response {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public GetProjectionResponse(List<ProjectionDetails> projections) {
 		this.projections = projections;
 	}

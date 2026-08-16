@@ -4,6 +4,14 @@ import cinemax.contracts.interfaces.*;
 
 public class GetUserByCredentials implements Query, UserRequest  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+	
 	private String username;	
 	private String md5Password;
 

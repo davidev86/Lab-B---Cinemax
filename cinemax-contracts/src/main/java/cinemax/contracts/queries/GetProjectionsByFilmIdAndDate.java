@@ -1,11 +1,14 @@
 package cinemax.contracts.queries;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import cinemax.contracts.interfaces.*;
 
 public class GetProjectionsByFilmIdAndDate implements Query, ProjectionRequest  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int film;	
 	private LocalDate maxDataPrenotazione;
 	

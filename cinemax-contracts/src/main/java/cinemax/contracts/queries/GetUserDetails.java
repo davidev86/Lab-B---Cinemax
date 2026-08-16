@@ -4,6 +4,10 @@ import cinemax.contracts.interfaces.*;
 
 public class GetUserDetails implements Query, UserRequest  {
 		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer UserId;
 	
 	public GetUserDetails() {

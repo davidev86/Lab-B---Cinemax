@@ -3,12 +3,15 @@ package cinemax.contracts.commands;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.ProjectionRequest;
 
 public class StoreProjection implements Command, ProjectionRequest{	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private LocalDateTime DataOraProiezione;
 	private Integer idFilm;

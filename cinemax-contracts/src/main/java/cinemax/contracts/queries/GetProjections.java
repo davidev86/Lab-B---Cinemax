@@ -6,6 +6,10 @@ import cinemax.contracts.interfaces.*;
 
 public class GetProjections implements Query, ProjectionRequest  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String titolo;
 	private String genere;
 	private LocalDate daDataProiezione;

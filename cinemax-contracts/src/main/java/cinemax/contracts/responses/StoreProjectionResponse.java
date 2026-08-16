@@ -4,6 +4,10 @@ import cinemax.contracts.interfaces.Response;
 
 public class StoreProjectionResponse  implements Response  {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	
 	public StoreProjectionResponse(Integer id) {

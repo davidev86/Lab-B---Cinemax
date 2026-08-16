@@ -1,4 +1,4 @@
-package cinemax.serverCM.services.Utils;
+package cinemax.serverCM.dao.Utils;
 
 
 import java.sql.Connection;

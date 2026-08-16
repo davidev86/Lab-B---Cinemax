@@ -1,15 +1,17 @@
 package cinemax.contracts.commands;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.ProjectionRequest;
 
 public class StoreUser implements Command, ProjectionRequest{	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private Integer id;
 	private String username;
