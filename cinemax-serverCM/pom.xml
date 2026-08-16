@@ -1,21 +1,29 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>it.uninsubria.cinemax</groupId>
-  <artifactId>serverCM</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>serverCM</name>
+  
+  <!-- 1. DICHIARA IL PARENT (Fondamentale!) -->
+  <parent>
+    <groupId>it.uninsubria.cinemax</groupId>
+    <artifactId>Lab-B-Cinemax</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+
+  <!-- groupId e version vengono ereditati dal parent, basta l'artifactId -->
+  <artifactId>server-cm</artifactId>
+  <name>server-cm</name>
   
   <dependencies>
-    <!-- Qui aggiungiamo la dipendenza ai tuoi contratti -->
+    <!-- Dipendenza ai contratti -->
     <dependency>
       <groupId>it.uninsubria.cinemax</groupId>
       <artifactId>cinemax-contracts</artifactId>
       <version>0.0.1-SNAPSHOT</version>
     </dependency>
+    
+    <!-- PostgreSQL: rimuovi la versione qui! La prende in automatico dal dependencyManagement del Parent -->
     <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>42.7.13</version>
     </dependency>
   </dependencies>
   

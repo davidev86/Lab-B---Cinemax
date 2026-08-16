@@ -31,7 +31,7 @@ public class ProjectionService {
 	public Response Find(ProjectionRequest req) {
 
 		Response response = null;
-		try {
+		try { 
 
 			switch (req) {
 			case GetProjections u  -> response = Find(u);  
