@@ -12,6 +12,15 @@ public class GetProjectionsByFilmIdAndDate implements Query, ProjectionRequest  
 	private int film;	
 	private LocalDate maxDataPrenotazione;
 	
+	/**
+	 * @param film
+	 * @param maxDataPrenotazione
+	 */
+	public GetProjectionsByFilmIdAndDate(int film, LocalDate maxDataPrenotazione) {
+		super();
+		this.film = film;
+		this.maxDataPrenotazione = maxDataPrenotazione;
+	}
 	public int getFilm() {
 		return film;
 	}

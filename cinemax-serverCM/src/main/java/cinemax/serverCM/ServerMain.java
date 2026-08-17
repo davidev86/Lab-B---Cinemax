@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class serverMain {
+public class ServerMain {
 
     public static void main(String[] args) {
         String dbHost = "";

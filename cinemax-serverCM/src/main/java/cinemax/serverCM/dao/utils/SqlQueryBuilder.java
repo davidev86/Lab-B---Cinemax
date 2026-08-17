@@ -1,4 +1,4 @@
-package cinemax.serverCM.dao.Utils;
+package cinemax.serverCM.dao.utils;
 
 import java.util.ArrayList;
 import java.util.List;

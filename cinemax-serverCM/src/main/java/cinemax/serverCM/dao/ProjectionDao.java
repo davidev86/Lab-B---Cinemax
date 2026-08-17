@@ -8,10 +8,10 @@ import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmIdAndDate;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
-import cinemax.serverCM.dao.Utils.DbHelper;
-import cinemax.serverCM.dao.Utils.SqlInsertBuilder;
-import cinemax.serverCM.dao.Utils.SqlQueryBuilder;
-import cinemax.serverCM.dao.Utils.SqlUpdateBuilder;
+import cinemax.serverCM.dao.utils.DbHelper;
+import cinemax.serverCM.dao.utils.SqlInsertBuilder;
+import cinemax.serverCM.dao.utils.SqlQueryBuilder;
+import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.dto.*;
 
@@ -56,8 +56,12 @@ public class ProjectionDao implements Dao {
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
-
-		sqb.and("titolo ILIKE ?", req.getTitolo())
+	
+		String titoloPattern = (req.getTitolo() != null && !req.getTitolo().isBlank()) 
+				? "%" + req.getTitolo() + "%" 
+				: null;
+		
+		sqb.and("titolofilm ILIKE ?", titoloPattern)
 		.and("genere ILIKE ?", req.getGenere())
 		.and("data_ora_proiezione >= ?", req.getDaDataProiezione())
 		.and("data_ora_proiezione < ?", req.getaDataProiezione())
@@ -130,7 +134,7 @@ public class ProjectionDao implements Dao {
 	}
 
 	@Override
-	public Response store(Command req) {
+	public Response execute(Command req) {
 
 		//CASO INSERT
 		if(req.getId() == null ) return insertProjection((StoreProjection) req);		

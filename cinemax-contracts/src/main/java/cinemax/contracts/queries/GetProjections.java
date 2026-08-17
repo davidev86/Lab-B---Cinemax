@@ -16,6 +16,33 @@ public class GetProjections implements Query, ProjectionRequest  {
 	private LocalDate aDataProiezione;
 	private BigDecimal daCosto;
 	private BigDecimal aCosto;
+	
+	public GetProjections() {
+		
+	}
+	
+	
+	
+	/**
+	 * @param titolo
+	 * @param genere
+	 * @param daDataProiezione
+	 * @param aDataProiezione
+	 * @param daCosto
+	 * @param aCosto
+	 */
+	public GetProjections(String titolo, String genere, LocalDate daDataProiezione, LocalDate aDataProiezione,
+			BigDecimal daCosto, BigDecimal aCosto) {
+		super();
+		this.titolo = titolo; 
+		this.genere = genere;
+		this.daDataProiezione = daDataProiezione;
+		this.aDataProiezione = aDataProiezione;
+		this.daCosto = daCosto;
+		this.aCosto = aCosto;
+	}
+
+
 	/**
 	 * @return the titolo
 	 */

@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable {
 
 					try (Connection conn = getConnection()) {						
 						Dao service = getEntityDao(received, conn);
-						Response response = service.store(command);
+						Response response = service.execute(command);
 
 						oos.writeObject(response);
 						oos.flush();						

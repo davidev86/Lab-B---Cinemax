@@ -9,10 +9,10 @@ import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.contracts.responses.GetUserDetailsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.contracts.responses.StoreUserResponse;
-import cinemax.serverCM.dao.Utils.DbHelper;
-import cinemax.serverCM.dao.Utils.SqlInsertBuilder;
-import cinemax.serverCM.dao.Utils.SqlQueryBuilder;
-import cinemax.serverCM.dao.Utils.SqlUpdateBuilder;
+import cinemax.serverCM.dao.utils.DbHelper;
+import cinemax.serverCM.dao.utils.SqlInsertBuilder;
+import cinemax.serverCM.dao.utils.SqlQueryBuilder;
+import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 import cinemax.contracts.commands.StoreUser;
 import cinemax.contracts.dto.*;
 import cinemax.contracts.dto.Enums.Ruolo;
@@ -60,7 +60,7 @@ public class UserDao implements Dao {
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
 		sqb.and("username = ?", req.getUsername())
-		.and("password ILIKE ?", req.getMd5Password());				
+		.and("password = ?", req.getMd5Password());				
 
 		try {
 
@@ -143,7 +143,7 @@ public class UserDao implements Dao {
 
 	
 	@Override
-	public Response store(Command cmd) {	
+	public Response execute(Command cmd) {	
 		
 		//CASO INSERT
 		if(cmd.getId() == null ) return insertUser((StoreUser)cmd);

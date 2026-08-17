@@ -17,6 +17,30 @@ public class StoreProjection implements Command, ProjectionRequest{
 	private Integer idFilm;
 	private BigDecimal prezzoBiglietto;
 	
+	public StoreProjection() {}
+	
+	/**
+	 * @param id
+	 * @param dataOraProiezione
+	 * @param idFilm
+	 * @param prezzoBiglietto
+	 */
+	public StoreProjection(Integer id, LocalDateTime dataOraProiezione, Integer idFilm, BigDecimal prezzoBiglietto) {
+		super();
+		this.id = id;
+		DataOraProiezione = dataOraProiezione;
+		this.idFilm = idFilm;
+		this.prezzoBiglietto = prezzoBiglietto;
+	}
+	
+	public StoreProjection(LocalDateTime dataOraProiezione, Integer idFilm, BigDecimal prezzoBiglietto) {
+		super();
+		this.id = null;
+		DataOraProiezione = dataOraProiezione;
+		this.idFilm = idFilm;
+		this.prezzoBiglietto = prezzoBiglietto;
+	}
+	
 	public Integer getId() {
 		return id;
 	}

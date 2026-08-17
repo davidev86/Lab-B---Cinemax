@@ -9,6 +9,6 @@ public interface Dao {
 	//il tipo di ritorno deve essere
 	Response find(Query req);
 
-	Response store(Command req); 
+	Response execute(Command req); 
 
 }
