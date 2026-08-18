@@ -30,10 +30,12 @@ public class ServerMain {
             dbPassword = reader.readLine();
 
             // Validazione minima dei dati inseriti
+            /*
             if (dbHost == null || dbHost.isBlank() || dbUser == null || dbUser.isBlank()) {
                 System.err.println("❌ Errore: Host o Username non possono essere vuoti. Avvio annullato.");
                 return; // Interrompe l'avvio del server se i dati non sono validi
             }
+            */
 
         } catch (IOException e) {
             System.err.println("❌ Errore durante la lettura dei parametri da tastiera: " + e.getMessage());

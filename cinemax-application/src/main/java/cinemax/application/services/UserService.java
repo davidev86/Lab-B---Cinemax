@@ -21,10 +21,16 @@ public class UserService {
         this.tcpClient = tcpClient;
     }
 	
-	public GetUserByCredentialResponse getUserByCredentials(String username, String md5Password) {
+	public GetUserByCredentialResponse getUserByCredentials(String username, String password) {
 		
-		GetUserByCredentials request = new GetUserByCredentials(username, md5Password);		
-		return tcpClient.sendRequest(request, GetUserByCredentialResponse.class);
+		try {
+			String md5Passord = HashBuilder.convertToMD5(password);
+			GetUserByCredentials request = new GetUserByCredentials(username, md5Passord);		
+			return tcpClient.sendRequest(request, GetUserByCredentialResponse.class);
+		}
+		catch (NoSuchAlgorithmException e) {
+			return null;
+		}
 	} 
 	
 	public GetUserDetailsResponse getUserDetails(int userId) {

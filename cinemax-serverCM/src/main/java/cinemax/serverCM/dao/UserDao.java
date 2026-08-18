@@ -71,6 +71,13 @@ public class UserDao implements Dao {
 				dto.setUsername(rs.getString("username"));
 				dto.setNome(rs.getString("nome"));
 				dto.setCognome(rs.getString("cognome"));		
+				
+
+	            // Ruolo (conversione da String del DB a Enum Java)
+	            String ruoloStr = rs.getString("ruolo");
+	            if (ruoloStr != null) {
+	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
+	            }
 								
 				return dto;
 			} ); 
@@ -115,7 +122,7 @@ public class UserDao implements Dao {
 	            // Ruolo (conversione da String del DB a Enum Java)
 	            String ruoloStr = rs.getString("ruolo");
 	            if (ruoloStr != null) {
-	                dto.setRuolo(Ruolo.valueOf(ruoloStr)); 
+	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
 	            }
 	            
 	            // 4. Data di nascita (gestisce eventuali valori NULL sul DB)
