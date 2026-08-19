@@ -73,6 +73,7 @@ public class UserDao implements Dao {
 				dto.setCognome(rs.getString("cognome"));		
 				
 				// Ruolo (conversione da String del DB a Enum Java)
+
 	            String ruoloStr = rs.getString("ruolo");
 	            if (ruoloStr != null) {
 	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
