@@ -30,11 +30,11 @@ public class ProjectionService {
 		return tcpClient.sendRequest(request, GetProjectionResponse.class);
 	}
 
-	public GetProjectionResponse getProjectionsByFilmIdAndDate(Integer filmId, LocalDate maxDataPrenotazione) {
+	public GetProjectionResponse getProjectionsByFilmIdAndDate(String titoloFilm, LocalDate maxDataPrenotazione) {
 		
-		GetProjectionsByFilmIdAndDate request = new GetProjectionsByFilmIdAndDate(filmId, maxDataPrenotazione);
+		GetProjectionsByFilmIdAndDate request = new GetProjectionsByFilmIdAndDate(titoloFilm, maxDataPrenotazione);
 		return tcpClient.sendRequest(request, GetProjectionResponse.class);
-	}
+	} 
 
 	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
 		

@@ -24,8 +24,7 @@ public class TcpClient {
 
             out.writeObject(requestPayload);
             out.flush();
-
-            // Ora responseClass.cast() funziona correttamente!
+          
             return responseClass.cast(in.readObject());
         } catch (Exception e) {
             throw new RuntimeException("Errore di comunicazione TCP", e);

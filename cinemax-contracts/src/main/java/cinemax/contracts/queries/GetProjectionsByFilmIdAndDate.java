@@ -9,32 +9,29 @@ public class GetProjectionsByFilmIdAndDate implements Query, ProjectionRequest  
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int film;	
+	private String titoloFilm;	
 	private LocalDate maxDataPrenotazione;
 	
 	/**
 	 * @param film
 	 * @param maxDataPrenotazione
 	 */
-	public GetProjectionsByFilmIdAndDate(int film, LocalDate maxDataPrenotazione) {
+	public GetProjectionsByFilmIdAndDate(String film, LocalDate maxDataPrenotazione) {
 		super();
-		this.film = film;
+		this.titoloFilm = film;
 		this.maxDataPrenotazione = maxDataPrenotazione;
 	}
-	public int getFilm() {
-		return film;
+	public String getTitoloFilm() {
+		return titoloFilm;
 	}
-	public void setFilm(int film) {
-		this.film = film;
+	public void setTitoloFilm(String film) {
+		this.titoloFilm = film;
 	}
 	public LocalDate getMaxDataPrenotazione() {
 		return maxDataPrenotazione;
 	}
 	public void setMaxDataPrenotazione(LocalDate maxDataPrenotazione) {
 		this.maxDataPrenotazione = maxDataPrenotazione;
-	}
-
-	
-	
+	}	
 }
  

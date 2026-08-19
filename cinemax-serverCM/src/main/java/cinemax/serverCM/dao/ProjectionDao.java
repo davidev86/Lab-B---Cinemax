@@ -102,7 +102,11 @@ public class ProjectionDao implements Dao {
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
-		sqb.and("idFilm = ?", req.getFilm())	
+		String titoloPattern = (req.getTitoloFilm() != null && !req.getTitoloFilm().isBlank()) 
+				? "%" + req.getTitoloFilm() + "%" 
+				: null;
+		
+		sqb.and("titolofilm ILIKE ?", titoloPattern)
 		.and("data_ora_proiezione <= ?", req.getMaxDataPrenotazione());				
 
 		try {
