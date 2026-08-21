@@ -5,8 +5,9 @@ import java.time.LocalDate;
 import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.ProjectionRequest;
+import cinemax.contracts.interfaces.UserRequest;
 
-public class StoreUser implements Command, ProjectionRequest{	
+public class StoreUser implements Command, UserRequest{	
 	
 	/**
 	 * 
@@ -22,7 +23,7 @@ public class StoreUser implements Command, ProjectionRequest{
 	private String domicilio;
 	private Ruolo ruolo;
 	
-	public StoreUser(String username, String md5Password, String nome, String cognome,	 LocalDate dataNascita,	 String domicilio,	 Ruolo ruolo) {
+	public StoreUser(String username, String md5Password, String nome, String cognome,	 LocalDate dataNascita,	 String domicilio, Ruolo ruolo) {
 		this.id = null;
 		this.username = username;
 		this.md5Password = md5Password;

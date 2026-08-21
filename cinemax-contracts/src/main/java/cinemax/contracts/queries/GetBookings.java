@@ -1,10 +1,11 @@
 package cinemax.contracts.queries;
 
 import java.time.LocalDate;
-import cinemax.contracts.interfaces.ProjectionRequest;
+
+import cinemax.contracts.interfaces.BookingRequest;
 import cinemax.contracts.interfaces.Query;
 
-public class GetBookings implements Query, ProjectionRequest {
+public class GetBookings implements Query, BookingRequest {
 
 	private static final long serialVersionUID = 1L;
 

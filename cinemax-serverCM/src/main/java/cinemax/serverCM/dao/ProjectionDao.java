@@ -5,7 +5,7 @@ import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetProjections;
-import cinemax.contracts.queries.GetProjectionsByFilmIdAndDate;
+import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.serverCM.dao.utils.DbHelper;
@@ -37,7 +37,7 @@ public class ProjectionDao implements Dao {
 
 			switch (req) {
 			case GetProjections u  -> response =find(u);  
-			case GetProjectionsByFilmIdAndDate u  -> response = find(u);  
+			case GetProjectionsByFilmAndDate u  -> response = find(u);  
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -96,7 +96,7 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 	
-	private Response find(GetProjectionsByFilmIdAndDate req) {		
+	private Response find(GetProjectionsByFilmAndDate req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
 

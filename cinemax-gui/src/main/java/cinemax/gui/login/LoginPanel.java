@@ -10,19 +10,19 @@ import java.awt.event.ActionListener;
 import java.util.function.Consumer;
 
 import cinemax.application.services.TcpClient;
-import cinemax.contracts.dto.UserMinInfos;
+import cinemax.contracts.dto.UserMinInfo;
 
 public class LoginPanel extends JPanel implements LoginCallBack {
 
-	Consumer<UserMinInfos> loginCallBack;
-	Consumer<UserMinInfos> logoutCallBack;
+	Consumer<UserMinInfo> loginCallBack;
+	Consumer<UserMinInfo> logoutCallBack;
 	CardLayout cardLayout;
 	JPanel panel;
 	JLabel labelUser;
 	TcpClient tcpClient;
 	RegistratiBox popup;
 
-	public LoginPanel(TcpClient tcpClient, Consumer<UserMinInfos> loginCallBack, Consumer<UserMinInfos> logoutCallBack) {
+	public LoginPanel(TcpClient tcpClient, Consumer<UserMinInfo> loginCallBack, Consumer<UserMinInfo> logoutCallBack) {
 		this.loginCallBack = loginCallBack;
 		this.logoutCallBack = logoutCallBack;
 		this.tcpClient = tcpClient;
@@ -101,7 +101,7 @@ public class LoginPanel extends JPanel implements LoginCallBack {
 	}
 
 	
-	public void onLoginSuccess(UserMinInfos user) {
+	public void onLoginSuccess(UserMinInfo user) {
 		labelUser.setText("Ciao " + user.getNome());
 		cardLayout.show(panel, "logged");
 			this.loginCallBack.accept(user);

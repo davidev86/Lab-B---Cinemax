@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.queries.GetProjections;
-import cinemax.contracts.queries.GetProjectionsByFilmIdAndDate;
+import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 
@@ -30,9 +30,15 @@ public class ProjectionService {
 		return tcpClient.sendRequest(request, GetProjectionResponse.class);
 	}
 
-	public GetProjectionResponse getProjectionsByFilmIdAndDate(String titoloFilm, LocalDate maxDataPrenotazione) {
+	public GetProjectionResponse getProjectionsByFilmAndDate(String titoloFilm, LocalDate maxDataPrenotazione) {
 		
-		GetProjectionsByFilmIdAndDate request = new GetProjectionsByFilmIdAndDate(titoloFilm, maxDataPrenotazione);
+		GetProjectionsByFilmAndDate request = new GetProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
+		return tcpClient.sendRequest(request, GetProjectionResponse.class);
+	}
+	
+	public GetProjectionResponse getProjectionsByFilmTitle(String titoloFilm) {
+		
+		GetProjectionsByFilmAndDate request = new GetProjectionsByFilmAndDate(titoloFilm, (LocalDate.now()).plusDays(90));
 		return tcpClient.sendRequest(request, GetProjectionResponse.class);
 	} 
 
@@ -46,5 +52,6 @@ public class ProjectionService {
 		
 		StoreProjection request = new StoreProjection(id, dataOraProiezione, idFilm, prezzoBiglietto);
 		return tcpClient.sendRequest(request, StoreProjectionResponse.class);
+
 	}
 }

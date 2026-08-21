@@ -117,4 +117,19 @@ public class ProjectionDetails implements Serializable {
 	public void setCosto(BigDecimal costo) {
 		this.costo = costo;
 	}
+	
+	@Override
+    public String toString() {
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
+        BigDecimal costoVal = (costo != null) ? costo : BigDecimal.ZERO;
+
+        return String.format("%s (%d) | %s | %d min | €%.2f", 
+            titoloFilm, 
+            anno != null ? anno : 0, 
+            dataFormattata, 
+            durataMinuti != null ? durataMinuti : 0, 
+            costoVal);
+    }
+	
 }

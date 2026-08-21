@@ -1,8 +1,9 @@
 package cinemax.contracts.commands;
 
+import cinemax.contracts.interfaces.BookingRequest;
 import cinemax.contracts.interfaces.Command;
 
-public class StoreBooking implements Command {
+public class StoreBooking implements Command,BookingRequest {
 
 	private static final long serialVersionUID = 1L;
 

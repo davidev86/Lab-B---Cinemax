@@ -6,9 +6,12 @@ import javax.swing.*;
 
 import cinemax.application.services.UserService;
 import cinemax.application.services.TcpClient;
-import cinemax.contracts.dto.UserMinInfos;
+import cinemax.contracts.dto.*;
 import cinemax.contracts.responses.GetUserDetailsResponse;
+import cinemax.gui.callback.SelezioneProjectionCallBack;
 import cinemax.gui.login.LoginPanel;
+import cinemax.gui.tabpanel.SearchProjectionPanel;
+import cinemax.gui.tabpanel.TabPanel;
 
 import java.awt.*;
 
@@ -16,14 +19,13 @@ import java.awt.*;
  
 public class Cinemaxhome { 
 	
-	static UserMinInfos loggedUser=null;
- //   static BookDTO onSelezione=null;
- //   static BookDTO onSelezioneLibro=null;
-
-	
-	ImagePanel imagePanel;
-	LoginPanel loginPanel;
-	
+	static UserMinInfo loggedUser=null;
+    static ProjectionDetails onSelezione=null;
+    static ProjectionDetails onSelezioneLibro=null;
+    static SelezioneProjectionCallBack selezioneProjectionCallBack;
+    LoginPanel loginPanel;
+    SearchProjectionPanel searchProjectionPanel;
+    static TabPanel tabPanel;
 	
 
 	    public static void main(final String[] args) {
@@ -32,18 +34,10 @@ public class Cinemaxhome {
 	        String serverIP = "127.0.0.1"; // localhost
 			int serverPort = 12345;
 			
-	        /*
-	         * 
-	         * Esempio chiamata. 
-	         * Il TCP client andrà poi pasasto ai vari componenti (panel?) che devono raggiungere il DB
-	         */
+	        // Il TCP client servrà ai componenti (panel) che devono comunicare con i DAO
+	        
 	        
 	        TcpClient  tcpClient = new TcpClient(serverIP, serverPort);
-	        
-	       
-	        UserService userService = new UserService(tcpClient);
-			
-	    
 
 	        //Creazione del frame principale
 	        JFrame frameHome = new JFrame("Cinemax");
@@ -58,40 +52,30 @@ public class Cinemaxhome {
 
 
 
-	        TabPanel tabPanel = new TabPanel();
-
-
-
-
-	//        JOptionPane.showMessageDialog(RicercaAutorePanel.this, "Scheda Libro!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-
-
-	//        RicercaAutorePanel ricercaAutorePanel = new RicercaAutorePanel();
+	        tabPanel = new TabPanel(tcpClient);
+	        SearchProjectionPanel searchProjectionPanel = new SearchProjectionPanel(selezioneProjectionCallBack, tcpClient);
+	        searchProjectionPanel.setVisible(true);
 
 
  
 
-	   LoginPanel loginPanel = new LoginPanel(tcpClient, (UserMinInfos user)->{
+	        LoginPanel loginPanel = new LoginPanel(tcpClient, (UserMinInfo user)->{
 
-		   loggedUser = user;
-	           tabPanel.setPanelforUSerLogged();
-	     //      ricercaAutorePanel.setButtonforUSerLogged(loggedUser);
+	        loggedUser = user;
+	           tabPanel.setPanelforUSerLogged(user);
 	           tabPanel.revalidate();
                tabPanel.repaint();
-
+               
 	        },
 			   
-	                (UserMinInfos user)->{
+	                (UserMinInfo user)->{
 
 	                    loggedUser = null;
 	                }
 	            );  
 
-
-
-	        GetUserDetailsResponse res =  userService.getUserDetails(1);
 	        
-	        //Creazione panel per immagine
+/*	        //Creazione panel per immagine
 	        ImagePanel imagePanel = new ImagePanel("/images/20230501_165319.jpg");
 	        
 	        try {
@@ -103,7 +87,8 @@ public class Cinemaxhome {
 	    	} catch (Exception e) {
                 System.err.println("Errore nel caricamento immagine: " + e.getMessage());
             }
-	            
+	*/
+	   
 	 	       // Aggiunta del pannello principale al frame
 		        frameHome.getContentPane().add(mainPanel);
 
@@ -114,26 +99,28 @@ public class Cinemaxhome {
 	        //aggiunta componenti al pannello principale
 		    mainPanel.add(loginPanel.build());
 	        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-	        mainPanel.add(imagePanel);
-	        mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+	   //     mainPanel.add(imagePanel);
+	   //     mainPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 	        mainPanel.add(tabPanel.build());
 		    } catch (Exception e) {
                 System.err.println("Errore di caricamento" + e.getMessage());
             }
-
+ 
 	       // Aggiunta del pannello principale al frame
 	        frameHome.getContentPane().add(mainPanel);
 
 	        // Visualizzazione del frame
 	        frameHome.setVisible(true);
 
-	    	
-	    	
 
 	    }
 
 
-	 //  public static void login(UserDTO userDTO) {
-
+	 public static void login(UserMinInfo userMinInfo) {
+		 
 	    }
+	 
+	  
+	 
 
+}

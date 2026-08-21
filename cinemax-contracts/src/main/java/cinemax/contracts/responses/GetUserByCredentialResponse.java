@@ -1,11 +1,11 @@
 package cinemax.contracts.responses;
 
-import cinemax.contracts.dto.UserMinInfos;
+import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.interfaces.Response;
 
 public class GetUserByCredentialResponse  implements Response  {
 	
-	public GetUserByCredentialResponse(UserMinInfos user) {
+	public GetUserByCredentialResponse(UserMinInfo user) {
 		this.user = user;
 	}
 	
@@ -13,13 +13,13 @@ public class GetUserByCredentialResponse  implements Response  {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private UserMinInfos user;
+	private UserMinInfo user;
 
-	public UserMinInfos getUser() {
+	public UserMinInfo getUser() {
 		return user;
 	}
 
-	public void setUser(UserMinInfos user) {
+	public void setUser(UserMinInfo user) {
 		this.user = user;
 	}
 	    

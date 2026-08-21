@@ -3,35 +3,38 @@ import java.time.LocalDate;
 
 import cinemax.contracts.interfaces.*;
 
-public class GetProjectionsByFilmIdAndDate implements Query, ProjectionRequest  {
+public class GetProjectionsByFilm implements Query, ProjectionRequest  {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String titoloFilm;	
+	private int film;	
 	private LocalDate maxDataPrenotazione;
 	
 	/**
 	 * @param film
 	 * @param maxDataPrenotazione
 	 */
-	public GetProjectionsByFilmIdAndDate(String film, LocalDate maxDataPrenotazione) {
+	public GetProjectionsByFilm(int film, LocalDate maxDataPrenotazione) {
 		super();
-		this.titoloFilm = film;
+		this.film = film;
 		this.maxDataPrenotazione = maxDataPrenotazione;
 	}
-	public String getTitoloFilm() {
-		return titoloFilm;
+	public int getFilm() {
+		return film;
 	}
-	public void setTitoloFilm(String film) {
-		this.titoloFilm = film;
+	public void setFilm(int film) {
+		this.film = film;
 	}
 	public LocalDate getMaxDataPrenotazione() {
 		return maxDataPrenotazione;
 	}
 	public void setMaxDataPrenotazione(LocalDate maxDataPrenotazione) {
 		this.maxDataPrenotazione = maxDataPrenotazione;
-	}	
+	}
+
+	
+	
 }
  

@@ -1,5 +1,7 @@
 package cinemax.serverCM.dao.utils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,18 @@ public class SqlQueryBuilder {
         if (value instanceof String && ((String) value).trim().isEmpty()) {
             return false;
         }
+        
+        if(value instanceof Integer && ((Integer) value) == 0)
+        	return false;
+        
+        if (value instanceof BigInteger && ((BigInteger) value).compareTo(BigInteger.ZERO) == 0) {
+            return false;
+        }
+
+        if (value instanceof BigDecimal && ((BigDecimal) value).compareTo(BigDecimal.ZERO) == 0) {
+            return false;
+        }
+        
         return true;
     }
 

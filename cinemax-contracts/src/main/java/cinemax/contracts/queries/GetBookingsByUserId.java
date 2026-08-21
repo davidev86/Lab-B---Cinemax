@@ -1,8 +1,9 @@
 package cinemax.contracts.queries;
 
+import cinemax.contracts.interfaces.BookingRequest;
 import cinemax.contracts.interfaces.Query;
 
-public class GetBookingsByUserId implements Query {
+public class GetBookingsByUserId implements Query,BookingRequest {
 
 	private static final long serialVersionUID = 1L;
 

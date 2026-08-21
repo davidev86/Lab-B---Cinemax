@@ -1,13 +1,18 @@
+package cinemax.gui;
+
 
 import cinemax.application.services.TcpClient;
 import cinemax.application.services.UserService;
-import cinemax.contracts.dto.UserMinInfos;
+import cinemax.contracts.dto.UserMinInfo;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 
 public class RegistratiBox extends JDialog {
@@ -16,7 +21,7 @@ public class RegistratiBox extends JDialog {
         JTextField nomeField;
         JTextField cognomeField;
         JTextField dataNascitaField;
-        JTextField indirizzoField;
+        JTextField domicilioField;
 
     public RegistratiBox(JPanel parent, TcpClient tcpClient) {
         // Configurazione della finestra di dialogo
@@ -47,9 +52,9 @@ public class RegistratiBox extends JDialog {
         JLabel cognome = new JLabel("Cognome:");
         cognomeField = new JTextField();
         JLabel dataNascita = new JLabel("data di nascita:");
-        dataNascitaField = new JTextField();
-        JLabel indirizzo = new JLabel("Indirizzo:");
-        indirizzoField = new JTextField();
+        dataNascitaField = new JTextField(10);
+        JLabel domicilio = new JLabel("Domicilio:");
+        domicilioField = new JTextField();
         
        
 
@@ -63,8 +68,8 @@ public class RegistratiBox extends JDialog {
         panel.add(cognomeField);
         panel.add(dataNascita);
         panel.add(dataNascitaField);
-        panel.add(indirizzo);
-        panel.add(indirizzoField);
+        panel.add(domicilio);
+        panel.add(domicilioField);
        
       
 
@@ -80,19 +85,19 @@ public class RegistratiBox extends JDialog {
             
             public void actionPerformed(ActionEvent e) {
 
-                String user = usernameField.getText();
-                String name = nomeField.getText();
-                String surname = cognomeField.getText();
-                String pwd = passwordField.getText();
-                String indirizzo = indirizzoField.getText();
-                String dataNascita = dataNascitaField.getText();
+                String username = usernameField.getText();
+                String nome = nomeField.getText();
+                String cognome = cognomeField.getText();
+                String password = passwordField.getText();
+                String domicilio = domicilioField.getText();
+                LocalDate dataNascita = getLocalDateFromField(dataNascitaField.getText());
                 
 
              UserService userService = new UserService(tcpClient);
            
-            
+             
              try {
-				userService.StoreUserResponse(username, password,   nome,  cognome,	  dataNascita,	  domicilio);
+				userService.insertUser(username, password, nome, cognome, dataNascita, domicilio);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				
@@ -116,4 +121,25 @@ public class RegistratiBox extends JDialog {
         buttonPanel.add(cancelButton);
         add(buttonPanel, BorderLayout.SOUTH);
     }
+    
+    
+    public LocalDate getLocalDateFromField(String inputField) {
+        String input = inputField.trim();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        try {
+            LocalDate date = LocalDate.parse(input, formatter);
+            return date;
+        } catch (DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(null, 
+                "Formato data non valido! Usa il formato gg/mm/aaaa.", 
+                "Errore Data", 
+                JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    
+    
+    }
+    
+    
 }

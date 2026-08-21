@@ -1,5 +1,19 @@
+package cinemax.gui.tabpanel;
 
 
+
+import cinemax.application.services.BookingService;
+import cinemax.application.services.TcpClient;
+import cinemax.contracts.dto.BookingDetails;
+import cinemax.contracts.dto.ProjectionDetails;
+import cinemax.contracts.dto.UserMinInfo;
+import cinemax.gui.callback.LoginCallBack;
+import cinemax.gui.callback.SelezioneBookingCallBack;
+import cinemax.gui.callback.SelezioneFilmCallBack;
+import cinemax.gui.callback.SelezioneProjectionCallBack;
+import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
+import cinemax.gui.dialog.DettaglioProiezioneDialog;
+import cinemax.gui.dialog.DettaglioProiezioneProiezionistaDialog;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -12,23 +26,22 @@ import java.util.function.Consumer;
 
 import static javax.imageio.ImageIO.read;
 
-TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
+
+
+public class TabPanel extends JPanel implements SelezioneProjectionCallBack, LoginCallBack, SelezioneBookingCallBack{
 
 	JTabbedPane tabbedPane;
-    JPanel tab1;
-    JPanel tab2;
-    JPanel tab3;
+    JPanel SearchProjectionTab;
+    JPanel SearchBookingTab;
+    JPanel ClientBookingTab;
     JPanel tab4;
     JPanel tab5;
-    JButton ricercaLibri;
+    JButton ricerca;
+    TcpClient tcpClient;
+    UserMinInfo user;
 
-
-
-
-
-    public TabPanel() {
-
-
+    public TabPanel(TcpClient tcpClient) {
+    		this.tcpClient = tcpClient;	
     }
 
 
@@ -38,103 +51,25 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
         tabbedPane = new JTabbedPane(JTabbedPane.RIGHT); // Schede a destra (verticali)
 
         // Creazione di pannelli da aggiungere come contenuto per le schede
-        tab1 = new JPanel();
-        tab2 = new JPanel();
-        tab3 = new JPanel();
+        SearchProjectionTab = new JPanel();
+        SearchBookingTab = new JPanel();
+        ClientBookingTab = new JPanel();
         tab4 = new JPanel();
         tab5 = new JPanel();
-
-
+     
+        //creazione contenuti SearchProjectionTab
+        SearchProjectionTab ricercaProiezioni = new SearchProjectionTab(this, tcpClient);
+        SearchProjectionTab.add(ricercaProiezioni);
+             
+//       creazione contenuti SearchBookingTab
+        SearchBookingTab ricercaPrenotazioni = new SearchBookingTab(this, tcpClient);
+        SearchBookingTab.add(ricercaPrenotazioni);
+//*
+//        creazione contenuti ClientBookingTab
+        ClientBookingTab ClientBooking = new ClientBookingTab(this, tcpClient);
+        ClientBookingTab.add(ClientBooking);
 
 /*
-        //creazione contenuti tab1
-        RicercaTitoloPanel ricercaTitolo = new RicercaTitoloPanel();
-        tab1.add(ricercaTitolo);
-
-//       creazione contenuti tab2
-        RicercaAutorePanel ricercaAutore = new RicercaAutorePanel();
-        tab2.add(ricercaAutore);
-
-
-//        creazione contenuti tab3
-
-        tab3.setLayout(new BoxLayout(tab3,
-                BoxLayout.Y_AXIS));
-        tab3.setMaximumSize(new Dimension(800, 400));
-
-        JLabel aggiungiLibreria  = new JLabel("Crea una nuova libreria");
-            aggiungiLibreria.setFont(new Font("Dialog", Font.BOLD, 20));
-            aggiungiLibreria.setMinimumSize(new Dimension(700, 40));
-            aggiungiLibreria.setHorizontalAlignment(SwingConstants.LEFT);
-            aggiungiLibreria.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JPanel CercaLibriPanel = new JPanel();
-                CercaLibriPanel.setLayout(new BoxLayout(CercaLibriPanel, BoxLayout.X_AXIS));
-                CercaLibriPanel.setMinimumSize(new Dimension(800, 40));
-                JLabel librerieLabel = new JLabel("Inserisci nome libreria: ");
-                JTextField libreriaText = new JTextField(10);
-                libreriaText.setMinimumSize(new Dimension(100, 20));
-                libreriaText.setMaximumSize(new Dimension(100, 20));
-                libreriaText.setEditable(true);
-
-
-                ricercaLibri = new JButton("Ricerca Libri");
-
-
-        CercaLibriPanel.add(Box.createHorizontalGlue());
-        CercaLibriPanel.add(librerieLabel);
-        CercaLibriPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-        CercaLibriPanel.add(libreriaText);
-        CercaLibriPanel.add(Box.createRigidArea(new Dimension(10, 10)));
-        CercaLibriPanel.add(ricercaLibri);
-
-        CercaLibriPanel.add(Box.createHorizontalGlue());
-
-
-        JPanel libreria = new JPanel();
-        libreria.setLayout(new BoxLayout(libreria, BoxLayout.X_AXIS));
-
-        libreria.setMinimumSize(new Dimension(900, 300));
-        libreria.setMaximumSize(new Dimension(900, 300));
-
-        JPanel libreriaScroller = new JPanel();
-        libreriaScroller.setMinimumSize(new Dimension(700, 300));
-        JScrollPane libreriaScroll = new JScrollPane(libreriaScroller);
-
-        JButton creaLibri = new JButton("Crea Libreria");
-
-
-
-//        ricercaLibri.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//
-////                setPaneloff();
-//                AggiungiLibreria aggiungiLibreria = new AggiungiLibreria(onSelezioneLibro);
-//                aggiungiLibreria.setVisible(true);
-//
-//
-//            }
-//        });
-
-
-
-
-        libreria.add(Box.createRigidArea(new Dimension(50, 10)));
-        libreria.add(libreriaScroll);
-        libreria.add(Box.createRigidArea(new Dimension(20, 10)));
-        libreria.add(creaLibri);
-
-        tab3.add(Box.createRigidArea(new Dimension(5, 30)));
-        tab3.add(aggiungiLibreria);
-        tab3.add(Box.createRigidArea(new Dimension(5, 50)));
-        tab3.add(CercaLibriPanel);
-        tab3.add(Box.createRigidArea(new Dimension(5, 30)));
-        tab3.add(libreria);
-
-
-
-
-
 
 
 //      creazione tab4
@@ -338,7 +273,7 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
 
 
         // Aggiunta delle schede al JTabbedPane
-        tabbedPane.addTab("Ricerca per titolo", tab1);
+        tabbedPane.addTab("Ricerca proiezioni", SearchProjectionTab);
         tabbedPane.addTab("Ricerca per autore", tab2);
         tabbedPane.addTab("Crea Nuova Libreria", tab3);
         tabbedPane.addTab("Inserisci Valutazioni", tab4);
@@ -346,14 +281,18 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
 
         setPaneloff();
 
-
 */
-
+        	
+        tabbedPane.addTab("Ricerca proiezioni", SearchProjectionTab);
+        tabbedPane.addTab("Ricerca prenotazioni", SearchBookingTab);
+        tabbedPane.addTab("Le tue prenotazioni", ClientBookingTab);
+    
+        
         return tabbedPane;
 
     }
 
-/*
+
     public void setPanelon(){
 
         tabbedPane.setEnabledAt(0, true);
@@ -367,8 +306,8 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
 
     public void setPaneloff(){
 
-//        tabbedPane.setEnabledAt(0, false);
-//        tabbedPane.setEnabledAt(1, false);
+  //      tabbedPane.setEnabledAt(0, false);
+        tabbedPane.setEnabledAt(1, false);
         tabbedPane.setEnabledAt(2, false);
         tabbedPane.setEnabledAt(3, false);
         tabbedPane.setEnabledAt(4, false);
@@ -377,19 +316,65 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
     }
 
 
-    public void setPanelforUSerLogged(UserDTO user) {
+    public void setPanelforUSerLogged(UserMinInfo user) {
 
+    		this.user = user;
+    	
+        tabbedPane.setEnabledAt(1, true);
         tabbedPane.setEnabledAt(2, true);
         tabbedPane.setEnabledAt(3, true);
-        tabbedPane.setEnabledAt(4, true);
 
     }
 
 
 
-    
-    public void onSelezione(BookDTO book) {
-        JOptionPane.showMessageDialog(this, book.title, "Successo", JOptionPane.INFORMATION_MESSAGE);
+    public void onSelezione(ProjectionDetails projection) {
+        BookingService bkgService = new BookingService(tcpClient);
+        Window parentWindow = SwingUtilities.getWindowAncestor(TabPanel.this);
+        JDialog dialog = null;
+
+        if (user == null) {
+            // Utente NON loggato (ospite)
+            dialog = new DettaglioProiezioneDialog(
+                parentWindow,
+                projection
+            );
+        } else {
+            // Utente LOGGATO
+            switch (user.getRuolo()) {
+                case CLIENTE:
+                    dialog = new DettaglioProiezioneClienteDialog(
+                        parentWindow,
+                        projection,
+                        (Integer seats) -> {
+                            bkgService.insertBooking(user.getId(), projection.getId(), seats);
+                        }
+                    );
+                    break;
+
+                case PROIEZIONISTA:
+                    dialog = new DettaglioProiezioneProiezionistaDialog(
+                        parentWindow,
+                        projection,
+                       (ProjectionDetails projModificata) -> {
+                            // Callback modifica: adatta con il metodo del tuo ProjectionService
+                            // projectionService.updateProjection(projModificata);
+                        },
+                        (ProjectionDetails projCancellata) -> {
+                            // Callback cancellazione: adatta con il metodo del tuo ProjectionService
+                            // projectionService.deleteProjection(projCancellata.getId());
+                        }
+                    );
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Ruolo non gestito: " + user.getRuolo());
+            }
+        }
+
+        if (dialog != null) {
+            dialog.setVisible(true);
+        }
     }
 
     
@@ -398,7 +383,23 @@ TabPanel extends JPanel /*implements SelezioneLibroCallBack */{
     }
 
 
+	@Override
+	public void onLoginSuccess(UserMinInfo user) {
+		// TODO Auto-generated method stub
+		
+	}
 
-*/
 
+	@Override
+	public void onLoginFailed(String errorMessage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onSelezione(BookingDetails bookingDetails) {
+		// TODO Auto-generated method stub
+		
+	}
 }

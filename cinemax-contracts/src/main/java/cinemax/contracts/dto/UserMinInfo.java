@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import cinemax.contracts.dto.Enums.Ruolo;
 
-public class UserMinInfos implements Serializable  {
+public class UserMinInfo implements Serializable  {
 
     /**
 	 * 
@@ -18,11 +18,11 @@ public class UserMinInfos implements Serializable  {
     private Ruolo ruolo;
 
     // Costruttore vuoto
-    public UserMinInfos() {
+    public UserMinInfo() {
     }
 
     // Costruttore completo
-    public UserMinInfos(Integer id, String nome, String cognome, String username, Ruolo ruolo) {
+    public UserMinInfo(Integer id, String nome, String cognome, String username, Ruolo ruolo) {
         this.id = id;
         this.nome = nome;
         this.cognome = cognome;
@@ -76,7 +76,7 @@ public class UserMinInfos implements Serializable  {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserMinInfos utente = (UserMinInfos) o;
+        UserMinInfo utente = (UserMinInfo) o;
         return Objects.equals(id, utente.id) || Objects.equals(username, utente.username);
     }
 

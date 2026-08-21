@@ -65,8 +65,8 @@ public class UserDao implements Dao {
 		try {
 
 			//one user is expected
-			List<UserMinInfos> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
-				UserMinInfos dto = new UserMinInfos();
+			List<UserMinInfo> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+				UserMinInfo dto = new UserMinInfo();
 				dto.setId(rs.getInt("id"));
 				dto.setUsername(rs.getString("username"));
 				dto.setNome(rs.getString("nome"));

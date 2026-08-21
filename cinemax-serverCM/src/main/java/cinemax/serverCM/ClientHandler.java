@@ -99,6 +99,7 @@ public class ClientHandler implements Runnable {
 	private Dao getEntityDao(Object req , Connection conn ) {
 		if (req instanceof ProjectionRequest) return new ProjectionDao(conn);
 		if (req instanceof UserRequest) return new UserDao(conn);
+		if (req instanceof BookingRequest) return new BookingDao(conn);
 		
 		return null;
 	}
