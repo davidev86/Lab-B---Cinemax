@@ -2,6 +2,7 @@ package cinemax.application.services;
 
 import java.time.LocalDate;
 
+import cinemax.contracts.commands.DeleteBooking;
 import cinemax.contracts.commands.StoreBooking;
 import cinemax.contracts.queries.GetBookings;
 import cinemax.contracts.queries.GetBookingsByUserId;
@@ -38,6 +39,12 @@ public class BookingService {
 	public StoreBookingResponse insertBooking(Integer idUtente, Integer idProiezione, Integer numeroPosti) {
 		
 		StoreBooking request = new StoreBooking(idUtente, idProiezione, numeroPosti);
+		return tcpClient.sendRequest(request, StoreBookingResponse.class);
+	}
+	
+	public StoreBookingResponse deleteBooking(Integer idPrenotazione) {
+		
+		DeleteBooking request = new DeleteBooking(idPrenotazione);
 		return tcpClient.sendRequest(request, StoreBookingResponse.class);
 	}
 }
