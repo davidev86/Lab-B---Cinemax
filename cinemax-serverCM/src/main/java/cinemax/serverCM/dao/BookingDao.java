@@ -51,7 +51,7 @@ public class BookingDao implements Dao {
 		String baseQuery = "SELECT * FROM public.\"Prenotazioni_pianificate\"";
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
-		sqb.and("id = ?", req.getCodicePrenotazione())
+		sqb.and("id_prenotazione = ?", req.getCodicePrenotazione())
 		   .and("nome ILIKE ?", req.getNomeCliente())
 		   .and("cognome ILIKE ?", req.getCognomeCliente());
 

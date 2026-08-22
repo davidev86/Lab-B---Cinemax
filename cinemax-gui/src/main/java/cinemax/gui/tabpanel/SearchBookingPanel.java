@@ -1,229 +1,253 @@
 package cinemax.gui.tabpanel;
 
-
-
 import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
 
-import cinemax.application.services.BookingService;
-import cinemax.application.services.ProjectionService;
-import cinemax.application.services.TcpClient;
-import cinemax.contracts.dto.BookingDetails;
-import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.responses.GetBookingResponse;
-import cinemax.contracts.responses.GetProjectionsResponse;
-import cinemax.gui.callback.SelezioneBookingCallBack;
-import cinemax.gui.callback.SelezioneProjectionCallBack;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
-import java.util.Date;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Locale;
 
+import cinemax.application.services.BookingService;
+import cinemax.application.services.TcpClient;
+import cinemax.contracts.dto.BookingDetails;
+import cinemax.contracts.responses.GetBookingResponse;
+import cinemax.gui.callback.SelezioneBookingCallBack;
 
+/**
+ * Pannello di ricerca per le prenotazioni con rendering ottimizzato e query asincrone.
+ */
 public class SearchBookingPanel extends JPanel {
 
-	private final BookingService bookingService;
-    private final CardLayout cardLayout;
-    private final JPanel cardPanel;
+    private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
+    private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private final BookingService bookingService;
     private final DefaultListModel<BookingDetails> resultListModel;
     private final JList<BookingDetails> listaRisultati;
-    
+    private final JButton btnCerca;
+
+    // Controlli Form
     private final JFormattedTextField textFieldCodicePrenotazione;
     private final JTextField textFieldNome;
     private final JTextField textFieldCognome;
     private final JTextField textFieldTitoloFilm;
-    private final JSpinner dateSpinnerInizio;
-    private final JSpinner dateSpinnerFine;
-    
-    
+    private final JFormattedTextField dataInizio;
+    private final JFormattedTextField dataFine;
+
     public SearchBookingPanel(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
- 	 
-    	
-    	this.bookingService = new BookingService(tcpClient);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.bookingService = new BookingService(tcpClient);
+        setLayout(new BorderLayout(10, 10));
+        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        //creazione e composizione del pannello ricerca
-        JPanel researchPanel = new JPanel();
-        researchPanel.setLayout(new BoxLayout(researchPanel, BoxLayout.Y_AXIS));
-
-        //ricerca per CodicePrenotazione
-        JLabel labelCodicePrenotazione = new JLabel("Ricerca prenotazioni:");
+        // =====================================================================
+        // 1. FORM DI RICERCA (GridBagLayout)
+        // =====================================================================
+        JPanel panelForm = new JPanel(new GridBagLayout());
+        panelForm.setBorder(BorderFactory.createTitledBorder("Filtri di Ricerca Prenotazioni"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(4, 6, 4, 6);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         NumberFormat integerFormat = NumberFormat.getIntegerInstance();
-        integerFormat.setGroupingUsed(false); // Rimuove i punti delle migliaia
+        integerFormat.setGroupingUsed(false);
 
         this.textFieldCodicePrenotazione = new JFormattedTextField(integerFormat);
-        this.textFieldCodicePrenotazione.setColumns(10);
         this.textFieldCodicePrenotazione.setValue(0);
-        
-        this.textFieldCodicePrenotazione.setEditable(true);
-        this.textFieldCodicePrenotazione.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        this.textFieldCodicePrenotazione.setPreferredSize(new Dimension(250, 25));
-       
-        //ricerca per Nome
-        JLabel labelNome = new JLabel("Ricerca per Nome:");
-        this.textFieldNome = new JTextField();
-        this.textFieldNome.setEditable(true);
-        this.textFieldNome.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        this.textFieldNome.setPreferredSize(new Dimension(250, 25));
-    
-      //ricerca per Cognome
-        JLabel labelCognome = new JLabel("Ricerca per Cognome:");
-        this.textFieldCognome = new JTextField();
-        this.textFieldCognome.setEditable(true);
-        this.textFieldCognome.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        this.textFieldCognome.setPreferredSize(new Dimension(250, 25));
-        
-        //ricerca per titolo
-        JLabel labelTitolo = new JLabel("Ricerca per Titolo Film:");
-        this.textFieldTitoloFilm = new JTextField();
-        this.textFieldTitoloFilm.setEditable(true);
-        this.textFieldTitoloFilm.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        this.textFieldTitoloFilm.setPreferredSize(new Dimension(250, 25));
-        
-        //ricerca per data
-        JLabel labelData = new JLabel("Ricerca per data:");
-        
-        JLabel labelDataInizio = new JLabel("data inizio:");
-        this.dateSpinnerInizio = new JSpinner(new SpinnerDateModel());
-        this.dateSpinnerInizio.setEditor(new JSpinner.DateEditor(dateSpinnerInizio, "dd/MM/yyyy"));
-        
-        JLabel labelDataFine = new JLabel("data fine:");
-        this.dateSpinnerFine = new JSpinner(new SpinnerDateModel());
-        this.dateSpinnerFine.setEditor(new JSpinner.DateEditor(dateSpinnerFine, "dd/MM/yyyy"));
-                
-        JButton button = new JButton("Ricerca");
-       // String filePath = "C:/Temp/Output";
+        this.textFieldCodicePrenotazione.setFont(FONT_BASE);
 
-        researchPanel.add(labelCodicePrenotazione);
-        researchPanel.add(textFieldCodicePrenotazione);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(labelNome);
-        researchPanel.add(textFieldNome);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(labelCognome);
-        researchPanel.add(textFieldCognome);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(labelTitolo);
-        researchPanel.add(textFieldTitoloFilm);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(labelDataInizio);
-        researchPanel.add(dateSpinnerInizio);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(labelDataFine);
-        researchPanel.add(dateSpinnerFine);
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        researchPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-       
-        researchPanel.add(button);
+        this.textFieldNome = new JTextField(15);
+        this.textFieldNome.setFont(FONT_BASE);
 
-     // 2. Inizializzazione Lista e Modello
-         
-        resultListModel = new DefaultListModel<>();
-        listaRisultati = new JList<>(resultListModel);
-        listaRisultati.setFont(new Font("Tahoma", Font.PLAIN, 12));   
-        
-        
-     // Gestione click su un elemento della lista
-        listaRisultati.addMouseListener(new MouseAdapter() {
+        this.textFieldCognome = new JTextField(15);
+        this.textFieldCognome.setFont(FONT_BASE);
+
+        this.textFieldTitoloFilm = new JTextField(15);
+        this.textFieldTitoloFilm.setFont(FONT_BASE);
+
+        this.dataInizio = creaCampoData();
+        this.dataFine = creaCampoData();
+
+        int riga = 0;
+        aggiungiRigaForm(panelForm, new JLabel("Codice Prenotazione:"), this.textFieldCodicePrenotazione, gbc, riga++);
+        aggiungiRigaForm(panelForm, new JLabel("Nome Cliente:"), this.textFieldNome, gbc, riga++);
+        aggiungiRigaForm(panelForm, new JLabel("Cognome Cliente:"), this.textFieldCognome, gbc, riga++);
+        aggiungiRigaForm(panelForm, new JLabel("Titolo Film:"), this.textFieldTitoloFilm, gbc, riga++);
+        aggiungiRigaForm(panelForm, new JLabel("Data Inizio (gg/mm/aaaa):"), this.dataInizio, gbc, riga++);
+        aggiungiRigaForm(panelForm, new JLabel("Data Fine (gg/mm/aaaa):"), this.dataFine, gbc, riga++);
+
+        this.btnCerca = new JButton("Avvia Ricerca");
+        this.btnCerca.setFont(FONT_BOLD);
+        this.btnCerca.addActionListener(e -> eseguiRicerca());
+
+        JPanel panelBottone = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        panelBottone.add(this.btnCerca);
+
+        JPanel topContainer = new JPanel();
+        topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+        topContainer.add(panelForm);
+        topContainer.add(panelBottone);
+
+        // =====================================================================
+        // 2. LISTA RISULTATI (Rendering O(1) e Scroll Ottimizzato)
+        // =====================================================================
+        this.resultListModel = new DefaultListModel<>();
+        this.listaRisultati = new JList<>(resultListModel);
+        this.listaRisultati.setFont(FONT_BASE);
+        this.listaRisultati.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.listaRisultati.setFixedCellHeight(26);
+        this.listaRisultati.setCellRenderer(new BookingCellRenderer());
+
+        this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 || e.getClickCount() == 2) {
+                if (e.getClickCount() >= 1) {
                     int index = listaRisultati.locationToIndex(e.getPoint());
-                    if (index >= 0) {
-                        BookingDetails selectedItem = resultListModel.getElementAt(index);
-                        if (selezioneBookingCallBack != null) {
-                            selezioneBookingCallBack.onSelezione(selectedItem);
-                        }
+                    if (index >= 0 && selezioneBookingCallBack != null) {
+                        selezioneBookingCallBack.onSelezione(resultListModel.getElementAt(index),null);
                     }
                 }
             }
         });
-        
-        
-        
+
         JScrollPane scrollPanel = new JScrollPane(listaRisultati);
-        scrollPanel.setSize(new Dimension(800, 400));
-        scrollPanel.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        scrollPanel.setPreferredSize(new Dimension(800, 300));
+        scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-
-     // 3. Pannello con CardLayout
-        cardLayout = new CardLayout();
-        cardPanel = new JPanel(cardLayout);
-        cardPanel.add(scrollPanel,
-                "scrollPanel");
-
-
-     // Composizione nel pannello principale
-        add(researchPanel);
-        add(Box.createRigidArea(new Dimension(10, 10)));
-        add(cardPanel);
-
-            
-        button.addActionListener(e -> eseguiRicerca());
+        // =====================================================================
+        // 3. ASSEMBLAGGIO GENERALE
+        // =====================================================================
+        add(topContainer, BorderLayout.NORTH);
+        add(scrollPanel, BorderLayout.CENTER);
     }
+
+    // =========================================================================
+    // LOGICA DI RICERCA ASINCRONA
+    // =========================================================================
 
     private void eseguiRicerca() {
-        // Validazione Dati
-    	int codicePrenotazione = ((Number) textFieldCodicePrenotazione.getValue()).intValue();
-    	String nome = textFieldNome.getText().trim();
-    	String cognome = textFieldCognome.getText().trim();
-    	String titolo = textFieldTitoloFilm.getText().trim();
-        
-        
-        if (codicePrenotazione==0 && nome.isEmpty() && cognome.isEmpty() && titolo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inserire un elemento per effettuare la ricerca.", "Dato Mancante", JOptionPane.WARNING_MESSAGE);
+        Integer codicePrenotazione = getCodicePrenotazione();
+        String nome = textFieldNome.getText().trim();
+        String cognome = textFieldCognome.getText().trim();
+        String titoloFilm = textFieldTitoloFilm.getText().trim();
+
+        LocalDate dInizio = parseLocalDate(this.dataInizio);
+        LocalDate dFine = parseLocalDate(this.dataFine);
+
+        if (dInizio != null && dFine != null && dInizio.isAfter(dFine)) {
+            mostraMessaggio("La data di inizio non può essere successiva alla data di fine.", "Errore Date", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Estrazione e Validazione Date
-        LocalDate dataInizio = convertToLocalDate((Date) dateSpinnerInizio.getValue());
-        LocalDate dataFine = convertToLocalDate((Date) dateSpinnerFine.getValue());
+        btnCerca.setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        if (dataInizio.isAfter(dataFine)) {
-            JOptionPane.showMessageDialog(this, "La data di inizio non può essere successiva alla data di fine.", "Errore Date", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        // Esecuzione chiamata protetta da try-catch
-        try {
-            GetBookingResponse response = bookingService.getBookings(codicePrenotazione, nome, cognome, titolo, dataInizio, dataFine);
-
-            resultListModel.clear();
-
-            if (response != null && response.getBookings() != null) {
-                List<BookingDetails> bookings = response.getBookings();
-                
-                if (bookings.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Nessuna prenotazione trovata per i criteri specificati.", "Nessun Risultato", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    for (BookingDetails booking : bookings) {
-                        resultListModel.addElement(booking);
-                    }
-                    cardLayout.show(cardPanel, "scrollPanel");
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Risposta non valida dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
+        new SwingWorker<GetBookingResponse, Void>() {
+            @Override
+            protected GetBookingResponse doInBackground() throws Exception {
+                return bookingService.getBookings(codicePrenotazione, nome, cognome, titoloFilm, dInizio, dFine);
             }
 
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Errore di comunicazione con il server: " + ex.getMessage(), 
-                "Errore di Rete", 
-                JOptionPane.ERROR_MESSAGE);
+            @Override
+            protected void done() {
+                btnCerca.setEnabled(true);
+                setCursor(Cursor.getDefaultCursor());
+
+                try {
+                    GetBookingResponse response = get();
+                    resultListModel.clear();
+
+                    if (response != null && response.getBookings() != null) {
+                        List<BookingDetails> bookings = response.getBookings();
+                        if (bookings.isEmpty()) {
+                            mostraMessaggio("Nessuna prenotazione trovata per i criteri specificati.", "Nessun Risultato", JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            resultListModel.addAll(bookings);
+                        }
+                    } else {
+                        mostraMessaggio("Risposta non valida ricevuta dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    mostraMessaggio("Errore di comunicazione con il server: " + ex.getMessage(), "Errore di Rete", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
+    // =========================================================================
+    // METODI AUSILIARI E PARSER
+    // =========================================================================
+
+    private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
+        gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
+        label.setFont(FONT_BASE);
+        panel.add(label, gbc);
+
+        gbc.gridx = 1; gbc.gridy = riga; gbc.weightx = 1.0;
+        panel.add(field, gbc);
+    }
+
+    public Integer getCodicePrenotazione() {
+        try {
+            textFieldCodicePrenotazione.commitEdit();
+        } catch (Exception ignored) {}
+
+        Object value = textFieldCodicePrenotazione.getValue();
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return 0;
+    }
+
+    private JFormattedTextField creaCampoData() {
+        JFormattedTextField field = new JFormattedTextField();
+        try {
+            MaskFormatter mask = new MaskFormatter("##/##/####");
+            mask.setPlaceholderCharacter('_');
+            field.setFormatterFactory(new DefaultFormatterFactory(mask));
+            field.setColumns(10);
+            field.setFont(FONT_BASE);
+        } catch (ParseException ignored) {}
+        return field;
+    }
+
+    private LocalDate parseLocalDate(JFormattedTextField field) {
+        String text = field.getText().trim();
+        if (text.contains("_") || text.isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(text, DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            return null;
         }
     }
 
-    private LocalDate convertToLocalDate(Date date) {
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    private void mostraMessaggio(String testo, String titolo, int tipo) {
+        JOptionPane.showMessageDialog(this, testo, titolo, tipo);
+    }
+
+    // =========================================================================
+    // CELL RENDERER
+    // =========================================================================
+
+    private static class BookingCellRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            if (value instanceof BookingDetails) {
+                setText(((BookingDetails) value).toString());
+            }
+            setBorder(BorderFactory.createEmptyBorder(2, 6, 2, 6));
+            return this;
+        }
     }
 }
-        
