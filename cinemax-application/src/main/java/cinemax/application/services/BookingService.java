@@ -6,6 +6,7 @@ import cinemax.contracts.commands.DeleteBooking;
 import cinemax.contracts.commands.StoreBooking;
 import cinemax.contracts.queries.GetBookings;
 import cinemax.contracts.queries.GetBookingsByUserId;
+import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
 import cinemax.contracts.responses.StoreBookingResponse;
 
@@ -42,9 +43,9 @@ public class BookingService {
 		return tcpClient.sendRequest(request, StoreBookingResponse.class);
 	}
 	
-	public StoreBookingResponse deleteBooking(Integer idPrenotazione) {
+	public DeleteBookingResponse deleteBooking(Integer idPrenotazione) {
 		
 		DeleteBooking request = new DeleteBooking(idPrenotazione);
-		return tcpClient.sendRequest(request, StoreBookingResponse.class);
+		return tcpClient.sendRequest(request, DeleteBookingResponse.class);
 	}
 }
