@@ -7,12 +7,17 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import cinemax.application.services.BookingService;
+import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
+import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.UserMinInfo;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
+import cinemax.contracts.responses.ui.GetProjectionResponse;
 import cinemax.gui.callback.SelezioneBookingCallBack;
+import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
 
 /**
  * Pannello per la visualizzazione e gestione (modifica / cancellazione) delle prenotazioni utente.
@@ -25,6 +30,7 @@ public class ClientBookingPanel extends JPanel {
     private final BookingService bookingService;
     private final UserMinInfo user;
     private final SelezioneBookingCallBack callBack;
+    private final TcpClient tcpClient;
 
     private final DefaultListModel<BookingDetails> resultListModel;
     private final JList<BookingDetails> listaRisultati;
@@ -33,6 +39,7 @@ public class ClientBookingPanel extends JPanel {
 
     public ClientBookingPanel(UserMinInfo user, SelezioneBookingCallBack callBack, TcpClient tcpClient) {
         this.user = user;
+        this.tcpClient = tcpClient;
         this.callBack = callBack;
         this.bookingService = new BookingService(tcpClient);
         
@@ -107,8 +114,21 @@ public class ClientBookingPanel extends JPanel {
 
     private void gestisciModifica() {
         BookingDetails selected = listaRisultati.getSelectedValue();
+        Window parentWindow = SwingUtilities.getWindowAncestor(ClientBookingPanel.this);
+        JDialog dialog = null;
+        BookingService bkgService = new BookingService(tcpClient);
+        
         if (selected != null && callBack != null) {
-            callBack.onSelezione(selected, selected.getIdPrenotazione());
+            //callBack.onSelezione(selected, selected.getIdPrenotazione());
+            ProjectionService projectionService = new ProjectionService(this.tcpClient);
+            	GetProjectionResponse projection = projectionService.getProjectionById(selected.getIdProiezione()) ;
+            
+            	dialog = new DettaglioProiezioneClienteDialog(
+                    parentWindow, 
+                    projection.getProjection(),
+                    (Integer seats) -> {
+                        bkgService.updateBooking(selected.getIdPrenotazione(), user.getId(), selected.getIdProiezione(), seats);      
+                    }); 
         }
     }
 

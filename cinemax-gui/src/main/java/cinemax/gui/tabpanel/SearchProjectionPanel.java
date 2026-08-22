@@ -166,7 +166,7 @@ public class SearchProjectionPanel extends JPanel {
         this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 || e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     int index = listaRisultati.locationToIndex(e.getPoint());
                     if (index >= 0 && selezioneProjectionCallBack != null) {
                         selezioneProjectionCallBack.onSelezione(resultListModel.getElementAt(index));
@@ -218,7 +218,7 @@ public class SearchProjectionPanel extends JPanel {
 
             try {
                 // Invocazione metodo dedicato
-                GetProjectionResponse response = projectionService.getProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
+                GetProjectionsResponse response = projectionService.getProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
                 popolaListaRisultati(response);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
@@ -283,7 +283,7 @@ public class SearchProjectionPanel extends JPanel {
 
         try {
             // Invocazione metodo con tutti i filtri avanzati
-            GetProjectionResponse response = projectionService.getProjections(titoloFilm, genere, dInizio, dFine, prezzoMin, prezzoMax);
+            GetProjectionsResponse response = projectionService.getProjections(titoloFilm, genere, dInizio, dFine, prezzoMin, prezzoMax);
             popolaListaRisultati(response);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
@@ -296,7 +296,7 @@ public class SearchProjectionPanel extends JPanel {
     /**
      * Aggiorna il modello della lista con i dati restituiti dal server.
      */
-    private void popolaListaRisultati(GetProjectionResponse response) {
+    private void popolaListaRisultati(GetProjectionsResponse response) {
         resultListModel.clear();
 
         if (response != null && response.getProjections() != null) {

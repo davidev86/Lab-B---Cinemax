@@ -7,7 +7,7 @@ import javax.swing.text.MaskFormatter;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.responses.GetProjectionResponse;
+import cinemax.contracts.responses.GetProjectionsResponse;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
 
 import java.time.LocalDate;
@@ -217,7 +217,7 @@ public class ProiezionistaChangeProjectionPanel extends JPanel {
 
             try {
                 // Invocazione metodo dedicato
-                GetProjectionResponse response = projectionService.getProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
+                GetProjectionsResponse response = projectionService.getProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
                 popolaListaRisultati(response);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
@@ -282,7 +282,7 @@ public class ProiezionistaChangeProjectionPanel extends JPanel {
 
         try {
             // Invocazione metodo con tutti i filtri avanzati
-            GetProjectionResponse response = projectionService.getProjections(titoloFilm, genere, dInizio, dFine, prezzoMin, prezzoMax);
+            GetProjectionsResponse response = projectionService.getProjections(titoloFilm, genere, dInizio, dFine, prezzoMin, prezzoMax);
             popolaListaRisultati(response);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
@@ -295,7 +295,7 @@ public class ProiezionistaChangeProjectionPanel extends JPanel {
     /**
      * Aggiorna il modello della lista con i dati restituiti dal server.
      */
-    private void popolaListaRisultati(GetProjectionResponse response) {
+    private void popolaListaRisultati(GetProjectionsResponse response) {
         resultListModel.clear();
 
         if (response != null && response.getProjections() != null) {

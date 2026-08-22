@@ -10,7 +10,7 @@ import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.responses.GetBookingResponse;
-import cinemax.contracts.responses.GetProjectionResponse;
+import cinemax.contracts.responses.GetProjectionsResponse;
 import cinemax.gui.callback.SelezioneBookingCallBack;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
 

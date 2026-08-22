@@ -9,6 +9,7 @@ import java.util.List;
 import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
+import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.responses.ui.*;
@@ -23,7 +24,7 @@ public class ProjectionService {
 		this.tcpClient = tcpClient;
 	}
 
-	public GetProjectionResponse getProjections(
+	public GetProjectionsResponse getProjections(
 			String titolo, 
 			String genere, 
 			LocalDate daDataProiezione, 
@@ -33,26 +34,33 @@ public class ProjectionService {
 
 		GetProjections request = new GetProjections(titolo, genere, daDataProiezione, aDataProiezione, daCosto, aCosto);
 		
-		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionResponse.class);
+		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
 			
-		return new GetProjectionResponse(Map(res.getProjections())); 
+		return new GetProjectionsResponse(Map(res.getProjections())); 
 	}
 
-	public GetProjectionResponse getProjectionsByFilmAndDate(String titoloFilm, LocalDate maxDataPrenotazione) {
+	public GetProjectionsResponse getProjectionsByFilmAndDate(String titoloFilm, LocalDate maxDataPrenotazione) {
 
 		GetProjectionsByFilmAndDate request = new GetProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
 		
-		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionResponse.class);
-		return new GetProjectionResponse(Map(res.getProjections()));
+		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
+		return new GetProjectionsResponse(Map(res.getProjections()));
 	}
 
-	public GetProjectionResponse getProjectionsByFilmTitle(String titoloFilm) {
+	public GetProjectionsResponse getProjectionsByFilmTitle(String titoloFilm) {
 
 		GetProjectionsByFilmAndDate request = new GetProjectionsByFilmAndDate(titoloFilm, (LocalDate.now()).plusDays(90));
-		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionResponse.class);
-		return new GetProjectionResponse(Map(res.getProjections()));
+		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
+		return new GetProjectionsResponse(Map(res.getProjections()));
 	} 
 
+	public GetProjectionResponse getProjectionById(Integer idProiezione) {
+
+		GetProjectionById request = new GetProjectionById(idProiezione);
+		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionResponse.class);
+		return new GetProjectionResponse(toView(res.getProjection(), maxAvailableSeats));
+	} 
+	
 	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
 
 		StoreProjection request = new StoreProjection(dataOraProiezione, idFilm, prezzoBiglietto);
@@ -106,4 +114,8 @@ public class ProjectionService {
 	private Integer GetAvailableSeats(ProjectionDetails projection) {
 		return maxAvailableSeats - projection.getTotalePostiPrenotati();
 	}
+	
+	
+	
+	
 }

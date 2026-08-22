@@ -147,11 +147,6 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     public void offSelezione(String errorMessage) {
         JOptionPane.showMessageDialog(this, errorMessage, "Avviso", JOptionPane.WARNING_MESSAGE);
     }
-
-    @Override
-    public void onSelezione(BookingDetails bookingDetails) {
-        // Gestione click su una prenotazione selezionata
-    }
     
     public void setPanelforUSerLogged(UserMinInfo user) {
         this.user = user;
@@ -163,6 +158,12 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         // Ripristina la visualizzazione per utente non autenticato
         aggiornaTabPerRuolo();
     }
+
+	@Override
+	public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {
+		// TODO Auto-generated method stub
+		
+	}
     
     
 }

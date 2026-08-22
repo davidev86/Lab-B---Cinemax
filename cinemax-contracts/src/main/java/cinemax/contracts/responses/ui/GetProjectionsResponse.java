@@ -6,21 +6,21 @@ import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.interfaces.Response;
 
-public class GetProjectionResponse implements Response {
+public class GetProjectionsResponse implements Response {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GetProjectionResponse(ProjectionDetailsView projection) {
-		this.projection = projection;
+	public GetProjectionsResponse(List<ProjectionDetailsView> projections) {
+		this.projections = projections;
 	}
 	
-	private ProjectionDetailsView projection;
+	private List<ProjectionDetailsView> projections;
 
-	public ProjectionDetailsView getProjection() {
-		return projection;
+	public List<ProjectionDetailsView> getProjections() {
+		return projections;
 	}
 
 	public void setProjections(List<ProjectionDetailsView> projections) {

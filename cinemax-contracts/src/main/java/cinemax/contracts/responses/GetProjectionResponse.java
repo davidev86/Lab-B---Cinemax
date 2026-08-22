@@ -13,17 +13,17 @@ public class GetProjectionResponse implements Response {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GetProjectionResponse(List<ProjectionDetails> projections) {
-		this.projections = projections;
+	public GetProjectionResponse(ProjectionDetails projection) {
+		this.projection = projection;
 	}
 	
-	private List<ProjectionDetails> projections;
+	private ProjectionDetails projection;
 
-	public List<ProjectionDetails> getProjections() {
-		return projections;
+	public ProjectionDetails getProjection() {
+		return projection;
 	}
 
-	public void setProjections(List<ProjectionDetails> projections) {
-		this.projections = projections;
+	public void setProjections(ProjectionDetails projection) {
+		this.projection = projection;
 	}
 }
