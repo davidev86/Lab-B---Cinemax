@@ -10,6 +10,7 @@ import cinemax.application.services.BookingService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.UserMinInfo;
+import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
 import cinemax.gui.callback.SelezioneBookingCallBack;
 
@@ -37,7 +38,8 @@ public class ClientBookingPanel extends JPanel {
         
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+
+        // 1. Inizializzazione preliminare dei pulsanti (risolve l'errore di inizializzazione nel listener)
         this.btnModifica = new JButton("Modifica Prenotazione");
         this.btnModifica.setFont(FONT_BASE);
         this.btnModifica.setEnabled(false);
@@ -47,9 +49,8 @@ public class ClientBookingPanel extends JPanel {
         this.btnCancella.setFont(FONT_BASE);
         this.btnCancella.setEnabled(false);
         this.btnCancella.addActionListener(e -> gestisciCancellazione());
-        
 
-        // 1. Modello e Lista con rendering ottimizzato
+        // 2. Modello e Lista con rendering ottimizzato
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -57,7 +58,7 @@ public class ClientBookingPanel extends JPanel {
         this.listaRisultati.setFixedCellHeight(26);
         this.listaRisultati.setCellRenderer(new BookingCellRenderer());
 
-        // Abilita/disabilita i pulsanti d'azione in base alla selezione attiva
+        // Abilita i pulsanti solo se una riga è effettivamente selezionata
         this.listaRisultati.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean hasSelection = !listaRisultati.isSelectionEmpty();
@@ -75,12 +76,12 @@ public class ClientBookingPanel extends JPanel {
             }
         });
 
-        // 2. Viewport & Scroll
+        // 3. Viewport & Scroll
         JScrollPane scrollPanel = new JScrollPane(listaRisultati);
         scrollPanel.setPreferredSize(new Dimension(800, 400));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-        // 3. Barra superiore con Titolo e Pulsanti Azione
+        // 4. Barra superiore con Titolo e Pulsanti Azione
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel lblTitolo = new JLabel("Le Tue Prenotazioni Effettuate");
         lblTitolo.setFont(FONT_TITLE);
@@ -92,22 +93,22 @@ public class ClientBookingPanel extends JPanel {
         topPanel.add(lblTitolo, BorderLayout.WEST);
         topPanel.add(panelAzioni, BorderLayout.EAST);
 
-        // 4. Assemblaggio layout
+        // 5. Assemblaggio layout
         add(topPanel, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
 
-        // 5. Caricamento iniziale
+        // 6. Caricamento iniziale
         visualizzaBooking();
     }
 
     // =========================================================================
-    // LOGICA AZIONI (MODIFICA E CANCELLAZIONE)
+    // GESTIONE AZIONI SULLA PRENOTAZIONE SELEZIONATA
     // =========================================================================
 
     private void gestisciModifica() {
         BookingDetails selected = listaRisultati.getSelectedValue();
         if (selected != null && callBack != null) {
-            callBack.onSelezione(selected);
+            callBack.onSelezione(selected, selected.getIdPrenotazione());
         }
     }
 
@@ -115,9 +116,12 @@ public class ClientBookingPanel extends JPanel {
         BookingDetails selected = listaRisultati.getSelectedValue();
         if (selected == null) return;
 
+        // Estrazione dinamica dell'ID dalla prenotazione selezionata
+        var idPrenotazione = selected.getIdPrenotazione();
+
         int conferma = JOptionPane.showConfirmDialog(
             this,
-            "Sei sicuro di voler cancellare la prenotazione selezionata?",
+            "Sei sicuro di voler cancellare la prenotazione con ID: " + idPrenotazione + "?",
             "Conferma Cancellazione",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE
@@ -129,21 +133,22 @@ public class ClientBookingPanel extends JPanel {
     }
 
     private void eseguiCancellazioneAsync(BookingDetails booking) {
-        setBottoniAbilitati(false);
+        setBottoniAbilitati(true);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        new SwingWorker<Boolean, Void>() {
+        
+        new SwingWorker<DeleteBookingResponse, Void>() {
             @Override
-            protected Boolean doInBackground() throws Exception {
-                return bookingService.deleteBooking(booking.getId());
+            protected DeleteBookingResponse doInBackground() throws Exception {
+            return bookingService.deleteBooking(booking.getIdPrenotazione());
             }
 
             @Override
             protected void done() {
                 setCursor(Cursor.getDefaultCursor());
                 try {
-                    boolean success = get();
-                    if (success) {
+                    DeleteBookingResponse response = get();
+                    if (response.isSuccess()) {
                         mostraMessaggio("Prenotazione cancellata con successo.", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                         visualizzaBooking();
                     } else {

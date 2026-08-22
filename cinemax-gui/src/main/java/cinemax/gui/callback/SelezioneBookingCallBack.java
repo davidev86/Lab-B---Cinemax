@@ -4,6 +4,6 @@ import cinemax.contracts.dto.BookingDetails;
 
 public interface SelezioneBookingCallBack {
 
-       void onSelezione(BookingDetails bookingDetails);
+       void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione);
         void offSelezione(String errorMessage);	
 }

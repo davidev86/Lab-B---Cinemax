@@ -26,7 +26,6 @@ public class Cinemaxhome {
     static ProjectionDetails onSelezioneLibro=null;
     static SelezioneProjectionCallBack selezioneProjectionCallBack;
     LoginPanel loginPanel;
-    
     SearchProjectionPanel searchProjectionPanel;
     static TabPanel tabPanel;
 	
