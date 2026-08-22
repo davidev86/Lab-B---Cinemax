@@ -67,7 +67,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
             
                 // Solo per PROIEZIONISTA
                 if (user.getRuolo() == Ruolo.PROIEZIONISTA) {
-                	Pan4 tab4 = new Pan4(this, tcpClient);
+                	ProiezionistaChangeProjectionPanel tab4 = new ProiezionistaChangeProjectionPanel(this, tcpClient);
                     tabbedPane.addTab("Le tue proiezioni", tab4);
             }
         }
