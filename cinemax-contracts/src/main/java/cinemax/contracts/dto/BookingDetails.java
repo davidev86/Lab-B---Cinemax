@@ -116,4 +116,23 @@ public class BookingDetails implements Serializable {
 	public void setTotale(BigDecimal totale) {
 		this.totale = totale;
 	}
+	
+	@Override
+	public String toString() {
+		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
+		BigDecimal totaleVal = (totale != null) ? totale : BigDecimal.ZERO;
+		int posti = (numeroPosti != null) ? numeroPosti : 0;
+		String nome = (nomeCliente != null) ? nomeCliente : "";
+		String cognome = (cognomeCliente != null) ? cognomeCliente : "";
+
+		return String.format("%s | Cliente: %s %s | %s | %d posti | €%.2f", 
+			titoloFilm != null ? titoloFilm : "N/D", 
+			nome, 
+			cognome, 
+			dataFormattata, 
+			posti, 
+			totaleVal);
+	}
+	
 }

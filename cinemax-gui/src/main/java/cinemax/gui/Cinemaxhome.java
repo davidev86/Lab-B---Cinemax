@@ -8,6 +8,8 @@ import cinemax.application.services.UserService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.*;
 import cinemax.contracts.responses.GetUserDetailsResponse;
+import cinemax.gui.callback.LoginCallBack;
+import cinemax.gui.callback.LogoutCallBack;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
 import cinemax.gui.login.LoginPanel;
 import cinemax.gui.tabpanel.SearchProjectionPanel;
@@ -24,7 +26,7 @@ public class Cinemaxhome {
     static ProjectionDetails onSelezioneLibro=null;
     static SelezioneProjectionCallBack selezioneProjectionCallBack;
     LoginPanel loginPanel;
-    LoggedPanel loggedPanel;
+    
     SearchProjectionPanel searchProjectionPanel;
     static TabPanel tabPanel;
 	
@@ -61,17 +63,17 @@ public class Cinemaxhome {
  
 
 	        LoginPanel loginPanel = new LoginPanel(tcpClient, (UserMinInfo user)->{
-
-	        loggedUser = user;
+	           loggedUser = user;
 	           tabPanel.setPanelforUSerLogged(user);
 	           tabPanel.revalidate();
                tabPanel.repaint();
                
 	        },
 			   
-	                (UserMinInfo user)->{
+	                ()->{
 
 	                    loggedUser = null;
+	                    tabPanel.setPanelforUserUnlogged();
 	                }
 	            );  
 
@@ -106,6 +108,9 @@ public class Cinemaxhome {
 	 public static void login(UserMinInfo userMinInfo) {
 		 
 	    }
+
+
+	
 	  
 
 }

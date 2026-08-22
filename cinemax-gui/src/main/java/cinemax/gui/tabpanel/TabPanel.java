@@ -91,11 +91,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         JOptionPane.showMessageDialog(this, "Login fallito: " + errorMessage, "Errore Autenticazione", JOptionPane.ERROR_MESSAGE);
     }
 
-    public void onLogout() {
-        this.user = null;
-        // Ripristina la visualizzazione per utente non autenticato
-        aggiornaTabPerRuolo();
-    }
+
 
     // =========================================================================
     // GESTIONE SELEZIONE PROIEZIONI
@@ -160,8 +156,13 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     public void setPanelforUSerLogged(UserMinInfo user) {
         this.user = user;
         aggiornaTabPerRuolo(); // Ricostruisce le schede mostrando quelle relative al ruolo
-    }
+    }   
     
+    public void setPanelforUserUnlogged() {
+        this.user = null;
+        // Ripristina la visualizzazione per utente non autenticato
+        aggiornaTabPerRuolo();
+    }
     
     
 }

@@ -1,4 +1,4 @@
-package cinemax.gui.login;
+ package cinemax.gui.login;
 
 
 import cinemax.application.services.TcpClient;
@@ -16,9 +16,8 @@ public class LoggedPanel extends JPanel {
     private final JLabel lblUtente;
     private final JButton btnEsci;
 
-    public LoggedPanel(LoginCallBack onLogoutCallback) {
+    public LoggedPanel(LoginCallBack onLogoutCallback) {   	
     	
-    	this.userService = new UserService(tcpClient);
     	
         // Layout direttamente sul pannello principale
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -42,8 +41,8 @@ public class LoggedPanel extends JPanel {
 
             // Notifica l'evento di logout (es. per disattivare i tab in TabPanel / Home)
             if (onLogoutCallback != null) {
-            	dispose();
-            	SwingUtilities.invokeLater(() ->  callBack.onLogoutCallBack(user.getUser()));
+            	
+            	SwingUtilities.invokeLater(() ->  onLogoutCallback.onLogoutCallBack(user.getUser()));
             }
         });
 

@@ -121,6 +121,14 @@ public class ProjectionDetails implements Serializable {
 		this.costo = costo;
 	}
 	
+	public Integer getTotalePostiPrenotati() {
+		return totalePostiPrenotati;
+	}
+
+	public void setTotalePostiPrenotati(Integer totalePostiPrenotati) {
+		this.totalePostiPrenotati = totalePostiPrenotati;
+	}
+	
 	@Override
     public String toString() {
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -134,13 +142,5 @@ public class ProjectionDetails implements Serializable {
             durataMinuti != null ? durataMinuti : 0, 
             costoVal);
     }
-
-	public Integer getTotalePostiPrenotati() {
-		return totalePostiPrenotati;
-	}
-
-	public void setTotalePostiPrenotati(Integer totalePostiPrenotati) {
-		this.totalePostiPrenotati = totalePostiPrenotati;
-	}
 	
 }

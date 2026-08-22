@@ -89,8 +89,9 @@ public class LoginBox extends JDialog {
             }
         });
 
-        buttonPanel.add(loginButton);
         buttonPanel.add(cancelButton);
+        buttonPanel.add(loginButton);
+        
 //        buttonPanel.setBorder(new EmptyBorder(10, 10, 20, 0));
         add(buttonPanel, BorderLayout.SOUTH);
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));

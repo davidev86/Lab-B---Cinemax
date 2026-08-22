@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 import cinemax.application.services.TcpClient;
@@ -15,14 +16,14 @@ import cinemax.contracts.dto.UserMinInfo;
 public class LoginPanel extends JPanel implements LoginCallBack {
 
 	Consumer<UserMinInfo> loginCallBack;
-	Consumer<UserMinInfo> logoutCallBack;
+	Runnable logoutCallBack;
 	CardLayout cardLayout;
 	JPanel panel;
 	JLabel labelUser;
 	TcpClient tcpClient;
 	RegistratiBox popup;
 
-	public LoginPanel(TcpClient tcpClient, Consumer<UserMinInfo> loginCallBack, Consumer<UserMinInfo> logoutCallBack) {
+	public LoginPanel(TcpClient tcpClient, Consumer<UserMinInfo> loginCallBack, Runnable logoutCallBack) {
 		this.loginCallBack = loginCallBack;
 		this.logoutCallBack = logoutCallBack;
 		this.tcpClient = tcpClient;
@@ -79,8 +80,15 @@ public class LoginPanel extends JPanel implements LoginCallBack {
 		esciButton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
+			
+				if (logoutCallBack != null) {
+					logoutCallBack.run(); // Avvisa il listener di logout
+				}				
+				
 				cardLayout.show(panel, "login");
 			}
+			
+			
 		});
 
 		//Creazione della label di benvenuto
