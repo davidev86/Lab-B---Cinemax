@@ -1,6 +1,7 @@
 package cinemax.gui.callback;
 
 import cinemax.application.services.BookingService;
+import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
 
 

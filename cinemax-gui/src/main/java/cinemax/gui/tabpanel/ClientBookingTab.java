@@ -10,7 +10,7 @@ import javax.swing.*;
 public class ClientBookingTab extends JPanel {
     public ClientBookingTab(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
 
-        add(new SearchBookingPanel(selezioneBookingCallBack, tcpClient));
+        add(new ClientBookingPanel(selezioneBookingCallBack, tcpClient));
     }
 }
 

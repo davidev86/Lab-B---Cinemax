@@ -1,13 +1,14 @@
 
 
-import bookRecommender.callbacks.SelezioneLibroCallBack;
+
 
 import javax.swing.*;
 import java.awt.*;
 
+
 Tab4 extends JPanel {
 
-    public Tab4(SelezioneLibroCallBack selezioneLibroCallBack) {
+    public Tab4(TcpClient tcpClient) {
 
 
         setLayout(new BoxLayout(this,

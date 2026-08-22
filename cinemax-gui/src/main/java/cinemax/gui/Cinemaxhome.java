@@ -24,6 +24,7 @@ public class Cinemaxhome {
     static ProjectionDetails onSelezioneLibro=null;
     static SelezioneProjectionCallBack selezioneProjectionCallBack;
     LoginPanel loginPanel;
+    LoggedPanel loggedPanel;
     SearchProjectionPanel searchProjectionPanel;
     static TabPanel tabPanel;
 	
@@ -75,20 +76,6 @@ public class Cinemaxhome {
 	            );  
 
 	        
-/*	        //Creazione panel per immagine
-	        ImagePanel imagePanel = new ImagePanel("/images/20230501_165319.jpg");
-	        
-	        try {
-	        	 
-	            imagePanel.setMinimumSize(new Dimension(1000, 200));
-	            imagePanel.setMaximumSize(new Dimension(1000, 200));
-	            imagePanel.setPreferredSize(new Dimension(1000, 200));
-	            mainPanel.add(imagePanel);
-	    	} catch (Exception e) {
-                System.err.println("Errore nel caricamento immagine: " + e.getMessage());
-            }
-	*/
-	   
 	 	       // Aggiunta del pannello principale al frame
 		        frameHome.getContentPane().add(mainPanel);
 
@@ -119,8 +106,6 @@ public class Cinemaxhome {
 	 public static void login(UserMinInfo userMinInfo) {
 		 
 	    }
-	 
 	  
-	 
 
 }
