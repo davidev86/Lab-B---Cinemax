@@ -80,7 +80,9 @@ public class BookingDao implements Dao {
 		try {
 			List<BookingDetails> bookings = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
 				BookingDetails dto = new BookingDetails();
-				dto.setId(rs.getInt("id")); 
+				dto.setIdPrenotazione(rs.getInt("id_prenotazione"));
+				dto.setIdProiezione(rs.getInt("id_proiezione"));
+				dto.setIdUtente(rs.getInt("id_utente"));
 				dto.setNomeCliente(rs.getString("nome"));
 				dto.setCognomeCliente(rs.getString("cognome"));
 				dto.setTitoloFilm(rs.getString("titolofilm"));

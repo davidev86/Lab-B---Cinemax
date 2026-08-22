@@ -82,6 +82,7 @@ public class ProjectionDao implements Dao {
 				dto.setDurataMinuti(rs.getInt("durataminuti"));
 				dto.setEtaMinima(rs.getInt("etaminima"));
 				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
+				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
 				return dto;
 			} );
 
@@ -123,6 +124,7 @@ public class ProjectionDao implements Dao {
 				dto.setDurataMinuti(rs.getInt("durataminuti"));
 				dto.setEtaMinima(rs.getInt("etaminima"));
 				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
+				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
 				return dto;
 			} );
 

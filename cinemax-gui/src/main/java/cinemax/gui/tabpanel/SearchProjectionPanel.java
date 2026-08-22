@@ -7,7 +7,8 @@ import javax.swing.text.MaskFormatter;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.responses.GetProjectionResponse;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
+import cinemax.contracts.responses.ui.*;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
 
 import java.time.LocalDate;
@@ -37,8 +38,8 @@ public class SearchProjectionPanel extends JPanel {
     private final ProjectionService projectionService;
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
-    private final DefaultListModel<ProjectionDetails> resultListModel;
-    private final JList<ProjectionDetails> listaRisultati;
+    private final DefaultListModel<ProjectionDetailsView> resultListModel;
+    private final JList<ProjectionDetailsView> listaRisultati;
 
     // Gestione dei due template di form tramite CardLayout
     private final CardLayout formsCardLayout;
@@ -299,7 +300,7 @@ public class SearchProjectionPanel extends JPanel {
         resultListModel.clear();
 
         if (response != null && response.getProjections() != null) {
-            List<ProjectionDetails> projections = response.getProjections();
+            List<ProjectionDetailsView> projections = response.getProjections();
 
             if (projections.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -307,7 +308,7 @@ public class SearchProjectionPanel extends JPanel {
                     "Nessun Risultato",
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
-                for (ProjectionDetails projection : projections) {
+                for (ProjectionDetailsView projection : projections) {
                     resultListModel.addElement(projection);
                 }
                 cardLayout.show(cardPanel, "scrollPanel");

@@ -18,6 +18,7 @@ public class ProjectionDetails implements Serializable {
     private Integer durataMinuti;
     private Integer etaMinima;
     private BigDecimal costo;
+    private Integer totalePostiPrenotati;
 
     // Costruttore vuoto (indispensabile per la serializzazione/deserializzazione)
     public ProjectionDetails() {
@@ -25,7 +26,7 @@ public class ProjectionDetails implements Serializable {
 
     // Costruttore con campi (opzionale ma comodo)
     public ProjectionDetails(Integer id, Integer idFilm, LocalDateTime dataOraProiezione, String titoloFilm, String genere, 
-                                    String regista, Integer anno, Integer durataMinuti, Integer etaMinima) {
+                                    String regista, Integer anno, Integer durataMinuti, Integer etaMinima, Integer totalePostiPrenotati, BigDecimal costo ) {
     	this.id = id;
     	this.idFilm = idFilm;
         this.dataOraProiezione = dataOraProiezione;
@@ -35,6 +36,8 @@ public class ProjectionDetails implements Serializable {
         this.anno = anno;
         this.durataMinuti = durataMinuti;
         this.etaMinima = etaMinima;
+        this.totalePostiPrenotati = totalePostiPrenotati;
+        this.costo = costo;
     }
 
     // Getter e Setter
@@ -131,5 +134,13 @@ public class ProjectionDetails implements Serializable {
             durataMinuti != null ? durataMinuti : 0, 
             costoVal);
     }
+
+	public Integer getTotalePostiPrenotati() {
+		return totalePostiPrenotati;
+	}
+
+	public void setTotalePostiPrenotati(Integer totalePostiPrenotati) {
+		this.totalePostiPrenotati = totalePostiPrenotati;
+	}
 	
 }

@@ -6,6 +6,7 @@ import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.UserMinInfo;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.gui.callback.LoginCallBack;
 import cinemax.gui.callback.SelezioneBookingCallBack;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
@@ -100,8 +101,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     // GESTIONE SELEZIONE PROIEZIONI
     // =========================================================================
 
-    @Override
-    public void onSelezione(ProjectionDetails projection) {
+    public void onSelezione(ProjectionDetailsView projection) {
         BookingService bkgService = new BookingService(tcpClient);
         Window parentWindow = SwingUtilities.getWindowAncestor(TabPanel.this);
         JDialog dialog = null;

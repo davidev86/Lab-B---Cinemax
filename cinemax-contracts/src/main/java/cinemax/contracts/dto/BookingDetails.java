@@ -8,7 +8,9 @@ public class BookingDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Integer id;
+	private Integer idPrenotazione;
+	private Integer idProiezione;
+	private Integer idUtente;
 	private String nomeCliente;
 	private String cognomeCliente;
 	private String titoloFilm;
@@ -20,9 +22,12 @@ public class BookingDetails implements Serializable {
 	public BookingDetails() {
 	}
 
-	public BookingDetails(Integer id, Integer idUtente, String nomeCliente, String cognomeCliente, String titoloFilm,
-			LocalDateTime dataOraProiezione, Integer numeroPosti, BigDecimal costo, BigDecimal totale) {
-		this.id = id;
+	public BookingDetails(Integer idPrenotazione, Integer idProiezione, Integer idUtente, String nomeCliente,
+			String cognomeCliente, String titoloFilm, LocalDateTime dataOraProiezione, Integer numeroPosti,
+			BigDecimal costo, BigDecimal totale) {
+		this.idPrenotazione = idPrenotazione;
+		this.idProiezione = idProiezione;
+		this.idUtente = idUtente;
 		this.nomeCliente = nomeCliente;
 		this.cognomeCliente = cognomeCliente;
 		this.titoloFilm = titoloFilm;
@@ -32,12 +37,28 @@ public class BookingDetails implements Serializable {
 		this.totale = totale;
 	}
 
-	public Integer getId() {
-		return id;
+	public Integer getIdPrenotazione() {
+		return idPrenotazione;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setIdPrenotazione(Integer idPrenotazione) {
+		this.idPrenotazione = idPrenotazione;
+	}
+
+	public Integer getIdProiezione() {
+		return idProiezione;
+	}
+
+	public void setIdProiezione(Integer idProiezione) {
+		this.idProiezione = idProiezione;
+	}
+
+	public Integer getIdUtente() {
+		return idUtente;
+	}
+
+	public void setIdUtente(Integer idUtente) {
+		this.idUtente = idUtente;
 	}
 
 	public String getNomeCliente() {

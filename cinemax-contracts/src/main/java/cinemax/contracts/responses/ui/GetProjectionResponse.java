@@ -1,4 +1,4 @@
-package cinemax.contracts.responses;
+package cinemax.contracts.responses.ui;
 
 import java.util.List;
 
@@ -13,17 +13,17 @@ public class GetProjectionResponse implements Response {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GetProjectionResponse(List<ProjectionDetails> projections) {
+	public GetProjectionResponse(List<ProjectionDetailsView> projections) {
 		this.projections = projections;
 	}
 	
-	private List<ProjectionDetails> projections;
+	private List<ProjectionDetailsView> projections;
 
-	public List<ProjectionDetails> getProjections() {
+	public List<ProjectionDetailsView> getProjections() {
 		return projections;
 	}
 
-	public void setProjections(List<ProjectionDetails> projections) {
+	public void setProjections(List<ProjectionDetailsView> projections) {
 		this.projections = projections;
 	}
 }

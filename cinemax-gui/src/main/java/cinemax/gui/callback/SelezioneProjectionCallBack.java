@@ -1,13 +1,11 @@
 package cinemax.gui.callback;
 
-import cinemax.application.services.ProjectionService;
-import cinemax.application.services.TcpClient;
-import cinemax.contracts.dto.ProjectionDetails;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
 public interface SelezioneProjectionCallBack {
 
 
-       void onSelezione(ProjectionDetails projectionDetails);
+       void onSelezione(ProjectionDetailsView projectionDetails);
         void offSelezione(String errorMessage);
 	
 }

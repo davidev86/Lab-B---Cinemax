@@ -37,7 +37,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
-import cinemax.application.services.BookingService;
 import cinemax.contracts.dto.ProjectionDetails;
 
 public class DettaglioProiezioneProiezionistaDialog extends JDialog {

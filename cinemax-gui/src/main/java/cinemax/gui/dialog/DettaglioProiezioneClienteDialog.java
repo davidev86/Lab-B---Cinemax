@@ -17,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -24,11 +25,11 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import cinemax.contracts.dto.ProjectionDetails;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
 public class DettaglioProiezioneClienteDialog extends JDialog {
 
-    public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetails proiezione, 
+    public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetailsView proiezione, 
             Consumer<Integer> storeBookingCallback) {
         super(owner, "Dettagli Proiezione", ModalityType.APPLICATION_MODAL);
          
@@ -96,7 +97,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
 
         JLabel postiLiberi = new JLabel(" | Posti liberi: ");
         postiLiberi.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        JLabel conteggioPostiLiberi = new JLabel("200");
+        JLabel conteggioPostiLiberi = new JLabel(proiezione.getTotalePostiLiberi().toString());
         conteggioPostiLiberi.setFont(new Font("SansSerif", Font.BOLD, 14));
         
         pricePanel.add(lblPrezzoTag);
@@ -134,6 +135,16 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
             if (storeBookingCallback != null) {
                 // Recupera il valore effettivo selezionato dal roller/spinner
                 int postiSelezionati = (Integer) reservedSeats.getValue();
+                
+                if(postiSelezionati > proiezione.getTotalePostiLiberi()) {
+                	 JOptionPane.showMessageDialog(this, 
+                             "Il numero di posti inserito è superiore al nomero di posti disponibili ", 
+                             "Numero posti non valido", 
+                             JOptionPane.ERROR_MESSAGE);
+                	
+                	 return;              	 
+                }
+                	
                 storeBookingCallback.accept(postiSelezionati);  
             }
             dispose();            
