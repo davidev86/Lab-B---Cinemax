@@ -14,7 +14,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
+import javax.swing.JButton;  
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -144,6 +144,8 @@ public class ClientBooking extends JPanel {
                     (Integer seats) -> {
                         bkgService.updateBooking(selected.getIdPrenotazione(), user.getId(), selected.getIdProiezione(), seats);      
                     }); 
+            	
+            	dialog.setVisible(true);
         }
     }
 
@@ -154,9 +156,12 @@ public class ClientBooking extends JPanel {
         // Estrazione dinamica dell'ID dalla prenotazione selezionata
         var idPrenotazione = selected.getIdPrenotazione();
 
+		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+		String dataFormattata = (selected.getDataOraProiezione() != null) ? selected.getDataOraProiezione().format(formatter) : "Data non disponibile";
+        
         int conferma = JOptionPane.showConfirmDialog(
             this,
-            "Sei sicuro di voler cancellare la prenotazione con ID: " + idPrenotazione + "?",
+            "Sei sicuro di voler cancellare la prenotazione in data: " + dataFormattata + "?",
             "Conferma Cancellazione",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE

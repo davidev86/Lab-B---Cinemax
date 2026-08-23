@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 
@@ -33,7 +34,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
             Consumer<Integer> storeBookingCallback) {
         super(owner, "Dettagli Proiezione", ModalityType.APPLICATION_MODAL);
          
-        setSize(480, 560);
+        setSize(480, 590);
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
@@ -88,16 +89,16 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         JLabel lblPrezzoTag = new JLabel("Prezzo Unitario: ");
         lblPrezzoTag.setFont(new Font("SansSerif", Font.PLAIN, 14));
         
-        String costoFormattato = (proiezione.getCosto() != null) 
-                ? String.format("€ %.2f", proiezione.getCosto()) 
-                : "€ 0.00";
+        BigDecimal costoUnitario = proiezione.getCosto() != null ? proiezione.getCosto() : BigDecimal.ZERO;
+        String costoFormattato = String.format("€ %.2f", costoUnitario);
+        
         JLabel lblPrezzoValore = new JLabel(costoFormattato);
         lblPrezzoValore.setFont(new Font("SansSerif", Font.BOLD, 16));
         lblPrezzoValore.setForeground(new Color(0, 135, 60));
 
         JLabel postiLiberi = new JLabel(" | Posti liberi: ");
         postiLiberi.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        JLabel conteggioPostiLiberi = new JLabel(proiezione.getTotalePostiLiberi().toString());
+        JLabel conteggioPostiLiberi = new JLabel(proiezione.getTotalePostiLiberi() != null ? proiezione.getTotalePostiLiberi().toString() : "0");
         conteggioPostiLiberi.setFont(new Font("SansSerif", Font.BOLD, 14));
         
         pricePanel.add(lblPrezzoTag);
@@ -106,23 +107,47 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         pricePanel.add(conteggioPostiLiberi);
         cardPanel.add(pricePanel); 
         
-        // SELEZIONE POSTI
-        JPanel selectSeats = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        selectSeats.setBorder(BorderFactory.createTitledBorder("Prenotazione"));
-        
+        // SELEZIONE POSTI E TOTALE (SPINNER + TOTALE)
+        JPanel selectSeatsContainer = new JPanel();
+        selectSeatsContainer.setLayout(new BoxLayout(selectSeatsContainer, BoxLayout.Y_AXIS));
+        selectSeatsContainer.setBorder(BorderFactory.createTitledBorder("Prenotazione"));
+
+        // Pannello Spinner
+        JPanel spinnerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         JLabel lblPrenota = new JLabel("Posti da prenotare:");
         lblPrenota.setFont(new Font("SansSerif", Font.BOLD, 12));
-        selectSeats.add(lblPrenota);
+        spinnerPanel.add(lblPrenota);
         
         SpinnerNumberModel model = new SpinnerNumberModel(1, 1, 20, 1);
         JSpinner reservedSeats = new JSpinner(model);
         reservedSeats.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        selectSeats.add(reservedSeats);
+        spinnerPanel.add(reservedSeats);
+
+        // Pannello Costo Totale
+        JPanel totalPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        JLabel lblTotaleTag = new JLabel("Costo Totale: ");
+        lblTotaleTag.setFont(new Font("SansSerif", Font.BOLD, 13));
+        
+        JLabel lblTotaleValore = new JLabel(String.format("€ %.2f", costoUnitario));
+        lblTotaleValore.setFont(new Font("SansSerif", Font.BOLD, 16));
+        lblTotaleValore.setForeground(new Color(0, 135, 60));
+
+        totalPanel.add(lblTotaleTag);
+        totalPanel.add(lblTotaleValore);
+
+        reservedSeats.addChangeListener(e -> {
+            int posti = (Integer) reservedSeats.getValue();
+            BigDecimal totale = costoUnitario.multiply(BigDecimal.valueOf(posti));
+            lblTotaleValore.setText(String.format("€ %.2f", totale));
+        });
+
+        selectSeatsContainer.add(spinnerPanel);
+        selectSeatsContainer.add(totalPanel);
 
         // Assembla i pannelli centrali nel contenitore unico
         mainCenterPanel.add(cardPanel);
         mainCenterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        mainCenterPanel.add(selectSeats);
+        mainCenterPanel.add(selectSeatsContainer);
 
         // Unica aggiunta a BorderLayout.CENTER
         add(mainCenterPanel, BorderLayout.CENTER);
@@ -133,18 +158,16 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
 
         btnAzione.addActionListener(e -> {
             if (storeBookingCallback != null) {
-                // Recupera il valore effettivo selezionato dal roller/spinner
                 int postiSelezionati = (Integer) reservedSeats.getValue();
                 
-                if(postiSelezionati > proiezione.getTotalePostiLiberi()) {
-                	 JOptionPane.showMessageDialog(this, 
-                             "Il numero di posti inserito è superiore al nomero di posti disponibili ", 
+                if (proiezione.getTotalePostiLiberi() != null && postiSelezionati > proiezione.getTotalePostiLiberi()) {
+                     JOptionPane.showMessageDialog(this, 
+                             "Il numero di posti inserito è superiore al numero di posti disponibili.", 
                              "Numero posti non valido", 
                              JOptionPane.ERROR_MESSAGE);
-                	
-                	 return;              	 
+                     return;              
                 }
-                	
+                    
                 storeBookingCallback.accept(postiSelezionati);  
             }
             dispose();            
@@ -156,7 +179,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         panelBottoni.add(btnAnnulla);
         panelBottoni.add(btnAzione);
         add(panelBottoni, BorderLayout.SOUTH);
-    }  
+    }   
 
     private void aggiungiRiga(JPanel container, String etichetta, String valore) {
         JLabel lblChiave = new JLabel(etichetta);

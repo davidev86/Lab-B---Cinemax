@@ -123,14 +123,10 @@ public class BookingDetails implements Serializable {
 		String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
 		BigDecimal totaleVal = (totale != null) ? totale : BigDecimal.ZERO;
 		int posti = (numeroPosti != null) ? numeroPosti : 0;
-		String nome = (nomeCliente != null) ? nomeCliente : "";
-		String cognome = (cognomeCliente != null) ? cognomeCliente : "";
 
-		return String.format("%s | Cliente: %s %s | %s | %d posti | €%.2f", 
-			titoloFilm != null ? titoloFilm : "N/D", 
-			nome, 
-			cognome, 
+		return String.format("%s | %s | %d posti | €%.2f", 
 			dataFormattata, 
+			titoloFilm != null ? titoloFilm : "N/D",	
 			posti, 
 			totaleVal);
 	}

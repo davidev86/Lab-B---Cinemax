@@ -2,7 +2,6 @@
  *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
  */
 
-
 package cinemax.application.services;
 
 import java.security.NoSuchAlgorithmException;
@@ -38,29 +37,6 @@ public class UserService {
         this.tcpClient = tcpClient;
     }
 
-<<<<<<< Updated upstream
-		
-	public StoreUserResponse insertUser(String username, String password, String nome, String cognome, LocalDate dataNascita, String domicilio) {
-	    try {
-	        String md5Password = HashBuilder.convertToMD5(password);
-	        StoreUser request = new StoreUser(username, md5Password, nome, cognome, dataNascita, domicilio, Ruolo.CLIENTE);        
-	        
-	        StoreUserResponse response = tcpClient.sendRequest(request, StoreUserResponse.class);
-	        
-	        // Verifica se la risposta è valida e se l'operazione ha avuto successo
-	        if (response == null || response.getId() == null) {
-	            String msg = "Utente duplicato!";
-	            throw new RuntimeException(msg);
-	        }
-	        
-	        return response;
-
-	    } catch (NoSuchAlgorithmException e) {
-	        throw new RuntimeException("Errore nell'algoritmo di hashing della password.", e);
-	    }
-	}	
-}
-=======
     /**
      * Esegue l'autenticazione dell'utente verificando la corrispondenza di username e password.
      * <p>
@@ -73,8 +49,8 @@ public class UserService {
      */
     public GetUserByCredentialResponse getUserByCredentials(String username, String password) {
         try {
-            String md5Passord = HashBuilder.convertToMD5(password);
-            GetUserByCredentials request = new GetUserByCredentials(username, md5Passord);
+            String md5Password = HashBuilder.convertToMD5(password);
+            GetUserByCredentials request = new GetUserByCredentials(username, md5Password);
             return tcpClient.sendRequest(request, GetUserByCredentialResponse.class);
         } catch (NoSuchAlgorithmException e) {
             return null;
@@ -109,8 +85,8 @@ public class UserService {
     public StoreUserResponse updateUser(Integer id, String username, String password, String nome, 
                                        String cognome, LocalDate dataNascita, String domicilio, Ruolo ruolo) {
         try {
-            String md5Passord = HashBuilder.convertToMD5(password);
-            StoreUser request = new StoreUser(id, username, md5Passord, nome, cognome, dataNascita, domicilio, ruolo);
+            String md5Password = HashBuilder.convertToMD5(password);
+            StoreUser request = new StoreUser(id, username, md5Password, nome, cognome, dataNascita, domicilio, ruolo);
             return tcpClient.sendRequest(request, StoreUserResponse.class);
         } catch (NoSuchAlgorithmException e) {
             return null;
@@ -126,18 +102,26 @@ public class UserService {
      * @param cognome     Cognome anagrafico del cliente.
      * @param dataNascita Data di nascita del cliente (può essere {@code null}).
      * @param domicilio   Indirizzo di residenza/domicilio del cliente.
-     * @return Oggetto {@link StoreUserResponse} con l'esito della registrazione, 
-     *         oppure {@code null} in caso di fallimento della cifratura MD5.
+     * @return Oggetto {@link StoreUserResponse} con l'esito della registrazione.
+     * @throws RuntimeException Se la registrazione fallisce (es. username duplicato) o per errori di hashing.
      */
     public StoreUserResponse insertUser(String username, String password, String nome, 
                                        String cognome, LocalDate dataNascita, String domicilio) {
         try {
-            String md5Passord = HashBuilder.convertToMD5(password);
-            StoreUser request = new StoreUser(username, md5Passord, nome, cognome, dataNascita, domicilio, Ruolo.CLIENTE);
-            return tcpClient.sendRequest(request, StoreUserResponse.class);
+            String md5Password = HashBuilder.convertToMD5(password);
+            StoreUser request = new StoreUser(username, md5Password, nome, cognome, dataNascita, domicilio, Ruolo.CLIENTE);        
+            
+            StoreUserResponse response = tcpClient.sendRequest(request, StoreUserResponse.class);
+            
+            // Verifica se la risposta è valida e se l'operazione ha restituito l'ID creato
+            if (response == null || response.getId() == null) {
+                throw new RuntimeException("Utente duplicato!");
+            }
+            
+            return response;
+
         } catch (NoSuchAlgorithmException e) {
-            return null;
+            throw new RuntimeException("Errore nell'algoritmo di hashing della password.", e);
         }
     }
 }
->>>>>>> Stashed changes

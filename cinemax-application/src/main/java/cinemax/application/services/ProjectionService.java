@@ -2,8 +2,6 @@
  *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
  */
 
-
-
 package cinemax.application.services;
 
 import java.math.BigDecimal;
@@ -139,9 +137,9 @@ public class ProjectionService {
     /**
      * Inserisce una nuova proiezione in palinsesto dopo aver verificato l'assenza di sovrapposizioni orarie.
      *
-     * @param idFilm             Identificativo del film da proiettare.
-     * @param dataOraProiezione  Orario e data di inizio spettacolo.
-     * @param prezzoBiglietto    Prezzo unitario del biglietto.
+     * @param idFilm            Identificativo del film da proiettare.
+     * @param dataOraProiezione Orario e data di inizio spettacolo.
+     * @param prezzoBiglietto   Prezzo unitario del biglietto.
      * @return Oggetto {@link StoreProjectionResponse} con l'esito del salvataggio.
      * @throws IllegalArgumentException Se l'orario scelto si sovrappone a una proiezione già esistente.
      */
@@ -168,10 +166,10 @@ public class ProjectionService {
     /**
      * Aggiorna le informazioni di una proiezione esistente, previa validazione delle sovrapposizioni orarie.
      *
-     * @param id                 Identificativo univoco della proiezione da modificare.
-     * @param idFilm             Identificativo del film associato.
-     * @param dataOraProiezione  Nuovo orario di inizio spettacolo.
-     * @param prezzoBiglietto    Nuovo costo del biglietto.
+     * @param id                Identificativo univoco della proiezione da modificare.
+     * @param idFilm            Identificativo del film associato.
+     * @param dataOraProiezione Nuovo orario di inizio spettacolo.
+     * @param prezzoBiglietto   Nuovo costo del biglietto.
      * @return Oggetto {@link StoreProjectionResponse} con l'esito dell'aggiornamento.
      * @throws IllegalArgumentException Se il nuovo orario va in conflitto con altre proiezioni.
      */
@@ -215,7 +213,6 @@ public class ProjectionService {
         }
 
         ProjectionDetailsView view = new ProjectionDetailsView();
-
         view.setId(source.getId());
         view.setIdFilm(source.getIdFilm());
         view.setDataOraProiezione(source.getDataOraProiezione());
