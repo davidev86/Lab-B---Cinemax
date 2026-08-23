@@ -157,9 +157,7 @@ public class RegistratiBox extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-    // =========================================================================
     // LOGICA DI REGISTRAZIONE ASINCRONA
-    // =========================================================================
 
     private void eseguiRegistrazione() {
         String username = usernameField.getText().trim();
