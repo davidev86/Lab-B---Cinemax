@@ -1,5 +1,10 @@
 package cinemax.serverCM.dao;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import cinemax.contracts.commands.DeleteBooking;
 import cinemax.contracts.commands.StoreBooking;
 import cinemax.contracts.dto.BookingDetails;
@@ -16,12 +21,6 @@ import cinemax.serverCM.dao.utils.SqlDeleteBuilder;
 import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
-
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class BookingDao implements Dao {
 

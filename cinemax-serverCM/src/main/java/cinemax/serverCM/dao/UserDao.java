@@ -1,5 +1,13 @@
 package cinemax.serverCM.dao;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+
+import cinemax.contracts.commands.StoreUser;
+import cinemax.contracts.dto.Enums.Ruolo;
+import cinemax.contracts.dto.UserDetails;
+import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
@@ -13,13 +21,6 @@ import cinemax.serverCM.dao.utils.DbHelper;
 import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
-import cinemax.contracts.commands.StoreUser;
-import cinemax.contracts.dto.*;
-import cinemax.contracts.dto.Enums.Ruolo;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 
 public class UserDao implements Dao {
 

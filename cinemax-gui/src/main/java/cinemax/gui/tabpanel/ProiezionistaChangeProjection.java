@@ -1,10 +1,35 @@
 package cinemax.gui.tabpanel;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import cinemax.application.services.FilmService;
 import cinemax.application.services.ProjectionService;
@@ -131,88 +156,50 @@ public class ProiezionistaChangeProjection extends JPanel {
         nuovaProiezione.setAnno(film.getAnno());
         nuovaProiezione.setDurataMinuti(film.getDurataMinuti());
         nuovaProiezione.setEtaMinima(film.getEtaMinima());
+        nuovaProiezione.setIdFilm(film.getId());
 
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
 
         DettaglioProiezioneProiezionistaDialog dialog = new DettaglioProiezioneProiezionistaDialog(
                 parentWindow,
                 nuovaProiezione,
-                this::eseguiModificaProiezione,
-                this::eseguiCancellazioneProiezione,
+                null,
+                null,
                 this::eseguiInserimentoProiezione
         );
 
         dialog.setVisible(true);
     }
 
-    private void eseguiInserimentoProiezione(ProjectionDetails proiezione) {
+    private Boolean eseguiInserimentoProiezione(ProjectionDetails proiezione) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        try {
+            // Chiamata diretta (il dialog modale si occupa già dell'attesa UI)
+            projectionService.insertProjection(
+                proiezione.getIdFilm(), 
+                proiezione.getDataOraProiezione(), 
+                proiezione.getCosto()
+            );
 
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                // Invocazione metodo di inserimento del service
-                projectionService.insertProjection(proiezione.getIdFilm(), proiezione.getDataOraProiezione(), proiezione.getCosto());
-                return null;
-            }
+            JOptionPane.showMessageDialog(
+                this, 
+                "Proiezione inserita con successo nel palinsesto!", 
+                "Operazione Riuscita", 
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            return true; // Esito positivo
 
-            @Override
-            protected void done() {
-                setCursor(Cursor.getDefaultCursor());
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Proiezione inserita con successo nel palinsesto!", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Errore durante l'inserimento: " + ex.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }.execute();
-    }
-
-    private void eseguiModificaProiezione(ProjectionDetails proiezione) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                projectionService.updateProjection(null, null, null, null);
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                setCursor(Cursor.getDefaultCursor());
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Proiezione aggiornata con successo!", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Errore durante l'aggiornamento: " + ex.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }.execute();
-    }
-
-    private void eseguiCancellazioneProiezione(ProjectionDetails proiezione) {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                projectionService.getProjectionById(proiezione.getId());
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                setCursor(Cursor.getDefaultCursor());
-                try {
-                    get();
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Proiezione rimossa dal palinsesto con successo!", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(ProiezionistaChangeProjection.this, "Errore durante la cancellazione: " + ex.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        }.execute();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                this, 
+                "Errore durante l'inserimento: " + ex.getMessage(), 
+                "Errore Server / Validazione", 
+                JOptionPane.ERROR_MESSAGE
+            );
+            return false; // Esito negativo: impedisce il dispose()
+        } finally {
+            setCursor(Cursor.getDefaultCursor());
+        }
     }
 
     // =========================================================================
@@ -238,7 +225,7 @@ public class ProiezionistaChangeProjection extends JPanel {
         new SwingWorker<GetFilmsResponse, Void>() {
             @Override
             protected GetFilmsResponse doInBackground() throws Exception {
-                return filmService.getFilmByTitle(titoloFilm);
+                return filmService.getFilmsByTitle(titoloFilm);
             }
 
             @Override

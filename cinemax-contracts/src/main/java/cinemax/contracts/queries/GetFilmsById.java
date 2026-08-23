@@ -1,6 +1,7 @@
 package cinemax.contracts.queries;
 
-import cinemax.contracts.interfaces.*;
+import cinemax.contracts.interfaces.FilmRequest;
+import cinemax.contracts.interfaces.Query;
 
 public class GetFilmsById implements Query, FilmRequest {
 

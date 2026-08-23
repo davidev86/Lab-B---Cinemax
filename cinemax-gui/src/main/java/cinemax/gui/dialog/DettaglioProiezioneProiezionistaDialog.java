@@ -2,7 +2,6 @@ package cinemax.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -16,10 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -34,7 +32,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
-import cinemax.contracts.dto.FilmDetails;
 import cinemax.contracts.dto.ProjectionDetails;
 
 public class DettaglioProiezioneProiezionistaDialog extends JDialog {
@@ -50,9 +47,9 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
     public DettaglioProiezioneProiezionistaDialog(
             Window owner, 
             ProjectionDetails proiezione,
-            Consumer<ProjectionDetails> onModificaCallback,
-            Consumer<ProjectionDetails> onCancellaCallback,
-            Consumer<ProjectionDetails> onInsertCallback) {
+            Function<ProjectionDetails, Boolean> onModificaCallback,
+            Function<ProjectionDetails, Boolean> onCancellaCallback,
+            Function<ProjectionDetails, Boolean> onInsertCallback) {
 
         super(owner, "Gestione Proiezione (Proiezionista)", ModalityType.APPLICATION_MODAL);
         this.proiezioneCorrente = (proiezione != null) ? proiezione : new ProjectionDetails();
@@ -148,10 +145,9 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
                 );
 
                 if (conferma == JOptionPane.YES_OPTION) {
-                    if (onCancellaCallback != null) {
-                        onCancellaCallback.accept(proiezioneCorrente);
+                    if (onCancellaCallback != null && Boolean.TRUE.equals(onCancellaCallback.apply(proiezioneCorrente))) {
+                        dispose();
                     }
-                    dispose();
                 }
             });
 
@@ -167,6 +163,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
                 );
 
                 if (conferma == JOptionPane.YES_OPTION) {
+                    // Si chiude SOLO se sia la validazione locale che l'operazione server vanno a buon fine (true)
                     if (validaEApplicaModifiche(onModificaCallback)) {
                         dispose();
                     }
@@ -191,6 +188,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
                 );
 
                 if (conferma == JOptionPane.YES_OPTION) {
+                    // Si chiude SOLO se la validazione client passa E l'operazione restituisce true
                     if (validaEApplicaModifiche(onInsertCallback)) {
                         dispose();
                     }
@@ -208,7 +206,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
     // VALIDAZIONE E SALVATAGGIO
     // =========================================================================
 
-    private boolean validaEApplicaModifiche(Consumer<ProjectionDetails> callback) {
+    private boolean validaEApplicaModifiche(Function<ProjectionDetails, Boolean> callback) {
         LocalDateTime nuovaDataOra = parseLocalDateTime(textFieldDataOra);
         if (nuovaDataOra == null) {
             JOptionPane.showMessageDialog(this, "Inserire data e ora nel formato gg/mm/aaaa hh:mm.", "Errore Data", JOptionPane.WARNING_MESSAGE);
@@ -230,7 +228,8 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         proiezioneCorrente.setCosto(nuovoCosto);
 
         if (callback != null) {
-            callback.accept(proiezioneCorrente);
+            // Esegue la callback e restituisce l'esito effettivo (true/false)
+            return Boolean.TRUE.equals(callback.apply(proiezioneCorrente));
         }
 
         return true;

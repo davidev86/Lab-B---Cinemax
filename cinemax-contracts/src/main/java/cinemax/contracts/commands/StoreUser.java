@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.interfaces.Command;
-import cinemax.contracts.interfaces.ProjectionRequest;
 import cinemax.contracts.interfaces.UserRequest;
 
 public class StoreUser implements Command, UserRequest{	

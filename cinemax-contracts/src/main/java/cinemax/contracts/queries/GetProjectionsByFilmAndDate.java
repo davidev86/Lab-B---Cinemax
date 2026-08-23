@@ -1,7 +1,8 @@
 package cinemax.contracts.queries;
 import java.time.LocalDate;
 
-import cinemax.contracts.interfaces.*;
+import cinemax.contracts.interfaces.ProjectionRequest;
+import cinemax.contracts.interfaces.Query;
 
 public class GetProjectionsByFilmAndDate implements Query, ProjectionRequest  {
 

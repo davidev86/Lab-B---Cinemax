@@ -1,17 +1,23 @@
 package cinemax.gui.login;
 
-import cinemax.gui.*;
-import cinemax.gui.callback.LoginCallBack;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.UserMinInfo;
+import cinemax.gui.RegistratiBox;
+import cinemax.gui.callback.LoginCallBack;
 
 public class LoginPanel extends JPanel implements LoginCallBack {
 

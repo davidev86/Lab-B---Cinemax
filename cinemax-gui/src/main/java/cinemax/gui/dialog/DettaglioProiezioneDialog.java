@@ -14,16 +14,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.dto.UserMinInfo;
-import cinemax.gui.callback.SelezioneProjectionCallBack;
 
 public class DettaglioProiezioneDialog extends JDialog {
 
