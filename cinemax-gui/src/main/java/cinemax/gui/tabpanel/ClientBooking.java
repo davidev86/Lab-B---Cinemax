@@ -126,11 +126,8 @@ public class ClientBooking extends JPanel {
         visualizzaBooking();
     }
 
-    // =========================================================================
     // GESTIONE AZIONI SULLA PRENOTAZIONE SELEZIONATA
-    // =========================================================================
-
-    private void gestisciModifica() {
+     private void gestisciModifica() {
         BookingDetails selected = listaRisultati.getSelectedValue();
         Window parentWindow = SwingUtilities.getWindowAncestor(ClientBooking.this);
         JDialog dialog = null;

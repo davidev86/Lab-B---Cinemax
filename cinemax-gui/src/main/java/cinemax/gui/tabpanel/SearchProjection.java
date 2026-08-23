@@ -87,10 +87,8 @@ public class SearchProjection extends JPanel {
 
         Font fontBase = new Font("Tahoma", Font.PLAIN, 12);
 
-        // =====================================================================
-        // 1. SELETTORE MODALITÀ (RADIO BUTTONS)
-        // =====================================================================
-        // Impostiamo il primo radio button a 'true' (selezionato di default)
+        // SELETTORE MODALITÀ (RADIO BUTTONS)
+        // primo radio button  a selezionato di default 'true' 
         this.radioRicercaTitolo = new JRadioButton("Ricerca per Titolo (prossimi 3 mesi)", true);
         this.radioRicercaCompleta = new JRadioButton("Ricerca Completa con Filtri Avanzati", false);
 
@@ -103,9 +101,7 @@ public class SearchProjection extends JPanel {
         panelRadio.add(this.radioRicercaTitolo);
         panelRadio.add(this.radioRicercaCompleta);
 
-        // =====================================================================
-        // 2. TEMPLATE 1: FORM RICERCA PER TITOLO
-        // =====================================================================
+        // TEMPLATE 1: FORM RICERCA PER TITOLO
         this.textFieldTitoloSemplice = new JTextField(20);
         this.textFieldTitoloSemplice.setFont(fontBase);
 
@@ -128,9 +124,7 @@ public class SearchProjection extends JPanel {
         labelInfoData.setForeground(Color.DARK_GRAY);
         panelFormTitolo.add(labelInfoData, gbcTitolo);
 
-        // =====================================================================
         // 3. TEMPLATE 2: FORM RICERCA COMPLETA
-        // =====================================================================
         this.textFieldTitoloFilm = new JTextField(20);
         this.textFieldTitoloFilm.setFont(fontBase);
 
@@ -158,9 +152,7 @@ public class SearchProjection extends JPanel {
         aggiungiRigaForm(panelFormCompleto, new JLabel("Costo Minimo (€):"), this.textFieldCostoBigliettoMin, gbcComp, riga++);
         aggiungiRigaForm(panelFormCompleto, new JLabel("Costo Massimo (€):"), this.textFieldCostoBigliettoMax, gbcComp, riga++);
 
-        // =====================================================================
-        // 4. CONTENITORE A SCHEDE (CARDLAYOUT) PER I DUE TEMPLATE
-        // =====================================================================
+        // CONTENITORE PER I DUE TEMPLATE
         this.formsCardLayout = new CardLayout();
         this.formsContainerPanel = new JPanel(this.formsCardLayout);
         this.formsContainerPanel.add(panelFormTitolo, CARD_RICERCA_TITOLO);
@@ -170,9 +162,7 @@ public class SearchProjection extends JPanel {
         this.radioRicercaTitolo.addActionListener(e -> formsCardLayout.show(formsContainerPanel, CARD_RICERCA_TITOLO));
         this.radioRicercaCompleta.addActionListener(e -> formsCardLayout.show(formsContainerPanel, CARD_RICERCA_COMPLETA));
 
-        // =====================================================================
-        // 5. PULSANTE DI AZIONE E LISTA RISULTATI
-        // =====================================================================
+        // PULSANTE DI AZIONE E LISTA RISULTATI
         JButton btnCerca = new JButton("Avvia Ricerca");
         btnCerca.setFont(new Font("Tahoma", Font.BOLD, 12));
         btnCerca.addActionListener(e -> eseguiRicerca());
@@ -215,9 +205,7 @@ public class SearchProjection extends JPanel {
         add(cardPanel);
     }
 
-    // =========================================================================
-    // LOGICA DI CONTROLLO ED ESECUZIONE DELLA RICERCA
-    // =========================================================================
+    // CONTROLLO ED ESECUZIONE DELLA RICERCA
 
     public void eseguiRicerca() {
     	
@@ -225,9 +213,7 @@ public class SearchProjection extends JPanel {
             SwingUtilities.invokeLater(this::eseguiRicerca);
             return;
         }
-        // -----------------------------------------------------------------
-        // CASO 1: RICERCA PER TITOLO (TEMPLATE 1)
-        // -----------------------------------------------------------------
+        //RICERCA PER TITOLO
         if (radioRicercaTitolo.isSelected()) {
             String titoloFilm = textFieldTitoloSemplice.getText().trim();
 
@@ -255,42 +241,40 @@ public class SearchProjection extends JPanel {
             return;
         }
 
-        // -----------------------------------------------------------------
-        // CASO 2: RICERCA COMPLETA (TEMPLATE 2)
-        // -----------------------------------------------------------------
+        // RICERCA COMPLETA
         String titoloFilm = textFieldTitoloFilm.getText().trim();
         String genere = textFieldGenere.getText().trim();
 
-        if (titoloFilm.isEmpty() && genere.isEmpty()) {
+        LocalDate dInizio = parseLocalDate(this.dataInizio);
+        LocalDate dFine = parseLocalDate(this.dataFine);
+
+        BigDecimal prezzoMin = getBigDecimalFromField(this.textFieldCostoBigliettoMin);
+        BigDecimal prezzoMax = getBigDecimalFromField(this.textFieldCostoBigliettoMax);
+       
+        boolean noTitolo = (titoloFilm == null || titoloFilm.trim().isEmpty());
+        boolean noGenere = (genere == null || genere.trim().isEmpty());
+        boolean noDate = (dInizio == null && dFine == null);
+        boolean noPrezzoMin = (prezzoMin == null || prezzoMin.compareTo(BigDecimal.ZERO) == 0);
+        boolean noPrezzoMax = (prezzoMax == null || prezzoMax.compareTo(BigDecimal.ZERO) == 0);
+
+        if (noTitolo && noGenere && noDate && noPrezzoMin && noPrezzoMax) {
             JOptionPane.showMessageDialog(this,
-                "Inserire almeno un titolo o un genere per la ricerca completa.",
+                "Inserire almeno un parametro o un genere per la ricerca completa.",
                 "Parametri Insufficienti",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        LocalDate dInizio = parseLocalDate(this.dataInizio);
-        LocalDate dFine = parseLocalDate(this.dataFine);
-
-        if (dInizio == null || dFine == null) {
-            JOptionPane.showMessageDialog(this,
-                "Specificare entrambe le date nel formato gg/mm/aaaa.",
-                "Data Non Valida",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (dFine.isBefore(dInizio)) {
+        
+        if (dFine != null && dInizio != null && dFine.isBefore(dInizio)) {
             JOptionPane.showMessageDialog(this,
                 "La data di fine deve essere successiva o uguale alla data di inizio.",
                 "Intervallo Date Invalido",
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        BigDecimal prezzoMin = getBigDecimalFromField(this.textFieldCostoBigliettoMin);
-        BigDecimal prezzoMax = getBigDecimalFromField(this.textFieldCostoBigliettoMax);
-
+         
+       
         if (prezzoMin.compareTo(BigDecimal.ZERO) < 0 || prezzoMax.compareTo(BigDecimal.ZERO) < 0) {
             JOptionPane.showMessageDialog(this,
                 "I prezzi non possono essere valori negativi.",
@@ -299,7 +283,7 @@ public class SearchProjection extends JPanel {
             return;
         }
 
-        if (prezzoMax.compareTo(BigDecimal.ZERO) > 0 && prezzoMin.compareTo(prezzoMax) > 0) {
+        if (prezzoMax.equals(null) && prezzoMin.equals(null) && prezzoMax.compareTo(BigDecimal.ZERO) > 0 && prezzoMin.compareTo(prezzoMax) > 0) {
             JOptionPane.showMessageDialog(this,
                 "Il prezzo minimo non può superare il prezzo massimo.",
                 "Prezzo Invalido",
@@ -343,11 +327,8 @@ public class SearchProjection extends JPanel {
             JOptionPane.showMessageDialog(this, "Risposta nulla o non valida ricevuta dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // =========================================================================
-    // METODI AUSILIARI DI FORMATTAZIONE E SUPPORTO UI
-    // =========================================================================
-
+ 
+    // METODI DI FORMATTAZIONE e GUI
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
         panel.add(label, gbc);

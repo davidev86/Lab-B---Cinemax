@@ -38,12 +38,12 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
 
-        // --- 1. CONTENITORE CENTRALE ---
+        // CONTENITORE CENTRALE
         JPanel mainCenterPanel = new JPanel();
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
 
-        // --- 2. SCHEDA STRUTTURATA DATI PROIEZIONE ---
+        // SCHEDA STRUTTURATA DATI PROIEZIONE
         JPanel cardPanel = new JPanel(); 
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         cardPanel.setBorder(new CompoundBorder(
@@ -106,7 +106,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         pricePanel.add(conteggioPostiLiberi);
         cardPanel.add(pricePanel); 
         
-        // --- 3. SELEZIONE POSTI (SPINNER) ---
+        // SELEZIONE POSTI
         JPanel selectSeats = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         selectSeats.setBorder(BorderFactory.createTitledBorder("Prenotazione"));
         
@@ -127,7 +127,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         // Unica aggiunta a BorderLayout.CENTER
         add(mainCenterPanel, BorderLayout.CENTER);
 
-        // --- 4. BOTTONI DI AZIONE (SUD) ---
+        // BOTTONI DI AZIONE
         JButton btnAnnulla = new JButton("Annulla");
         JButton btnAzione = new JButton("Prenota Posti");     
 

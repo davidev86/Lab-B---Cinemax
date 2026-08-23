@@ -4,7 +4,6 @@
 
 package cinemax.gui;
 
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -41,6 +40,14 @@ import javax.swing.text.MaskFormatter;
 
 import cinemax.application.services.TcpClient;
 import cinemax.application.services.UserService;
+
+/**
+ * Finestra di dialogo modale per la registrazione di un nuovo utente.
+ * <p>
+ * Gestisce l'acquisizione dei dati anagrafici e di accesso, la validazione 
+ * dell'input lato client e l'invio asincrono delle informazioni al server 
+ * per evitare blocchi dell'Event Dispatch Thread (EDT).
+ */
 
 public class RegistratiBox extends JDialog {
 
@@ -209,10 +216,7 @@ public class RegistratiBox extends JDialog {
         }.execute();
     }
 
-    // =========================================================================
     // UTILITY DI LAYOUT E PARSING
-    // =========================================================================
-
     private void aggiungiRigaForm(JPanel panel, String labelText, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridy = riga;
 
