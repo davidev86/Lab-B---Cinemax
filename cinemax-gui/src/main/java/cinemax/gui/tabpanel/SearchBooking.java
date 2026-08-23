@@ -23,7 +23,7 @@ import cinemax.gui.callback.SelezioneBookingCallBack;
 /**
  * Pannello di ricerca per le prenotazioni con rendering ottimizzato e query asincrone.
  */
-public class SearchBookingPanel extends JPanel {
+public class SearchBooking extends JPanel {
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
@@ -42,7 +42,7 @@ public class SearchBookingPanel extends JPanel {
     private final JFormattedTextField dataInizio;
     private final JFormattedTextField dataFine;
 
-    public SearchBookingPanel(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
+    public SearchBooking(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
         this.bookingService = new BookingService(tcpClient);
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

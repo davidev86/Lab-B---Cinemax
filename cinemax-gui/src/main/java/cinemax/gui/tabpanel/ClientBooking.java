@@ -40,7 +40,7 @@ import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
 /**
  * Pannello per la visualizzazione e gestione (modifica / cancellazione) delle prenotazioni utente.
  */
-public class ClientBookingPanel extends JPanel {
+public class ClientBooking extends JPanel {
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_TITLE = new Font("Tahoma", Font.BOLD, 14);
@@ -55,7 +55,7 @@ public class ClientBookingPanel extends JPanel {
     private final JButton btnModifica;
     private final JButton btnCancella;
 
-    public ClientBookingPanel(UserMinInfo user, SelezioneBookingCallBack callBack, TcpClient tcpClient) {
+    public ClientBooking(UserMinInfo user, SelezioneBookingCallBack callBack, TcpClient tcpClient) {
         this.user = user;
         this.tcpClient = tcpClient;
         this.callBack = callBack;
@@ -132,7 +132,7 @@ public class ClientBookingPanel extends JPanel {
 
     private void gestisciModifica() {
         BookingDetails selected = listaRisultati.getSelectedValue();
-        Window parentWindow = SwingUtilities.getWindowAncestor(ClientBookingPanel.this);
+        Window parentWindow = SwingUtilities.getWindowAncestor(ClientBooking.this);
         JDialog dialog = null;
         BookingService bkgService = new BookingService(tcpClient);
         

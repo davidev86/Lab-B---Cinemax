@@ -11,10 +11,10 @@ import cinemax.gui.callback.SelezioneProjectionCallBack;
 import javax.swing.*;
 
 public class SearchProjectionTab extends JPanel {
-	SearchProjectionPanel panel;
+	SearchProjection panel;
 	
 	public SearchProjectionTab(SelezioneProjectionCallBack selezioneProjectionCallBack, TcpClient tcpClient) {
-		panel  = new SearchProjectionPanel(selezioneProjectionCallBack, tcpClient);
+		panel  = new SearchProjection(selezioneProjectionCallBack, tcpClient);
         add(panel);
     }
 	

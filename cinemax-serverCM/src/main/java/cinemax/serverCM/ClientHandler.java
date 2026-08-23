@@ -100,7 +100,7 @@ public class ClientHandler implements Runnable {
 		if (req instanceof ProjectionRequest) return new ProjectionDao(conn);
 		if (req instanceof UserRequest) return new UserDao(conn);
 		if (req instanceof BookingRequest) return new BookingDao(conn);
-		
+		if (req instanceof FilmRequest) return new FilmDao(conn);	
 		return null;
 	}
 	

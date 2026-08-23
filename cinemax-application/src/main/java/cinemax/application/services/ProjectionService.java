@@ -13,10 +13,10 @@ import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.queries.GetProjectionsByRangeDate;
-import cinemax.contracts.responses.ui.*;
 import cinemax.contracts.responses.GetFilmResponse;
-import cinemax.contracts.responses.GetFilmsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
+import cinemax.contracts.responses.ui.GetProjectionResponse;
+import cinemax.contracts.responses.ui.GetProjectionsResponse;
 
 public class ProjectionService {
 
@@ -81,8 +81,8 @@ public class ProjectionService {
 		//Get film 
 		FilmService filmService = new FilmService(tcpClient);
 		GetFilmResponse response = filmService.getFilmById(idFilm);
-		
-		Integer durata = response.getProjection().getDurataMinuti();
+		 
+		Integer durata = response.getFilm().getDurataMinuti(); 
 		
 		//Set date range
 		LocalDateTime from = dataOraProiezione.minusHours(30);

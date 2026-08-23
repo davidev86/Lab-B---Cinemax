@@ -28,7 +28,7 @@ import java.util.Locale;
  * 1) Ricerca Rapida per Titolo (con finestra temporale automatica di 3 mesi).
  * 2) Ricerca Avanzata/Completa con tutti i filtri (genere, intervallo date, prezzi).
  */
-public class SearchProjectionPanel extends JPanel {
+public class SearchProjection extends JPanel {
 
     // Identificatori per il CardLayout che gestisce i due template di ricerca
     private static final String CARD_RICERCA_TITOLO = "CARD_TITOLO";
@@ -60,7 +60,7 @@ public class SearchProjectionPanel extends JPanel {
     private final JFormattedTextField textFieldCostoBigliettoMin;
     private final JFormattedTextField textFieldCostoBigliettoMax;
 
-    public SearchProjectionPanel(SelezioneProjectionCallBack selezioneProjectionCallBack, TcpClient tcpClient) {
+    public SearchProjection(SelezioneProjectionCallBack selezioneProjectionCallBack, TcpClient tcpClient) {
         this.projectionService = new ProjectionService(tcpClient);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

@@ -2,7 +2,6 @@ package cinemax.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -13,7 +12,6 @@ import java.awt.Window;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -30,22 +28,22 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
+import cinemax.contracts.dto.FilmDetails;
 import cinemax.contracts.dto.ProjectionDetails;
 
 public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
-    private final ProjectionDetails proiezioneCorrente;
-//	private final BookingService bookingService;
+    private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
+    private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // Campi modificabili
-    private final JLabel lblTitoloFilm;
+    private final ProjectionDetails proiezioneCorrente;
     private final JFormattedTextField textFieldDataOra;
     private final JFormattedTextField textFieldCostoBiglietto;
 
@@ -53,65 +51,51 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
             Window owner, 
             ProjectionDetails proiezione,
             Consumer<ProjectionDetails> onModificaCallback,
-            Consumer<ProjectionDetails> onCancellaCallback) {
+            Consumer<ProjectionDetails> onCancellaCallback,
+            Consumer<ProjectionDetails> onInsertCallback) {
 
         super(owner, "Gestione Proiezione (Proiezionista)", ModalityType.APPLICATION_MODAL);
-        this.proiezioneCorrente = proiezione;
+        this.proiezioneCorrente = (proiezione != null) ? proiezione : new ProjectionDetails();
 
-        setSize(520, 600);
+        boolean exists = (this.proiezioneCorrente.getId() != null);
+
+        setSize(520, 560);
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
 
-        Font fontBase = new Font("Tahoma", Font.PLAIN, 12); 
-        Font fontBold = new Font("Tahoma", Font.BOLD, 12);
-
-        // --- VERIFICA PRENOTAZIONI ATTIVE ---
- //       boolean haPrenotazioni = verificaPresenzaPrenotazioni(proiezione);
-//        boolean isModificabile = !haPrenotazioni;
-
-        // --- 1. CONTENITORE PRINCIPALE ---
+        // =====================================================================
+        // 1. SCHEDA DATI PROIEZIONE
+        // =====================================================================
         JPanel mainCenterPanel = new JPanel();
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
-/*
-        // Banner informativo se la modifica è bloccata
-        if (haPrenotazioni) {
-            JPanel bannerAvviso = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            bannerAvviso.setBackground(new Color(255, 235, 235));
-            bannerAvviso.setBorder(BorderFactory.createLineBorder(new Color(220, 53, 69)));
-            JLabel lblAvviso = new JLabel("<html><b>Attenzione:</b> Esistono prenotazioni per questo spettacolo. Modifica e cancellazione bloccate.</html>");
-            lblAvviso.setForeground(new Color(150, 0, 0));
-            bannerAvviso.add(lblAvviso);
-            mainCenterPanel.add(bannerAvviso);
-            mainCenterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        }
-*/
-        // --- 2. SCHEDA DETTAGLI PROIEZIONE ---
+
         JPanel cardPanel = new JPanel();
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         cardPanel.setBorder(new CompoundBorder(
                 new EmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder(
                         BorderFactory.createEtchedBorder(),
-                        " Modifica Parametri Spettacolo ",
+                        exists ? " Modifica Proiezione " : " Inserimento Nuova Proiezione ",
                         TitledBorder.LEFT,
                         TitledBorder.TOP,
-                        fontBold
+                        FONT_BOLD
                 )
         ));
- 
-        this.lblTitoloFilm = new JLabel(proiezione.getTitoloFilm() != null ? proiezione.getTitoloFilm() : "");
-        this.lblTitoloFilm.setFont(new Font("Tahoma", Font.BOLD, 14));
-    //    this.textFieldTitoloFilm.setEditable(isModificabile);
+
+        JLabel lblTitoloFilm = new JLabel(this.proiezioneCorrente.getTitoloFilm() != null ? this.proiezioneCorrente.getTitoloFilm() : "-");
+        lblTitoloFilm.setFont(new Font("Tahoma", Font.BOLD, 14));
 
         JPanel panelTitolo = new JPanel(new BorderLayout(5, 5));
         panelTitolo.setBorder(new EmptyBorder(5, 10, 10, 10));
-        panelTitolo.add(new JLabel("Titolo Film:"), BorderLayout.NORTH);
+        JLabel lblTitoloHeader = new JLabel("Titolo Film:");
+        lblTitoloHeader.setFont(FONT_BOLD);
+        panelTitolo.add(lblTitoloHeader, BorderLayout.NORTH);
         panelTitolo.add(lblTitoloFilm, BorderLayout.CENTER);
         cardPanel.add(panelTitolo);
 
-        // Form con griglia
+        // Griglia Campi
         JPanel formGrid = new JPanel(new GridBagLayout());
         formGrid.setBorder(new EmptyBorder(5, 10, 10, 10));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -119,94 +103,112 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String dataOraIniziale = (proiezione.getDataOraProiezione() != null) 
-                ? proiezione.getDataOraProiezione().format(dtf) 
+        String dataOraIniziale = (this.proiezioneCorrente.getDataOraProiezione() != null) 
+                ? this.proiezioneCorrente.getDataOraProiezione().format(DATETIME_FORMATTER) 
                 : "";
         this.textFieldDataOra = creaCampoDataOra(dataOraIniziale);
- //       this.textFieldDataOra.setEditable(isModificabile);
 
-        this.textFieldCostoBiglietto = creaCampoValuta(fontBase);
-        this.textFieldCostoBiglietto.setValue(proiezione.getCosto() != null ? proiezione.getCosto() : BigDecimal.ZERO);
- //       this.textFieldCostoBiglietto.setEditable(isModificabile);
+        this.textFieldCostoBiglietto = creaCampoValuta();
+        this.textFieldCostoBiglietto.setValue(this.proiezioneCorrente.getCosto() != null ? this.proiezioneCorrente.getCosto() : BigDecimal.ZERO);
 
         int riga = 0;
         aggiungiRigaForm(formGrid, new JLabel("Data & Ora (gg/mm/aaaa hh:mm):"), textFieldDataOra, gbc, riga++);
         aggiungiRigaForm(formGrid, new JLabel("Prezzo Biglietto (€):"), textFieldCostoBiglietto, gbc, riga++);
-        aggiungiRigaForm(formGrid, new JLabel("Regista:"), new JLabel(valoreODefault(proiezione.getRegista())), gbc, riga++);
-        aggiungiRigaForm(formGrid, new JLabel("Genere:"), new JLabel(valoreODefault(proiezione.getGenere())), gbc, riga++);
-        aggiungiRigaForm(formGrid, new JLabel("Anno Uscita:"), new JLabel(proiezione.getAnno() != null ? String.valueOf(proiezione.getAnno()) : "-"), gbc, riga++);
-        aggiungiRigaForm(formGrid, new JLabel("Durata:"), new JLabel((proiezione.getDurataMinuti() != null ? proiezione.getDurataMinuti() : 0) + " min"), gbc, riga++);
-        aggiungiRigaForm(formGrid, new JLabel("Età Minima:"), new JLabel((proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni"), gbc, riga++);
+        aggiungiRigaForm(formGrid, new JLabel("Regista:"), new JLabel(valoreODefault(this.proiezioneCorrente.getRegista())), gbc, riga++);
+        aggiungiRigaForm(formGrid, new JLabel("Genere:"), new JLabel(valoreODefault(this.proiezioneCorrente.getGenere())), gbc, riga++);
+        aggiungiRigaForm(formGrid, new JLabel("Anno Uscita:"), new JLabel(this.proiezioneCorrente.getAnno() != null ? String.valueOf(this.proiezioneCorrente.getAnno()) : "-"), gbc, riga++);
+        aggiungiRigaForm(formGrid, new JLabel("Durata:"), new JLabel((this.proiezioneCorrente.getDurataMinuti() != null ? this.proiezioneCorrente.getDurataMinuti() : 0) + " min"), gbc, riga++);
+        aggiungiRigaForm(formGrid, new JLabel("Età Minima:"), new JLabel((this.proiezioneCorrente.getEtaMinima() != null ? this.proiezioneCorrente.getEtaMinima() : 0) + " anni"), gbc, riga++);
 
         cardPanel.add(formGrid);
         mainCenterPanel.add(cardPanel);
         add(mainCenterPanel, BorderLayout.CENTER);
 
-        // --- 3. BOTTONI DI AZIONE ---
+        // =====================================================================
+        // 2. BOTTONI DI AZIONE CONDIZIONATI ALL'ID
+        // =====================================================================
+        JPanel panelBottoni = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+
         JButton btnAnnulla = new JButton("Chiudi");
-        JButton btnModifica = new JButton("Salva Modifiche");
-        JButton btnCancella = new JButton("Annulla Proiezione");
-
-        btnCancella.setForeground(new Color(180, 0, 0));
- //       btnModifica.setEnabled(isModificabile);
- //       btnCancella.setEnabled(isModificabile);
-
-        btnModifica.addActionListener(e -> {
-        	int conferma = JOptionPane.showConfirmDialog(
-                    this,
-                    "Sei sicuro di voler moodificare questa proiezione?",
-                    "Modifica salvata",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );        	
-        	
-        	if (validaESalvaModifiche(onModificaCallback)) {
-                dispose();
-            
-            } 
-        });
-
-        btnCancella.addActionListener(e -> {
-            int conferma = JOptionPane.showConfirmDialog(
-                    this,
-                    "Sei sicuro di voler annullare definitivamente questa proiezione?",
-                    "Conferma Cancellazione",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-            if (conferma == JOptionPane.YES_OPTION) {
-                if (onCancellaCallback != null) {
-                    onCancellaCallback.accept(proiezioneCorrente);
-                }
-                dispose();
-            }
-        });
-
+        btnAnnulla.setFont(FONT_BASE);
         btnAnnulla.addActionListener(e -> dispose());
 
-        JPanel panelBottoni = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        panelBottoni.add(btnCancella);
-        panelBottoni.add(btnAnnulla);
-        panelBottoni.add(btnModifica);
+        if (exists) {
+            // Caso Proiezione Esistente (ID Presente): Modifica e Cancellazione attivi
+            JButton btnCancella = new JButton("Annulla Proiezione");
+            btnCancella.setFont(FONT_BASE);
+            btnCancella.setForeground(new Color(180, 0, 0));
+            btnCancella.addActionListener(e -> {
+                int conferma = JOptionPane.showConfirmDialog(
+                        this,
+                        "Sei sicuro di voler annullare definitivamente questa proiezione?",
+                        "Conferma Cancellazione",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE
+                );
+
+                if (conferma == JOptionPane.YES_OPTION) {
+                    if (onCancellaCallback != null) {
+                        onCancellaCallback.accept(proiezioneCorrente);
+                    }
+                    dispose();
+                }
+            });
+
+            JButton btnModifica = new JButton("Salva Modifiche");
+            btnModifica.setFont(FONT_BOLD);
+            btnModifica.addActionListener(e -> {
+                int conferma = JOptionPane.showConfirmDialog(
+                        this,
+                        "Sei sicuro di voler salvare le modifiche a questa proiezione?",
+                        "Conferma Modifica",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (conferma == JOptionPane.YES_OPTION) {
+                    if (validaEApplicaModifiche(onModificaCallback)) {
+                        dispose();
+                    }
+                }
+            });
+
+            panelBottoni.add(btnCancella);
+            panelBottoni.add(btnAnnulla);
+            panelBottoni.add(btnModifica);
+
+        } else {
+            // Caso Nuova Proiezione (ID Nullo): Inserimento attivo
+            JButton btnInserisci = new JButton("Inserisci nuova Proiezione");
+            btnInserisci.setFont(FONT_BOLD);
+            btnInserisci.addActionListener(e -> {
+                int conferma = JOptionPane.showConfirmDialog(
+                        this,
+                        "Sei sicuro di voler inserire questa nuova proiezione a palinsesto?",
+                        "Conferma Inserimento",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE
+                );
+
+                if (conferma == JOptionPane.YES_OPTION) {
+                    if (validaEApplicaModifiche(onInsertCallback)) {
+                        dispose();
+                    }
+                }
+            });
+
+            panelBottoni.add(btnAnnulla);
+            panelBottoni.add(btnInserisci);
+        }
+
         add(panelBottoni, BorderLayout.SOUTH);
     }
 
     // =========================================================================
-    // LOGICA DI CONTROLLO E VALIDAZIONE
+    // VALIDAZIONE E SALVATAGGIO
     // =========================================================================
 
- /*   private boolean verificaPresenzaPrenotazioni(ProjectionDetails proiezione) {
-        if (proiezione == null || proiezione.getNumeroPosti() == null) {
-            return false;
-        }
-        // Se numeroPosti indica i posti già prenotati (> 0 blocca la modifica)
-        return proiezione.getNumeroPosti() > 0;
-    }
-*/
-    private boolean validaESalvaModifiche(Consumer<ProjectionDetails> onModificaCallback) {
-     
+    private boolean validaEApplicaModifiche(Consumer<ProjectionDetails> callback) {
         LocalDateTime nuovaDataOra = parseLocalDateTime(textFieldDataOra);
         if (nuovaDataOra == null) {
             JOptionPane.showMessageDialog(this, "Inserire data e ora nel formato gg/mm/aaaa hh:mm.", "Errore Data", JOptionPane.WARNING_MESSAGE);
@@ -224,24 +226,23 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
             return false;
         }
 
-      
         proiezioneCorrente.setDataOraProiezione(nuovaDataOra);
         proiezioneCorrente.setCosto(nuovoCosto);
 
-        if (onModificaCallback != null) {
-            onModificaCallback.accept(proiezioneCorrente);
+        if (callback != null) {
+            callback.accept(proiezioneCorrente);
         }
 
         return true;
     }
 
     // =========================================================================
-    // HELPERS GRAFICI E PARSING
+    // METODI AUSILIARI DI RENDERING E PARSING
     // =========================================================================
 
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
-        label.setFont(new Font("Tahoma", Font.BOLD, 12));
+        label.setFont(FONT_BOLD);
         label.setForeground(Color.DARK_GRAY);
         panel.add(label, gbc);
 
@@ -256,17 +257,15 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
             mask.setPlaceholderCharacter('_');
             field.setFormatterFactory(new DefaultFormatterFactory(mask));
             field.setColumns(14);
-            field.setFont(new Font("Tahoma", Font.PLAIN, 12));
+            field.setFont(FONT_BASE);
             if (valoreIniziale != null && !valoreIniziale.isEmpty()) {
                 field.setText(valoreIniziale);
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        } catch (ParseException ignored) {}
         return field;
     }
 
-    private JFormattedTextField creaCampoValuta(Font font) {
+    private JFormattedTextField creaCampoValuta() {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
         currencyFormat.setMinimumFractionDigits(2);
         currencyFormat.setMaximumFractionDigits(2);
@@ -277,7 +276,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
         JFormattedTextField field = new JFormattedTextField(currencyFormat);
         field.setColumns(10);
-        field.setFont(font);
+        field.setFont(FONT_BASE);
         return field;
     }
 
@@ -286,11 +285,9 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         if (text.contains("_") || text.isEmpty()) {
             return null;
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         try {
-            return LocalDate.parse(text.substring(0, 10), DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                            .atTime(Integer.parseInt(text.substring(11, 13)), Integer.parseInt(text.substring(14, 16)));
-        } catch (Exception e) {
+            return LocalDateTime.parse(text, DATETIME_FORMATTER);
+        } catch (DateTimeParseException e) {
             return null;
         }
     }

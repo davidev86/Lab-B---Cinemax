@@ -1,6 +1,7 @@
 package cinemax.gui.tabpanel;
 
 import cinemax.application.services.BookingService;
+import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.Enums.Ruolo;
@@ -14,6 +15,8 @@ import cinemax.gui.callback.SelezioneProjectionCallBack;
 import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
 import cinemax.gui.dialog.DettaglioProiezioneDialog;
 import cinemax.gui.dialog.DettaglioProiezioneProiezionistaDialog;
+import cinemax.gui.callback.SelezioneFilmCallBack;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,10 +28,10 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     
     //Tabs
     private JTabbedPane tabbedPane;
-    private SearchBookingTab ricercaPrenotazioni;
-    private ClientBookingPanel clientBooking;
-    private ProiezionistaChangeProjectionPanel proiezionistaChangeProjection;
-    private SearchProjectionTab searchProjectionTab;
+    private SearchBooking ricercaPrenotazioni;
+    private ClientBooking clientBooking;
+    private ProiezionistaChangeProjection proiezionistaChangeProjection;
+    private SearchProjection searchProjection;
 
     public TabPanel(TcpClient tcpClient) {
         this.tcpClient = tcpClient;
@@ -53,29 +56,29 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         tabbedPane.removeAll(); // Rimuove tutte le schede precedenti per aggiornarle
 
         // 1. SCHEDA 1: Ricerca Proiezioni (Sempre visibile a chiunque)
-        searchProjectionTab = new SearchProjectionTab(this, tcpClient);
-        tabbedPane.addTab("Ricerca proiezioni", searchProjectionTab);
+        searchProjection = new SearchProjection(this, tcpClient);
+        tabbedPane.addTab("Ricerca proiezioni", searchProjection);
 
         // 2. SCHEDE RISERVATE (Solo se l'utente è loggato)
         if (user != null && user.getRuolo() != null) {
 
             // Solo per BIGLIETTAIO
             if (user.getRuolo() == Ruolo.BIGLIETTAIO) {
-                ricercaPrenotazioni = new SearchBookingTab(this, tcpClient);
+                ricercaPrenotazioni = new SearchBooking(this, tcpClient);
                 tabbedPane.addTab("Ricerca prenotazioni", ricercaPrenotazioni);
             }
 
             // Solo per CLIENTE
             if (user.getRuolo() == Ruolo.CLIENTE) {
-            	clientBooking = new ClientBookingPanel(user, this, tcpClient);
+            	clientBooking = new ClientBooking(user, this, tcpClient);
                 tabbedPane.addTab("Le tue prenotazioni", clientBooking);
               
             }
             
-                // Solo per PROIEZIONISTA
-                if (user.getRuolo() == Ruolo.PROIEZIONISTA) {
-                	proiezionistaChangeProjection = new ProiezionistaChangeProjectionPanel(this, tcpClient);
-                    tabbedPane.addTab("Le tue proiezioni", proiezionistaChangeProjection);
+            // Solo per PROIEZIONISTA
+            if (user.getRuolo() == Ruolo.PROIEZIONISTA) {
+            	proiezionistaChangeProjection = new ProiezionistaChangeProjection(tcpClient);
+                tabbedPane.addTab("Inserisci nuova proiezione", proiezionistaChangeProjection);
             }
         }
 
@@ -106,6 +109,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
 
     public void onSelezione(ProjectionDetailsView projection) {
         BookingService bkgService = new BookingService(tcpClient);
+        ProjectionService projectionService  = new ProjectionService(tcpClient);
         Window parentWindow = SwingUtilities.getWindowAncestor(TabPanel.this);
         JDialog dialog = null;
 
@@ -125,7 +129,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                            if(res.isSuccess()) {
                         	   
                         	  this.clientBooking.visualizzaBooking();
-                        	  this.searchProjectionTab.eseguiRicerca();
+                        	  this.searchProjection.eseguiRicerca();
                            }  
                         } 
                     );
@@ -136,11 +140,17 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                         parentWindow,
                         projection,
                         (ProjectionDetails projModificata) -> {
-                            // Salva modifiche su backend
-                        },
+                        	projectionService.updateProjection(
+                        		    projModificata.getId(), 
+                        		    projModificata.getIdFilm(), 
+                        		    projModificata.getDataOraProiezione(), 
+                        		    projModificata.getCosto()
+                        		); },
                         (ProjectionDetails projCancellata) -> {
                             // Cancella proiezione su backend
-                        }
+                        },
+                        
+                       null
                     );
                                       
                     break;

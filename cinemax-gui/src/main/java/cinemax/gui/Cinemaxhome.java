@@ -12,7 +12,7 @@ import cinemax.gui.callback.LoginCallBack;
 import cinemax.gui.callback.LogoutCallBack;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
 import cinemax.gui.login.LoginPanel;
-import cinemax.gui.tabpanel.SearchProjectionPanel;
+import cinemax.gui.tabpanel.SearchProjection;
 import cinemax.gui.tabpanel.TabPanel;
 
 import java.awt.*;
@@ -26,7 +26,7 @@ public class Cinemaxhome {
     static ProjectionDetails onSelezioneLibro=null;
     static SelezioneProjectionCallBack selezioneProjectionCallBack;
     LoginPanel loginPanel;
-    SearchProjectionPanel searchProjectionPanel;
+    SearchProjection searchProjection;
     static TabPanel tabPanel;
 	
 
@@ -55,8 +55,8 @@ public class Cinemaxhome {
 
 
 	        tabPanel = new TabPanel(tcpClient);
-	        SearchProjectionPanel searchProjectionPanel = new SearchProjectionPanel(selezioneProjectionCallBack, tcpClient);
-	        searchProjectionPanel.setVisible(true);
+	        SearchProjection searchProjection = new SearchProjection(selezioneProjectionCallBack, tcpClient);
+	        searchProjection.setVisible(true);
 
 
  
