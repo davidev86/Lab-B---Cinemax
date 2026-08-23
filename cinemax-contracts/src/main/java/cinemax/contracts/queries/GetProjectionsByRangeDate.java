@@ -1,5 +1,4 @@
 package cinemax.contracts.queries;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import cinemax.contracts.interfaces.ProjectionRequest;

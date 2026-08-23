@@ -2,18 +2,26 @@ package cinemax.gui.login;
 
 
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import cinemax.application.services.TcpClient;
 import cinemax.application.services.UserService;
-import cinemax.contracts.dto.UserDetails;
+import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.gui.callback.LoginCallBack;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
 public class LoginBox extends JDialog {
@@ -68,12 +76,11 @@ public class LoginBox extends JDialog {
                 
                 new Thread(() ->{
                 
-	                GetUserByCredentialResponse user = userService.getUserByCredentials(username, pwd);
-	
-	                if (user!=null) {
-	                            JOptionPane.showMessageDialog(LoginBox.this, "Login riuscito!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+	                GetUserByCredentialResponse responseGetUser = userService.getUserByCredentials(username, pwd);
+	                if (responseGetUser!=null) {
+	                            JOptionPane.showMessageDialog(LoginBox.this, "Benvenuto " + responseGetUser.getUser().getNome(), "Successo", JOptionPane.INFORMATION_MESSAGE);
 	                            dispose();
-	                            SwingUtilities.invokeLater(() ->  callBack.onLoginSuccess(user.getUser()));
+	                            SwingUtilities.invokeLater(() ->  callBack.onLoginSuccess(responseGetUser.getUser()));
 	                } else {
 	                    JOptionPane.showMessageDialog(LoginBox.this, "Credenziali errate!", "Errore", JOptionPane.ERROR_MESSAGE);
 	                }

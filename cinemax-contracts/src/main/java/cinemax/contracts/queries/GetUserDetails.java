@@ -1,6 +1,7 @@
 package cinemax.contracts.queries;
 
-import cinemax.contracts.interfaces.*;
+import cinemax.contracts.interfaces.Query;
+import cinemax.contracts.interfaces.UserRequest;
 
 public class GetUserDetails implements Query, UserRequest  {
 		

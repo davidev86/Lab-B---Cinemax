@@ -16,11 +16,11 @@ public class GetFilmResponse implements Response {
 	
 	private FilmDetails projection;
 
-	public FilmDetails getProjection() {
+	public FilmDetails getFilm() {
 		return projection;
 	}
 
-	public void setProjection(FilmDetails projection) {
+	public void setFilm(FilmDetails projection) {
 		this.projection = projection;
 	}
 }

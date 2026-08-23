@@ -1,6 +1,7 @@
 package cinemax.contracts.responses;
 
 import java.util.List;
+
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.interfaces.Response;
 

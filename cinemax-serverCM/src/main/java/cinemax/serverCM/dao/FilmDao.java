@@ -1,30 +1,19 @@
 package cinemax.serverCM.dao;
 
-import cinemax.contracts.interfaces.Command;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
+import cinemax.contracts.dto.FilmDetails;
+import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetFilmsById;
 import cinemax.contracts.queries.GetFilmsByTitle;
-import cinemax.contracts.queries.GetProjectionById;
-import cinemax.contracts.queries.GetProjections;
-import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.responses.GetFilmResponse;
 import cinemax.contracts.responses.GetFilmsResponse;
-import cinemax.contracts.responses.GetProjectionResponse;
-import cinemax.contracts.responses.GetProjectionsResponse;
-import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.serverCM.dao.utils.DbHelper;
-import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
-import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
-import cinemax.contracts.commands.StoreProjection;
-import cinemax.contracts.dto.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.time.LocalDateTime;
 
 public class FilmDao implements Dao {
 

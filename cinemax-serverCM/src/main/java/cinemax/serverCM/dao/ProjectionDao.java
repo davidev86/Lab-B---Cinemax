@@ -1,27 +1,30 @@
 package cinemax.serverCM.dao;
 
-import cinemax.contracts.interfaces.Command;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.List;
 
+import cinemax.contracts.commands.DeleteProjection;
+import cinemax.contracts.commands.StoreProjection;
+import cinemax.contracts.dto.ProjectionDetails;
+import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetProjectionById;
+import cinemax.contracts.queries.GetProjectionHistory;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.queries.GetProjectionsByRangeDate;
+import cinemax.contracts.responses.DeleteProjectionResponse;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.GetProjectionsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.serverCM.dao.utils.DbHelper;
+import cinemax.serverCM.dao.utils.SqlDeleteBuilder;
 import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
-import cinemax.contracts.commands.StoreProjection;
-import cinemax.contracts.dto.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.time.LocalDateTime;
 
 public class ProjectionDao implements Dao {
 
@@ -222,16 +225,52 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 	
-	
+	private Response find(GetProjectionHistory req) {
+		
+		String baseQuery = "SELECT * FROM public.\"Proiezioni_storiche\"";
+
+		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);		
+
+		try {
+
+			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+				ProjectionDetails dto = new ProjectionDetails();
+				dto.setId(rs.getInt("id_proiezione"));
+				dto.setIdFilm(rs.getInt("id_film"));
+				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
+				dto.setTitoloFilm(rs.getString("titolofilm"));
+				dto.setGenere(rs.getString("genere"));
+				dto.setRegista(rs.getString("regista"));
+				dto.setAnno(rs.getInt("anno"));
+				dto.setDurataMinuti(rs.getInt("durataminuti"));
+				dto.setEtaMinima(rs.getInt("etaminima"));
+				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
+				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
+				return dto;
+			} );
+
+			return new GetProjectionsResponse(projs);
+
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	
 	@Override
 	public Response execute(Command req) {
 
-		//CASO INSERT
-		if(req.getId() == null ) return insertProjection((StoreProjection) req);		
-		//CASO UPDATE
-		else return updateProjection((StoreProjection)req);			
+		return switch (req) {
+	        case StoreProjection storeProj -> (storeProj.getId() == null) 
+	                ? insertProjection(storeProj) 
+	                : updateProjection(storeProj);
+	        case DeleteProjection deleteProj -> deleteProjection(deleteProj);
+	        default -> null;
+	    };
 	}
 
 	private Response updateProjection(StoreProjection req) {
@@ -273,5 +312,18 @@ public class ProjectionDao implements Dao {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	 
+	private Response deleteProjection(DeleteProjection req) {
+	    SqlDeleteBuilder sdb = new SqlDeleteBuilder("public.\"Proiezioni\"");
+	    sdb.where("id = ?", req.getId());
+
+	    try { 
+	        int rowsAffected = DbHelper.executeUpdate(_connection, sdb.getSql(), sdb.getParams());
+	        return new DeleteProjectionResponse(rowsAffected > 0);
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return new DeleteProjectionResponse(false); 
+	    }
 	}
 }

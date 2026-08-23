@@ -1,5 +1,13 @@
 package cinemax.gui.tabpanel;
 
+import java.awt.Window;
+
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+
 import cinemax.application.services.BookingService;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
@@ -8,6 +16,7 @@ import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
+import cinemax.contracts.responses.DeleteProjectionResponse;
 import cinemax.contracts.responses.StoreBookingResponse;
 import cinemax.gui.callback.LoginCallBack;
 import cinemax.gui.callback.SelezioneBookingCallBack;
@@ -15,18 +24,13 @@ import cinemax.gui.callback.SelezioneProjectionCallBack;
 import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
 import cinemax.gui.dialog.DettaglioProiezioneDialog;
 import cinemax.gui.dialog.DettaglioProiezioneProiezionistaDialog;
-import cinemax.gui.callback.SelezioneFilmCallBack;
-
-
-import javax.swing.*;
-import java.awt.*;
 
 public class TabPanel extends JPanel implements SelezioneProjectionCallBack, LoginCallBack, SelezioneBookingCallBack {
 
     private final TcpClient tcpClient;
     private UserMinInfo user;
     
-    //Tabs
+    // Tabs
     private JTabbedPane tabbedPane;
     private SearchBooking ricercaPrenotazioni;
     private ClientBooking clientBooking;
@@ -70,14 +74,13 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
 
             // Solo per CLIENTE
             if (user.getRuolo() == Ruolo.CLIENTE) {
-            	clientBooking = new ClientBooking(user, this, tcpClient);
+                clientBooking = new ClientBooking(user, this, tcpClient);
                 tabbedPane.addTab("Le tue prenotazioni", clientBooking);
-              
             }
             
             // Solo per PROIEZIONISTA
             if (user.getRuolo() == Ruolo.PROIEZIONISTA) {
-            	proiezionistaChangeProjection = new ProiezionistaChangeProjection(tcpClient);
+                proiezionistaChangeProjection = new ProiezionistaChangeProjection(tcpClient);
                 tabbedPane.addTab("Inserisci nuova proiezione", proiezionistaChangeProjection);
             }
         }
@@ -101,15 +104,14 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         JOptionPane.showMessageDialog(this, "Login fallito: " + errorMessage, "Errore Autenticazione", JOptionPane.ERROR_MESSAGE);
     }
 
-
-
     // =========================================================================
     // GESTIONE SELEZIONE PROIEZIONI
     // =========================================================================
 
+    @Override
     public void onSelezione(ProjectionDetailsView projection) {
         BookingService bkgService = new BookingService(tcpClient);
-        ProjectionService projectionService  = new ProjectionService(tcpClient);
+        ProjectionService projectionService = new ProjectionService(tcpClient);
         Window parentWindow = SwingUtilities.getWindowAncestor(TabPanel.this);
         JDialog dialog = null;
 
@@ -124,13 +126,11 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                         parentWindow,
                         projection,
                         (Integer seats) -> {
-                           StoreBookingResponse res = bkgService.insertBooking(user.getId(), projection.getId(), seats);
-                           
-                           if(res.isSuccess()) {
-                        	   
-                        	  this.clientBooking.visualizzaBooking();
-                        	  this.searchProjection.eseguiRicerca();
-                           }  
+                            StoreBookingResponse res = bkgService.insertBooking(user.getId(), projection.getId(), seats);
+                            if (res != null && res.isSuccess()) {
+                                this.clientBooking.visualizzaBooking();
+                                this.searchProjection.eseguiRicerca();
+                            }  
                         } 
                     );
                     break;
@@ -139,20 +139,50 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                     dialog = new DettaglioProiezioneProiezionistaDialog(
                         parentWindow,
                         projection,
+
+                        // 1. Callback MODIFICA
                         (ProjectionDetails projModificata) -> {
-                        	projectionService.updateProjection(
-                        		    projModificata.getId(), 
-                        		    projModificata.getIdFilm(), 
-                        		    projModificata.getDataOraProiezione(), 
-                        		    projModificata.getCosto()
-                        		); },
-                        (ProjectionDetails projCancellata) -> {
-                            // Cancella proiezione su backend
+                            try {
+                                projectionService.updateProjection(
+                                    projModificata.getId(), 
+                                    projModificata.getIdFilm(), 
+                                    projModificata.getDataOraProiezione(), 
+                                    projModificata.getCosto()
+                                );
+
+                                JOptionPane.showMessageDialog(this, "Proiezione modificata con successo!", "Esito Modifica", JOptionPane.INFORMATION_MESSAGE);
+                                this.searchProjection.eseguiRicerca();
+                                return true; // Operazione riuscita: chiude la dialog
+
+                            } catch (Exception ex) {
+                                // Intercetta l'IllegalArgumentException lanciata dal service (es. sovrapposizione orari)
+                                JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore Modifica", JOptionPane.ERROR_MESSAGE);
+                                return false; // Mantiene la dialog aperta per correggere i dati
+                            }
                         },
-                        
-                       null
+
+                        // 2. Callback CANCELLAZIONE
+                        (ProjectionDetails projCancellata) -> {
+                        	try {
+                                DeleteProjectionResponse res = projectionService.deleteProjection(projCancellata.getId());
+
+                                if (res != null && res.isSuccess()) {
+                                    JOptionPane.showMessageDialog(this, "Proiezione annullata con successo!", "Esito Annullamento", JOptionPane.INFORMATION_MESSAGE);
+                                    this.searchProjection.eseguiRicerca();
+                                    return true; // Chiude il dialog
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Impossibile annullare la proiezione. Verificare che non ci siano prenotazioni collegate.", "Errore Annullamento", JOptionPane.ERROR_MESSAGE);
+                                    return false; // Mantiene il dialog aperto
+                                }
+
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore Annullamento", JOptionPane.ERROR_MESSAGE);
+                                return false;
+                            }
+                        },
+
+                        null
                     );
-                                      
                     break;
 
                 default:
@@ -182,11 +212,8 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         aggiornaTabPerRuolo();
     }
 
-	@Override
-	public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {
-		// TODO Auto-generated method stub
-		
-	}
-    
-    
+    @Override
+    public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {
+        // TODO Auto-generated method stub
+    }
 }

@@ -1,11 +1,11 @@
 package cinemax.gui;
-import java.awt.*;
-import java.awt.image.*;
-import javax.imageio.ImageIO;
-import java.io.*;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Panel;
+import java.io.IOException;
 import java.util.Objects;
-import javax.imageio.*;
-import javax.swing.*;
+
+import javax.imageio.ImageIO;
 
 
 // Classe personalizzata per disegnare un'immagine

@@ -2,6 +2,7 @@ package cinemax.contracts.dto.ui;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 import cinemax.contracts.dto.ProjectionDetails;
 
 public class ProjectionDetailsView extends ProjectionDetails {

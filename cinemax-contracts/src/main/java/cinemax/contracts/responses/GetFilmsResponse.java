@@ -12,17 +12,17 @@ public class GetFilmsResponse implements Response {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public GetFilmsResponse(List<FilmDetails> projections) {
-		this.projections = projections;
+	public GetFilmsResponse(List<FilmDetails> films) {
+		this.films = films;
 	}
 	
-	private List<FilmDetails> projections;
+	private List<FilmDetails> films;
 
-	public List<FilmDetails> getProjections() {
-		return projections;
+	public List<FilmDetails> getFilms() {
+		return films;
 	}
 
-	public void setProjections(List<FilmDetails> projections) {
-		this.projections = projections;
+	public void setFilms(List<FilmDetails> films) {
+		this.films = films;
 	}
 }

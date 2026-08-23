@@ -2,7 +2,8 @@ package cinemax.contracts.queries;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import cinemax.contracts.interfaces.*;
+import cinemax.contracts.interfaces.ProjectionRequest;
+import cinemax.contracts.interfaces.Query;
 
 public class GetProjections implements Query, ProjectionRequest  {
 

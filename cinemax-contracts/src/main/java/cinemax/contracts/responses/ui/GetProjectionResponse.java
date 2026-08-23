@@ -1,8 +1,5 @@
 package cinemax.contracts.responses.ui;
 
-import java.util.List;
-
-import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.interfaces.Response;
 

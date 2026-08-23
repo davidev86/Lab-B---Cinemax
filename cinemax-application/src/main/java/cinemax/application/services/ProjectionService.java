@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import cinemax.contracts.commands.DeleteProjection;
 import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
@@ -13,6 +14,7 @@ import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.queries.GetProjectionsByRangeDate;
+import cinemax.contracts.responses.DeleteProjectionResponse;
 import cinemax.contracts.responses.GetFilmResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.contracts.responses.ui.GetProjectionResponse;
@@ -76,29 +78,34 @@ public class ProjectionService {
 		return new GetProjectionsResponse(Map(res.getProjections())); 
 	}
 	
-	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
-				
-		//Get film 
-		FilmService filmService = new FilmService(tcpClient);
-		GetFilmResponse response = filmService.getFilmById(idFilm);
-		 
-		Integer durata = response.getFilm().getDurataMinuti(); 
-		
-		//Set date range
-		LocalDateTime from = dataOraProiezione.minusHours(30);
-		LocalDateTime to = dataOraProiezione.plusMinutes(durata + 30);
-		
-		GetProjectionsResponse res = getProjectionsByDateRange(from, to );
-		
-		if(res != null && !res.getProjections().isEmpty())
-			return new StoreProjectionResponse();
+	public cinemax.contracts.responses.GetProjectionsResponse getHistoricalProjection(			
+			LocalDateTime daDataProiezione, 
+			LocalDateTime aDataProiezione
+			) { 
+
+		GetProjectionsByRangeDate request = new GetProjectionsByRangeDate( daDataProiezione, aDataProiezione);
+		return tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
+	}
+	
+	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {		
+
+		if(IsTheProjectionOverlap(idFilm, dataOraProiezione))
+			throw new IllegalArgumentException("Orario non disponibile: si sovrappone a un'altra proiezione in palinsesto.");
 		
 		StoreProjection request = new StoreProjection(dataOraProiezione, idFilm, prezzoBiglietto);
 		return tcpClient.sendRequest(request, StoreProjectionResponse.class);
 	}
+	
+	public DeleteProjectionResponse deleteProjection(Integer idProiezione) {
+	    DeleteProjection request = new DeleteProjection(idProiezione);
+	    return tcpClient.sendRequest(request, DeleteProjectionResponse.class);
+	}
 
 	public StoreProjectionResponse updateProjection(Integer id, Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
 
+		if(IsTheProjectionOverlap(idFilm, dataOraProiezione))
+			throw new IllegalArgumentException("Orario non disponibile: si sovrappone a un'altra proiezione in palinsesto.");
+		
 		StoreProjection request = new StoreProjection(id, dataOraProiezione, idFilm, prezzoBiglietto);
 		return tcpClient.sendRequest(request, StoreProjectionResponse.class);	
 	}
@@ -144,4 +151,20 @@ public class ProjectionService {
 	private Integer GetAvailableSeats(ProjectionDetails projection) {
 		return maxAvailableSeats - projection.getTotalePostiPrenotati();
 	}	
+	
+	private Boolean IsTheProjectionOverlap(Integer idFilm, LocalDateTime dataOraProiezione) {
+		//Get film 
+		FilmService filmService = new FilmService(tcpClient);
+		GetFilmResponse response = filmService.getFilmById(idFilm);
+		 
+		Integer durata = response.getFilm().getDurataMinuti(); 
+		
+		//Set date range
+		LocalDateTime from = dataOraProiezione.minusMinutes(30);
+		LocalDateTime to = dataOraProiezione.plusMinutes(durata + 30);
+		
+		GetProjectionsResponse res = getProjectionsByDateRange(from, to );
+		
+		return res != null && !res.getProjections().isEmpty();
+	}
 }

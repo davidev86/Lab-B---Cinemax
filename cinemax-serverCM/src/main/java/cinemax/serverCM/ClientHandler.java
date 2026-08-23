@@ -10,8 +10,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import cinemax.contracts.interfaces.*;
-import cinemax.serverCM.dao.*;
+import cinemax.contracts.interfaces.BookingRequest;
+import cinemax.contracts.interfaces.Command;
+import cinemax.contracts.interfaces.FilmRequest;
+import cinemax.contracts.interfaces.ProjectionRequest;
+import cinemax.contracts.interfaces.Query;
+import cinemax.contracts.interfaces.Response;
+import cinemax.contracts.interfaces.UserRequest;
+import cinemax.serverCM.dao.BookingDao;
+import cinemax.serverCM.dao.Dao;
+import cinemax.serverCM.dao.FilmDao;
+import cinemax.serverCM.dao.ProjectionDao;
+import cinemax.serverCM.dao.UserDao;
 
 
 public class ClientHandler implements Runnable {

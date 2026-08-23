@@ -1,27 +1,48 @@
 package cinemax.gui.tabpanel;
 
-import javax.swing.*;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.MaskFormatter;
-
-import cinemax.application.services.ProjectionService;
-import cinemax.application.services.TcpClient;
-import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.dto.ui.ProjectionDetailsView;
-import cinemax.contracts.responses.ui.*;
-import cinemax.gui.callback.SelezioneProjectionCallBack;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
+
+import cinemax.application.services.ProjectionService;
+import cinemax.application.services.TcpClient;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
+import cinemax.contracts.responses.ui.GetProjectionsResponse;
+import cinemax.gui.callback.SelezioneProjectionCallBack;
 
 /**
  * Pannello di ricerca per le proiezioni con due template distinti (CardLayout):
