@@ -82,6 +82,9 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
             if (user.getRuolo() == Ruolo.PROIEZIONISTA) {
                 proiezionistaChangeProjection = new ProiezionistaChangeProjection(tcpClient);
                 tabbedPane.addTab("Inserisci nuova proiezione", proiezionistaChangeProjection);
+                
+                SearchProjectionHistory storiproiezionistaChangeProjection = new SearchProjectionHistory(tcpClient);
+                tabbedPane.addTab("Storico proiezioni", storiproiezionistaChangeProjection);
             }
         }
 

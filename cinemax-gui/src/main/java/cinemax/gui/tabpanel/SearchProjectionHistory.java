@@ -3,6 +3,7 @@ package cinemax.gui.tabpanel;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -16,22 +17,28 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
-import cinemax.contracts.dto.ui.ProjectionDetailsView;
-import cinemax.contracts.responses.ui.GetProjectionsResponse;
-import cinemax.gui.callback.SelezioneProjectionCallBack;
+import cinemax.application.services.ProjectionService;
+import cinemax.application.services.TcpClient;
+import cinemax.contracts.dto.ProjectionDetails;
+import cinemax.contracts.responses.GetProjectionsResponse;
+import cinemax.gui.dialog.DettaglioProiezioneDialog;
 
 /**
  * Pannello per la visualizzazione dello storico delle proiezioni.
+ * Carica automaticamente lo storico dei dati all'istanziazione via SwingWorker.
  */
-public class SearchProjectionHistory implements LoginCallBack, extends JPanel  {
+public class SearchProjectionHistory extends JPanel {
 
+    private final ProjectionService projectionService;
     private final CardLayout cardLayout;
     private final JPanel cardPanel;
-    private final DefaultListModel<ProjectionDetailsView> resultListModel;
-    private final JList<ProjectionDetailsView> listaRisultati;
+    private final DefaultListModel<ProjectionDetails> resultListModel;
+    private final JList<ProjectionDetails> listaRisultati;
 
-    public SearchProjectionHistory(SelezioneProjectionCallBack selezioneProjectionCallBack) {
+    public SearchProjectionHistory(TcpClient tcpClient) {
+        this.projectionService = new ProjectionService(tcpClient);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         Font fontBase = new Font("Tahoma", Font.PLAIN, 12);
@@ -46,14 +53,17 @@ public class SearchProjectionHistory implements LoginCallBack, extends JPanel  {
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(fontBase);
 
+        
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
         this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = listaRisultati.locationToIndex(e.getPoint());
-                    if (index >= 0 && selezioneProjectionCallBack != null) {
-                        selezioneProjectionCallBack.onSelezione(resultListModel.getElementAt(index));
-                    }
+                    if (index >= 0) {                    	 
+                    	var dialog =  new DettaglioProiezioneDialog(parentWindow, resultListModel.getElementAt(index));
+                    	dialog.setVisible(true);
+                    } 
                 }
             }
         });
@@ -70,21 +80,48 @@ public class SearchProjectionHistory implements LoginCallBack, extends JPanel  {
         add(labelTitolo);
         add(Box.createRigidArea(new Dimension(0, 15)));
         add(cardPanel);
+
+        // Avvio del caricamento automatico in background
+        caricaStoricoInBackground();
+    }
+
+    /**
+     * Esegue la chiamata al server in un thread separato (SwingWorker)
+     * per non bloccare l'interfaccia grafica durante il recupero dei dati.
+     */
+    private void caricaStoricoInBackground() {
+        SwingWorker<GetProjectionsResponse, Void> worker = new SwingWorker<>() {
+            @Override
+            protected GetProjectionsResponse doInBackground() throws Exception {
+                // Chiamata di rete eseguita in background (sostituisci i parametri se necessario)
+                return projectionService.getHistoricalProjection(); 
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    GetProjectionsResponse response = get();
+                    popolaListaRisultati(response);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(SearchProjectionHistory.this,
+                        "Errore durante il caricamento dello storico: " + ex.getMessage(),
+                        "Errore Server",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     /**
      * Aggiorna il modello della lista con i dati restituiti dal server.
      */
-    private void popolaListaRisultati(GetProjectionsResponse response) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            SwingUtilities.invokeLater(() -> popolaListaRisultati(response));
-            return;
-        }
-
+    public void popolaListaRisultati(GetProjectionsResponse response) {
         resultListModel.clear();
 
         if (response != null && response.getProjections() != null) {
-            List<ProjectionDetailsView> projections = response.getProjections();
+            List<ProjectionDetails> projections = response.getProjections();
 
             if (projections.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
@@ -92,7 +129,7 @@ public class SearchProjectionHistory implements LoginCallBack, extends JPanel  {
                     "Storico Vuoto",
                     JOptionPane.INFORMATION_MESSAGE);
             } else {
-                for (ProjectionDetailsView projection : projections) {
+                for (ProjectionDetails projection : projections) {
                     resultListModel.addElement(projection);
                 }
                 cardLayout.show(cardPanel, "scrollPanel");

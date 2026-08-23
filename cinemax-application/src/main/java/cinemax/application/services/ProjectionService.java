@@ -11,6 +11,7 @@ import cinemax.contracts.commands.StoreProjection;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.queries.GetProjectionById;
+import cinemax.contracts.queries.GetProjectionHistory;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
 import cinemax.contracts.queries.GetProjectionsByRangeDate;
@@ -34,7 +35,7 @@ public class ProjectionService {
 			String genere, 
 			LocalDate daDataProiezione, 
 			LocalDate aDataProiezione, 
-			BigDecimal daCosto, 
+			BigDecimal daCosto,  
 			BigDecimal aCosto) {
 
 		GetProjections request = new GetProjections(titolo, genere, daDataProiezione, aDataProiezione, daCosto, aCosto);
@@ -78,12 +79,9 @@ public class ProjectionService {
 		return new GetProjectionsResponse(Map(res.getProjections())); 
 	}
 	
-	public cinemax.contracts.responses.GetProjectionsResponse getHistoricalProjection(			
-			LocalDateTime daDataProiezione, 
-			LocalDateTime aDataProiezione
-			) { 
+	public cinemax.contracts.responses.GetProjectionsResponse getHistoricalProjection() { 
 
-		GetProjectionsByRangeDate request = new GetProjectionsByRangeDate( daDataProiezione, aDataProiezione);
+		GetProjectionHistory request = new GetProjectionHistory();
 		return tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
 	}
 	

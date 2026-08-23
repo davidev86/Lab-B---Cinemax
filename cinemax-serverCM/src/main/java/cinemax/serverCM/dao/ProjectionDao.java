@@ -46,6 +46,7 @@ public class ProjectionDao implements Dao {
 			case GetProjectionsByFilmAndDate u  -> response = find(u);
 			case GetProjectionById u  -> response = find(u);  
 			case GetProjectionsByRangeDate u  -> response = find(u);
+			case GetProjectionHistory u  -> response = find(u);
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -245,7 +246,7 @@ public class ProjectionDao implements Dao {
 				dto.setDurataMinuti(rs.getInt("durataminuti"));
 				dto.setEtaMinima(rs.getInt("etaminima"));
 				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
-				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
+
 				return dto;
 			} );
 
