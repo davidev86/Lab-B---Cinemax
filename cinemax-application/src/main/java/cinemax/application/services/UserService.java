@@ -53,18 +53,24 @@ public class UserService {
 	}
 	
 
-	public StoreUserResponse insertUser(String username, String password, String nome, String cognome,	 LocalDate dataNascita,	 String domicilio) {
 		
-		
-		try {
-			String md5Passord = HashBuilder.convertToMD5(password);
-			StoreUser request = new StoreUser(username, md5Passord, nome, cognome, dataNascita, domicilio, Ruolo.CLIENTE);		
-			return tcpClient.sendRequest(request, StoreUserResponse.class);
-		}
-		catch (NoSuchAlgorithmException e) {
-			return null;
-		}
-		
-	}
-	
+	public StoreUserResponse insertUser(String username, String password, String nome, String cognome, LocalDate dataNascita, String domicilio) {
+	    try {
+	        String md5Password = HashBuilder.convertToMD5(password);
+	        StoreUser request = new StoreUser(username, md5Password, nome, cognome, dataNascita, domicilio, Ruolo.CLIENTE);        
+	        
+	        StoreUserResponse response = tcpClient.sendRequest(request, StoreUserResponse.class);
+	        
+	        // Verifica se la risposta è valida e se l'operazione ha avuto successo
+	        if (response == null || response.getId() == null) {
+	            String msg = "Utente duplicato!";
+	            throw new RuntimeException(msg);
+	        }
+	        
+	        return response;
+
+	    } catch (NoSuchAlgorithmException e) {
+	        throw new RuntimeException("Errore nell'algoritmo di hashing della password.", e);
+	    }
+	}	
 }

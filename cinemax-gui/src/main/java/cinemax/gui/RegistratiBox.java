@@ -192,7 +192,7 @@ public class RegistratiBox extends JDialog {
             @Override
             protected void done() {
                 setStatoControlli(true);
-                setCursor(Cursor.getDefaultCursor());
+                setCursor(Cursor.getDefaultCursor()); 
 
                 try {
                     get();
@@ -200,7 +200,9 @@ public class RegistratiBox extends JDialog {
                             "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
                 } catch (Exception ex) {
-                    mostraMessaggio("Errore durante la registrazione: " + ex.getMessage(), 
+                	
+                	Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+                    mostraMessaggio("Errore durante la registrazione: " + cause.getMessage(), 
                             "Errore Server", JOptionPane.ERROR_MESSAGE);
                 }
             }

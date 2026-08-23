@@ -59,8 +59,8 @@ public class UserDao implements Dao {
 		String baseQuery = "SELECT * FROM public.\"Utenti\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
-
-		sqb.and("username = ?", req.getUsername())
+		
+		sqb.and("LOWER(username) = LOWER(?)", req.getUsername())
 		.and("password = ?", req.getMd5Password());				
 
 		try {
@@ -160,53 +160,51 @@ public class UserDao implements Dao {
 	}	
 	
 	private Response updateUser(StoreUser req) {
-		SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Utenti\"");
-		
-		sub.set("username", req.getUsername())
-		   .set("md5Password", req.getMd5Password())
-		   .set("nome", req.getNome())
-		   .set("cognome", req.getCognome())
-		   .set("dataNascita", req.getDataNascita())
-		   .set("domicilio", req.getDomicilio())
-		   .set("ruolo", req.getRuolo() != null ? req.getRuolo().name() : null);			
+	    SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Utenti\"");
+	    
+	    sub.set("username", req.getUsername())
+	       .set("password", req.getMd5Password())
+	       .set("nome", req.getNome())
+	       .set("cognome", req.getCognome())
+	       .set("data_nascita", req.getDataNascita())
+	       .set("domicilio", req.getDomicilio())
+	       .set("ruolo", req.getRuolo() != null ? req.getRuolo().name().toLowerCase() : null);         
 
-		
-		sub.where("id", req.getId());
-		
-		try {
-			int rowsAffected = DbHelper.executeUpdate(_connection, sub.getSql(), sub.getParams());
-			System.out.println("Proiezione aggiornata, righe modificate: " + rowsAffected);
+	    sub.where("id", req.getId());
+	    
+	    try {
+	        int rowsAffected = DbHelper.executeUpdate(_connection, sub.getSql(), sub.getParams());
+	        System.out.println("Utente aggiornato, righe modificate: " + rowsAffected);
 
-			return new StoreProjectionResponse(req.getId());
+	        return new StoreUserResponse(req.getId());
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}		
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }       
 	}
-	
+
 	private Response insertUser(StoreUser req) {
-		//CASO INSERT
-		SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Utenti\"");
+	    SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Utenti\"");
 
-		sib.set("username", req.getUsername())
-		   .set("md5Password", req.getMd5Password())
-		   .set("nome", req.getNome())
-		   .set("cognome", req.getCognome())
-		   .set("dataNascita", req.getDataNascita())
-		   .set("domicilio", req.getDomicilio())
-		   .set("ruolo", req.getRuolo() != null ? req.getRuolo().name() : null);			
+	    sib.set("username", req.getUsername())
+	       .set("password", req.getMd5Password())
+	       .set("nome", req.getNome())
+	       .set("cognome", req.getCognome())
+	       .set("data_nascita", req.getDataNascita())
+	       .set("domicilio", req.getDomicilio())
+	       .set("ruolo", req.getRuolo() != null ? req.getRuolo().name().toLowerCase() : null);         
 
-		try {
-			// Esegue l'insert e recupera l'ID generato da PostgreSQL
-			Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
-			System.out.println("Nuova proiezione inserita con ID: " + newId);
+	    try {
+	        // Esegue l'insert e recupera l'ID generato da PostgreSQL
+	        Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
+	        System.out.println("Nuovo utente inserito con ID: " + newId);
 
-			return new StoreUserResponse(newId);
+	        return new StoreUserResponse(newId);
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}			
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }           
 	}
 }

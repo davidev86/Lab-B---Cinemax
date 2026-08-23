@@ -226,10 +226,8 @@ public class ClientBooking extends JPanel {
 
                     if (response != null && response.getBookings() != null) {
                         List<BookingDetails> bookings = response.getBookings();
-                        if (bookings.isEmpty()) {
-                            mostraMessaggio("Non hai ancora effettuato nessuna prenotazione.", "Nessun Risultato", JOptionPane.INFORMATION_MESSAGE);
-                        } else {
-                            resultListModel.addAll(bookings);
+                        if (!bookings.isEmpty()) {
+                        	 resultListModel.addAll(bookings);
                         }
                     } else {
                         mostraMessaggio("Risposta non valida dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
