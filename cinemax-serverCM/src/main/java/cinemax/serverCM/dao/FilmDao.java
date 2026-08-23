@@ -4,10 +4,12 @@ import cinemax.contracts.interfaces.Command;
 
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
+import cinemax.contracts.queries.GetFilmsById;
 import cinemax.contracts.queries.GetFilmsByTitle;
 import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
+import cinemax.contracts.responses.GetFilmResponse;
 import cinemax.contracts.responses.GetFilmsResponse;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.GetProjectionsResponse;
@@ -40,7 +42,8 @@ public class FilmDao implements Dao {
 		try { 
 
 			switch (req) {
-			case GetFilmsByTitle u  -> response =find(u);  			
+			case GetFilmsByTitle u  -> response =find(u);  	
+			case GetFilmsById u  -> response =find(u);  
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -92,38 +95,29 @@ public class FilmDao implements Dao {
 		return null;
 	}
 	
-	private Response find(GetProjectionsByFilmAndDate req) {		
+	private Response find(GetFilmsById req) {		
 
-		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
+		String baseQuery = "SELECT * FROM public.\"Films\"";
 
 		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
 
-		String titoloPattern = (req.getTitoloFilm() != null && !req.getTitoloFilm().isBlank()) 
-				? "%" + req.getTitoloFilm() + "%" 
-				: null;
-		
-		sqb.and("titolofilm ILIKE ?", titoloPattern)
-		.and("data_ora_proiezione <= ?", req.getMaxDataPrenotazione());				
-
+		sqb.and("id = ?", req.getIdFilm());
+	
 		try {
 
-			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
-				ProjectionDetails dto = new ProjectionDetails();
-				dto.setId(rs.getInt("id_proiezione"));
-				dto.setIdFilm(rs.getInt("id_film"));
-				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
-				dto.setTitoloFilm(rs.getString("titolofilm"));
-				dto.setGenere(rs.getString("genere"));
-				dto.setRegista(rs.getString("regista"));
-				dto.setAnno(rs.getInt("anno"));
-				dto.setDurataMinuti(rs.getInt("durataminuti"));
-				dto.setEtaMinima(rs.getInt("etaminima"));
-				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
-				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
+			List<FilmDetails> films = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+				FilmDetails dto = new FilmDetails();
+				dto.setId(rs.getInt("id"));
+			    dto.setTitoloFilm(rs.getString("titolo_film"));
+			    dto.setGenere(rs.getString("genere"));
+			    dto.setRegista(rs.getString("regista"));
+			    dto.setAnno(rs.getInt("anno"));
+			    dto.setDurataMinuti(rs.getInt("durata_minuti"));
+			    dto.setEtaMinima(rs.getInt("eta_minima"));
 				return dto;
 			} );
-
-			return new GetProjectionsResponse(projs);
+					   
+			return new GetFilmResponse(films.getFirst());
 
 		}
 		catch (SQLException e) {
@@ -134,97 +128,9 @@ public class FilmDao implements Dao {
 		return null;
 	}
 
-	
-	private Response find(GetProjectionById req) {		
-
-		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
-
-		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
-
-		
-		sqb.and("id_proiezione = ?", req.getIdProiezione());
-	
-		try {
-
-			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
-				ProjectionDetails dto = new ProjectionDetails();
-				dto.setId(rs.getInt("id_proiezione"));
-				dto.setIdFilm(rs.getInt("id_film"));
-				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
-				dto.setTitoloFilm(rs.getString("titolofilm"));
-				dto.setGenere(rs.getString("genere"));
-				dto.setRegista(rs.getString("regista"));
-				dto.setAnno(rs.getInt("anno")); 
-				dto.setDurataMinuti(rs.getInt("durataminuti"));
-				dto.setEtaMinima(rs.getInt("etaminima"));
-				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
-				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
-				return dto;
-			} );
-
-			return new GetProjectionResponse(projs.getFirst());
-
-		}
-		catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-
-	
-	
-	
-	
-	
 	@Override
 	public Response execute(Command req) {
-
-		//CASO INSERT
-		if(req.getId() == null ) return insertProjection((StoreProjection) req);		
-		//CASO UPDATE
-		else return updateProjection((StoreProjection)req);			
-	}
-
-	private Response updateProjection(StoreProjection req) {
-		SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Proiezioni\"");
-		
-		sub.set("data_ora_proiezione", req.getDataOraProiezione());
-		sub.set("prezzo_biglietto", req.getPrezzoBiglietto());
-		sub.set("id_film", req.getIdFilm());
-		
-		sub.where("id", req.getId());
-		
-		try {
-			int rowsAffected = DbHelper.executeUpdate(_connection, sub.getSql(), sub.getParams());
-			System.out.println("Proiezione aggiornata, righe modificate: " + rowsAffected);
-
-			return new StoreProjectionResponse(req.getId());
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}		
-	}
-
-	private Response insertProjection(StoreProjection req) {
-		SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Proiezioni\"");
-
-		sib.set("data_ora_proiezione", req.getDataOraProiezione())
-		.set("prezzo_biglietto", req.getPrezzoBiglietto())
-		.set("id_film", req.getIdFilm());	       
-
-		try {
-			// Esegue l'insert e recupera l'ID generato da PostgreSQL
-			Integer newId = DbHelper.executeInsert(_connection, sib.getSql(), sib.getParams()); 
-			System.out.println("Nuova proiezione inserita con ID: " + newId);
-
-			return new StoreProjectionResponse(newId);
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Non è possibile inserire un film!");
+	}	
 }

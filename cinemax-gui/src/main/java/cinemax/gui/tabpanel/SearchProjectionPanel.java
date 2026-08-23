@@ -198,7 +198,12 @@ public class SearchProjectionPanel extends JPanel {
     // LOGICA DI CONTROLLO ED ESECUZIONE DELLA RICERCA
     // =========================================================================
 
-    private void eseguiRicerca() {
+    public void eseguiRicerca() {
+    	
+    	if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(this::eseguiRicerca);
+            return;
+        }
         // -----------------------------------------------------------------
         // CASO 1: RICERCA PER TITOLO (TEMPLATE 1)
         // -----------------------------------------------------------------

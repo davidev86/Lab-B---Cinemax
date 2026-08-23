@@ -1,9 +1,6 @@
 package cinemax.contracts.responses;
 
-import java.util.List;
-
 import cinemax.contracts.dto.ProjectionDetails;
-import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.interfaces.Response;
 
 public class GetProjectionResponse implements Response {

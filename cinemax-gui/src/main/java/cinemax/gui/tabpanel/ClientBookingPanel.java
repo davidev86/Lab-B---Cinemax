@@ -1,18 +1,36 @@
 package cinemax.gui.tabpanel;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import cinemax.application.services.BookingService;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
-import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.UserMinInfo;
-import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
 import cinemax.contracts.responses.ui.GetProjectionResponse;

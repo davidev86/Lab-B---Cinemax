@@ -9,6 +9,11 @@ public class StoreProjectionResponse  implements Response  {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Integer id;
+	private Boolean success = false;
+	
+	public StoreProjectionResponse() {
+		
+	}
 	
 	public StoreProjectionResponse(Integer id) {
 		this.id = id;
@@ -20,5 +25,10 @@ public class StoreProjectionResponse  implements Response  {
 
 	public void setId(Integer id) {
 		this.id = id;
+		this.success = true;
+	}
+
+	public Boolean getSuccess() {
+		return success;
 	}
 }

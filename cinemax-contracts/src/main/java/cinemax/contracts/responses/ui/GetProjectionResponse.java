@@ -23,7 +23,7 @@ public class GetProjectionResponse implements Response {
 		return projection;
 	}
 
-	public void setProjections(List<ProjectionDetailsView> projections) {
-		this.projections = projections;
-	}
+	public void setProjection(ProjectionDetailsView projection) {
+		this.projection = projection;
+	} 
 }

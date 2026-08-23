@@ -12,7 +12,10 @@ import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
+import cinemax.contracts.queries.GetProjectionsByRangeDate;
 import cinemax.contracts.responses.ui.*;
+import cinemax.contracts.responses.GetFilmResponse;
+import cinemax.contracts.responses.GetFilmsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
 
 public class ProjectionService {
@@ -61,8 +64,35 @@ public class ProjectionService {
 		return new GetProjectionResponse(toView(res.getProjection(), maxAvailableSeats));
 	} 
 	
-	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
+	public GetProjectionsResponse getProjectionsByDateRange(			
+			LocalDateTime daDataProiezione, 
+			LocalDateTime aDataProiezione
+			) { 
 
+		GetProjectionsByRangeDate request = new GetProjectionsByRangeDate( daDataProiezione, aDataProiezione);
+		
+		var res = tcpClient.sendRequest(request, cinemax.contracts.responses.GetProjectionsResponse.class);
+			
+		return new GetProjectionsResponse(Map(res.getProjections())); 
+	}
+	
+	public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
+				
+		//Get film 
+		FilmService filmService = new FilmService(tcpClient);
+		GetFilmResponse response = filmService.getFilmById(idFilm);
+		
+		Integer durata = response.getProjection().getDurataMinuti();
+		
+		//Set date range
+		LocalDateTime from = dataOraProiezione.minusHours(30);
+		LocalDateTime to = dataOraProiezione.plusMinutes(durata + 30);
+		
+		GetProjectionsResponse res = getProjectionsByDateRange(from, to );
+		
+		if(res != null && !res.getProjections().isEmpty())
+			return new StoreProjectionResponse();
+		
 		StoreProjection request = new StoreProjection(dataOraProiezione, idFilm, prezzoBiglietto);
 		return tcpClient.sendRequest(request, StoreProjectionResponse.class);
 	}
@@ -113,9 +143,5 @@ public class ProjectionService {
 
 	private Integer GetAvailableSeats(ProjectionDetails projection) {
 		return maxAvailableSeats - projection.getTotalePostiPrenotati();
-	}
-	
-	
-	
-	
+	}	
 }

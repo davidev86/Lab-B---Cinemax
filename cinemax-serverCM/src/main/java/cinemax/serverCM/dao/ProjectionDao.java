@@ -7,6 +7,7 @@ import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetProjectionById;
 import cinemax.contracts.queries.GetProjections;
 import cinemax.contracts.queries.GetProjectionsByFilmAndDate;
+import cinemax.contracts.queries.GetProjectionsByRangeDate;
 import cinemax.contracts.responses.GetProjectionResponse;
 import cinemax.contracts.responses.GetProjectionsResponse;
 import cinemax.contracts.responses.StoreProjectionResponse;
@@ -39,7 +40,9 @@ public class ProjectionDao implements Dao {
 
 			switch (req) {
 			case GetProjections u  -> response =find(u);  
-			case GetProjectionsByFilmAndDate u  -> response = find(u);  
+			case GetProjectionsByFilmAndDate u  -> response = find(u);
+			case GetProjectionById u  -> response = find(u);  
+			case GetProjectionsByRangeDate u  -> response = find(u);
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
 			}		
@@ -180,7 +183,44 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 
-	
+	private Response find(GetProjectionsByRangeDate req) {
+		
+		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
+
+		SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
+		
+		sqb
+		.and("data_ora_proiezione >= ?", req.getDaDataProiezione())
+		.and("data_ora_proiezione < ?", req.getaDataProiezione());				
+
+		try {
+
+			List<ProjectionDetails> projs = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
+				ProjectionDetails dto = new ProjectionDetails();
+				dto.setId(rs.getInt("id_proiezione"));
+				dto.setIdFilm(rs.getInt("id_film"));
+				dto.setDataOraProiezione(rs.getObject("data_ora_proiezione", LocalDateTime.class));
+				dto.setTitoloFilm(rs.getString("titolofilm"));
+				dto.setGenere(rs.getString("genere"));
+				dto.setRegista(rs.getString("regista"));
+				dto.setAnno(rs.getInt("anno"));
+				dto.setDurataMinuti(rs.getInt("durataminuti"));
+				dto.setEtaMinima(rs.getInt("etaminima"));
+				dto.setCosto(rs.getBigDecimal("prezzo_biglietto"));
+				dto.setTotalePostiPrenotati(rs.getInt("totale_posti_prenotati"));
+				return dto;
+			} );
+
+			return new GetProjectionsResponse(projs);
+
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	
 	
