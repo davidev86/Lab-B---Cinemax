@@ -36,7 +36,6 @@ public class UserService {
     public UserService(TcpClient tcpClient) {
         this.tcpClient = tcpClient;
     }
-
     /**
      * Esegue l'autenticazione dell'utente verificando la corrispondenza di username e password.
      * <p>

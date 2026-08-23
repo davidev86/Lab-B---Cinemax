@@ -124,7 +124,8 @@ public class SearchBooking extends JPanel {
         topContainer.add(panelForm);
         topContainer.add(panelBottone);
 
-        // 2. LISTA RISULTATI
+
+        //LISTA RISULTATI
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -161,14 +162,13 @@ public class SearchBooking extends JPanel {
         scrollPanel.setPreferredSize(new Dimension(800, 300));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
+
+        //ASSEMBLAGGIO GENERALE
         add(topContainer, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
     }
 
-    // =========================================================================
     // LOGICA DI RICERCA ASINCRONA
-    // =========================================================================
-
     private void eseguiRicerca() {
         Integer codicePrenotazione = getCodicePrenotazione();
         String nome = textFieldNome.getText().trim();
@@ -225,10 +225,7 @@ public class SearchBooking extends JPanel {
         }.execute();
     }
 
-    // =========================================================================
     // METODI AUSILIARI E PARSER
-    // =========================================================================
-
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
         label.setFont(FONT_BASE);
@@ -279,10 +276,7 @@ public class SearchBooking extends JPanel {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }
 
-    // =========================================================================
     // CELL RENDERER
-    // =========================================================================
-
     private static class BookingCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
