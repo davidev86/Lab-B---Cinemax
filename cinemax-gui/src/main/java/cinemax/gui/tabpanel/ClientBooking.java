@@ -250,10 +250,7 @@ public class ClientBooking extends JPanel {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }
 
-    // =========================================================================
     // CELL RENDERER
-    // =========================================================================
-
     private static class BookingCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

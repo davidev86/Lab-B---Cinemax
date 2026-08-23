@@ -9,6 +9,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -33,6 +35,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
@@ -40,8 +43,10 @@ import javax.swing.text.MaskFormatter;
 import cinemax.application.services.BookingService;
 import cinemax.application.services.TcpClient;
 import cinemax.contracts.dto.BookingDetails;
+import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.GetBookingResponse;
 import cinemax.gui.callback.SelezioneBookingCallBack;
+import cinemax.gui.dialog.DettaglioPrenotazioneBigliettaioDialog;
 
 /**
  * Pannello di ricerca per le prenotazioni con rendering ottimizzato e query asincrone.
@@ -56,7 +61,7 @@ public class SearchBooking extends JPanel {
     private final DefaultListModel<BookingDetails> resultListModel;
     private final JList<BookingDetails> listaRisultati;
     private final JButton btnCerca;
-
+    
     // Controlli Form
     private final JFormattedTextField textFieldCodicePrenotazione;
     private final JTextField textFieldNome;
@@ -70,9 +75,7 @@ public class SearchBooking extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // =====================================================================
         // 1. FORM DI RICERCA (GridBagLayout)
-        // =====================================================================
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Filtri di Ricerca Prenotazioni"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -83,8 +86,10 @@ public class SearchBooking extends JPanel {
         NumberFormat integerFormat = NumberFormat.getIntegerInstance();
         integerFormat.setGroupingUsed(false);
 
+        // Campo codice prenotazione (inizialmente vuoto/null per non forzare il filtro)
         this.textFieldCodicePrenotazione = new JFormattedTextField(integerFormat);
-        this.textFieldCodicePrenotazione.setValue(0);
+        this.textFieldCodicePrenotazione.setValue(null);
+        this.textFieldCodicePrenotazione.setColumns(15);
         this.textFieldCodicePrenotazione.setFont(FONT_BASE);
 
         this.textFieldNome = new JTextField(15);
@@ -119,9 +124,7 @@ public class SearchBooking extends JPanel {
         topContainer.add(panelForm);
         topContainer.add(panelBottone);
 
-        // =====================================================================
-        // 2. LISTA RISULTATI (Rendering O(1) e Scroll Ottimizzato)
-        // =====================================================================
+        // 2. LISTA RISULTATI
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -132,10 +135,23 @@ public class SearchBooking extends JPanel {
         this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() >= 1) {
+                if (e.getClickCount() >= 2) {
                     int index = listaRisultati.locationToIndex(e.getPoint());
-                    if (index >= 0 && selezioneBookingCallBack != null) {
-                        selezioneBookingCallBack.onSelezione(resultListModel.getElementAt(index),null);
+                    Rectangle cellBounds = listaRisultati.getCellBounds(index, index);
+                    
+                    // Verifica che il click sia avvenuto effettivamente su una riga esistente
+                    if (index >= 0 && cellBounds != null && cellBounds.contains(e.getPoint())) {
+                        BookingDetails prenotazioneSelezionata = resultListModel.getElementAt(index);
+                        
+                        if (selezioneBookingCallBack != null) {
+                            selezioneBookingCallBack.onSelezione(prenotazioneSelezionata, null);
+                        }
+
+                        Window parentWindow = SwingUtilities.getWindowAncestor(SearchBooking.this);
+                        ProjectionDetailsView proiezione = new ProjectionDetailsView();
+                        DettaglioPrenotazioneBigliettaioDialog dialog = 
+                                new DettaglioPrenotazioneBigliettaioDialog(parentWindow, proiezione, prenotazioneSelezionata);
+                        dialog.setVisible(true);
                     }
                 }
             }
@@ -145,9 +161,6 @@ public class SearchBooking extends JPanel {
         scrollPanel.setPreferredSize(new Dimension(800, 300));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-        // =====================================================================
-        // 3. ASSEMBLAGGIO GENERALE
-        // =====================================================================
         add(topContainer, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
     }
@@ -176,7 +189,14 @@ public class SearchBooking extends JPanel {
         new SwingWorker<GetBookingResponse, Void>() {
             @Override
             protected GetBookingResponse doInBackground() throws Exception {
-                return bookingService.getBookings(codicePrenotazione, nome, cognome, titoloFilm, dInizio, dFine);
+                return bookingService.getBookings(
+                        codicePrenotazione, 
+                        nome.isEmpty() ? null : nome, 
+                        cognome.isEmpty() ? null : cognome, 
+                        titoloFilm.isEmpty() ? null : titoloFilm, 
+                        dInizio, 
+                        dFine
+                );
             }
 
             @Override
@@ -225,9 +245,10 @@ public class SearchBooking extends JPanel {
 
         Object value = textFieldCodicePrenotazione.getValue();
         if (value instanceof Number) {
-            return ((Number) value).intValue();
+            int intVal = ((Number) value).intValue();
+            return intVal > 0 ? intVal : null;
         }
-        return 0;
+        return null;
     }
 
     private JFormattedTextField creaCampoData() {
