@@ -2,7 +2,9 @@ package cinemax.serverCM.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import cinemax.contracts.commands.DeleteProjection;
@@ -70,10 +72,13 @@ public class ProjectionDao implements Dao {
 				? "%" + req.getTitolo() + "%" 
 				: null;
 		
+		LocalDateTime da = req.getDaDataProiezione() == null? null: req.getDaDataProiezione().atStartOfDay();
+		LocalDateTime a = req.getDaDataProiezione() == null? null: req.getDaDataProiezione().atTime(LocalTime.MAX);
+		
 		sqb.and("titolofilm ILIKE ?", titoloPattern)
 		.and("genere ILIKE ?", req.getGenere())
-		.and("data_ora_proiezione >= ?", req.getDaDataProiezione())
-		.and("data_ora_proiezione < ?", req.getaDataProiezione())
+		.and("data_ora_proiezione >= ?", da)
+		.and("data_ora_proiezione < ?", a)
 		.and("prezzo_biglietto >= ?", req.getDaCosto())
 		.and("prezzo_biglietto < ?", req.getaCosto());				
 

@@ -72,7 +72,7 @@ public class SearchBooking extends JPanel {
 
     public SearchBooking(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
         this.bookingService = new BookingService(tcpClient);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(10, 10)); 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // 1. FORM DI RICERCA (GridBagLayout)

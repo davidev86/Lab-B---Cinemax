@@ -47,7 +47,6 @@ public class ClientBooking extends JPanel {
 
     private final BookingService bookingService;
     private final UserMinInfo user;
-    private final SelezioneBookingCallBack callBack;
     private final TcpClient tcpClient;
 
     private final DefaultListModel<BookingDetails> resultListModel;
@@ -55,10 +54,9 @@ public class ClientBooking extends JPanel {
     private final JButton btnModifica;
     private final JButton btnCancella;
 
-    public ClientBooking(UserMinInfo user, SelezioneBookingCallBack callBack, TcpClient tcpClient) {
+    public ClientBooking(UserMinInfo user, TcpClient tcpClient){ 
         this.user = user;
         this.tcpClient = tcpClient;
-        this.callBack = callBack;
         this.bookingService = new BookingService(tcpClient);
         
         setLayout(new BorderLayout(10, 10));
@@ -133,8 +131,8 @@ public class ClientBooking extends JPanel {
         JDialog dialog = null;
         BookingService bkgService = new BookingService(tcpClient);
         
-        if (selected != null && callBack != null) {
-            //callBack.onSelezione(selected, selected.getIdPrenotazione());
+        if (selected != null) {
+
             ProjectionService projectionService = new ProjectionService(this.tcpClient);
             	GetProjectionResponse projection = projectionService.getProjectionById(selected.getIdProiezione()) ;
             
@@ -142,7 +140,8 @@ public class ClientBooking extends JPanel {
                     parentWindow, 
                     projection.getProjection(),
                     (Integer seats) -> {
-                        bkgService.updateBooking(selected.getIdPrenotazione(), user.getId(), selected.getIdProiezione(), seats);      
+                        bkgService.updateBooking(selected.getIdPrenotazione(), user.getId(), selected.getIdProiezione(), seats);
+                        visualizzaBooking();
                     }); 
             	
             	dialog.setVisible(true);

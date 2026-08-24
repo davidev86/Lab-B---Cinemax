@@ -2,7 +2,9 @@ package cinemax.serverCM.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import cinemax.contracts.commands.DeleteBooking;
@@ -12,6 +14,7 @@ import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.Response;
 import cinemax.contracts.queries.GetBookings;
+import cinemax.contracts.queries.GetBookingsByDate;
 import cinemax.contracts.queries.GetBookingsByUserId;
 import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
@@ -37,6 +40,7 @@ public class BookingDao implements Dao {
 			switch (req) {
 				case GetBookings u -> response = find(u);
 				case GetBookingsByUserId u -> response = find(u);
+				case GetBookingsByDate u -> response = find(u);
 				default -> throw new IllegalArgumentException("Unexpected value: " + req);
 			}
 		} catch (Exception e) {
@@ -73,6 +77,24 @@ public class BookingDao implements Dao {
 		sqb.and("id_utente = ?", req.getIdUtente());
 
 		return executeBookingQuery(sqb);
+	}
+	
+	// Ricerca le prenotazioni per una specifica data ricevuta nella request
+	private Response find(GetBookingsByDate req) {
+	    LocalDate targetDate = (req != null && req.getDate() != null)  
+	            ? req.getDate() 
+	            : LocalDate.now();
+
+	    LocalDateTime startOfDay = targetDate.atStartOfDay();
+	    LocalDateTime endOfDay = targetDate.atTime(LocalTime.MAX);
+
+	    String baseQuery = "SELECT * FROM public.\"Prenotazioni_pianificate\"";
+	    SqlQueryBuilder sqb = new SqlQueryBuilder(baseQuery);
+
+	    sqb.and("data_ora_proiezione >= ?", startOfDay)
+	       .and("data_ora_proiezione <= ?", endOfDay);
+
+	    return executeBookingQuery(sqb);
 	}
 
 	private Response executeBookingQuery(SqlQueryBuilder sqb) {

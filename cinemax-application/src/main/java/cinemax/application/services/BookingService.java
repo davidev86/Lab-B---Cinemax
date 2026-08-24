@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import cinemax.contracts.commands.DeleteBooking;
 import cinemax.contracts.commands.StoreBooking;
 import cinemax.contracts.queries.GetBookings;
+import cinemax.contracts.queries.GetBookingsByDate;
 import cinemax.contracts.queries.GetBookingsByUserId;
 import cinemax.contracts.responses.DeleteBookingResponse;
 import cinemax.contracts.responses.GetBookingResponse;
@@ -62,6 +63,18 @@ public class BookingService {
     public GetBookingResponse getBookingsByUserId(Integer idUtente) {
         
         GetBookingsByUserId request = new GetBookingsByUserId(idUtente);
+        return tcpClient.sendRequest(request, GetBookingResponse.class);
+    }
+    
+    /**
+     * Recupera le prenotazioni di oggi.
+     *
+     * @param No params
+     * @return Oggetto {@link GetBookingResponse} contenente la lista delle prenotazioni effettuate.
+     */
+    public GetBookingResponse getBookingsCurrentDay() {
+        
+    	GetBookingsByDate request = new GetBookingsByDate(LocalDate.now());
         return tcpClient.sendRequest(request, GetBookingResponse.class);
     }
 

@@ -18,6 +18,7 @@ import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.DeleteProjectionResponse;
 import cinemax.contracts.responses.StoreBookingResponse;
+import cinemax.contracts.responses.ui.GetProjectionResponse;
 import cinemax.gui.callback.LoginCallBack;
 import cinemax.gui.callback.SelezioneBookingCallBack;
 import cinemax.gui.callback.SelezioneProjectionCallBack;
@@ -32,7 +33,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     
     // Tabs
     private JTabbedPane tabbedPane;
-    private SearchBooking ricercaPrenotazioni;
+    private SearchBooking searchBookings;
     private ClientBooking clientBooking;
     private ProiezionistaChangeProjection proiezionistaChangeProjection;
     private SearchProjection searchProjection;
@@ -68,13 +69,15 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
 
             // Solo per BIGLIETTAIO
             if (user.getRuolo() == Ruolo.BIGLIETTAIO) {
-                ricercaPrenotazioni = new SearchBooking(this, tcpClient);
-                tabbedPane.addTab("Ricerca prenotazioni", ricercaPrenotazioni);
-            }
+                searchBookings = new SearchBooking(this, tcpClient);
+                tabbedPane.addTab("Ricerca prenotazioni", searchBookings);
+                SearchBookingCurrentDay searchBookingCurrentDay = new SearchBookingCurrentDay(tcpClient);
+                tabbedPane.addTab("Ricerca prenotazioni", searchBookingCurrentDay);
+            }  
 
             // Solo per CLIENTE
             if (user.getRuolo() == Ruolo.CLIENTE) {
-                clientBooking = new ClientBooking(user, this, tcpClient);
+                clientBooking = new ClientBooking(user, tcpClient);
                 tabbedPane.addTab("Le tue prenotazioni", clientBooking);
             }
             
@@ -216,7 +219,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
     }
 
     @Override
-    public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {
-        // TODO Auto-generated method stub
+    public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {   	
+     
     }
 }
