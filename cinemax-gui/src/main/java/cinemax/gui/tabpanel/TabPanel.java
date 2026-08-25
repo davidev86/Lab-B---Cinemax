@@ -72,7 +72,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                 searchBookings = new SearchBooking(this, tcpClient);
                 tabbedPane.addTab("Ricerca prenotazioni", searchBookings);
                 SearchBookingCurrentDay searchBookingCurrentDay = new SearchBookingCurrentDay(tcpClient);
-                tabbedPane.addTab("Ricerca prenotazioni", searchBookingCurrentDay);
+                tabbedPane.addTab("Prenotazioni di oggi", searchBookingCurrentDay);
             }  
 
             // Solo per CLIENTE

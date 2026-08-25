@@ -119,8 +119,8 @@ public class ClientHandler implements Runnable {
 	private Connection getConnection() throws SQLException {
 
 		//TODO:DA CAMBIARE PRIMA DI CONSEGNARE!!!
-		String url = "jdbc:postgresql://192.168.1.61:5432/Cinemax";
-		return DriverManager.getConnection(url, "postgres", "personalSpace");
+		String url = "jdbc:postgresql://127.0.0.1:5432/Cinemax";
+		return DriverManager.getConnection(url, "postgres", "carlotta");
 		
 		//String url = "jdbc:postgresql://" + dbHost + "/Cinemax";
 		//return DriverManager.getConnection(url, dbUser, dbPassword);
