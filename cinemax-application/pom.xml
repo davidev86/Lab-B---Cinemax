@@ -1,17 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  
   <parent>
     <groupId>it.uninsubria.cinemax</groupId>
     <artifactId>Lab-B-Cinemax</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
+  
   <artifactId>cinemax-application</artifactId>
-  <name>cinemax-application</name>  
+  <packaging>jar</packaging>
+  <name>cinemax-application</name>
+  <description>Modulo applicazione Cinemax con servizi di business logic</description>
+  
   <dependencies>
-  	<dependency>
-  		<groupId>it.uninsubria.cinemax</groupId>
-  		<artifactId>cinemax-contracts</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
+    <dependency>
+      <groupId>it.uninsubria.cinemax</groupId>
+      <artifactId>cinemax-contracts</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

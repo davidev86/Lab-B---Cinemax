@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.queries;
 
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.UserRequest;
 
+/**
+ * Query parametrizzata per autenticare un utente tramite username e password (hash MD5).
+ */
 public class GetUserByCredentials implements Query, UserRequest  {
 
 	/**
@@ -40,3 +46,5 @@ public class GetUserByCredentials implements Query, UserRequest  {
 	
 }
  
+
+

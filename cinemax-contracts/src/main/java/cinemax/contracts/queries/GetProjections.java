@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.queries;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -5,6 +8,9 @@ import java.time.LocalDate;
 import cinemax.contracts.interfaces.ProjectionRequest;
 import cinemax.contracts.interfaces.Query;
 
+/**
+ * Query parametrizzata per cercare proiezioni con filtri avanzati su titolo, genere, intervallo date proiezione e intervallo prezzi.
+ */
 public class GetProjections implements Query, ProjectionRequest  {
 
 	/**
@@ -98,3 +104,5 @@ public class GetProjections implements Query, ProjectionRequest  {
 	
 }
  
+
+

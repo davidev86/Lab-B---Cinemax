@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao.utils;
 
 import java.math.BigDecimal;
@@ -5,6 +8,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder per la costruzione dinamica di query SQL con supporto a condizioni WHERE aggregate in AND e gestione parametrizzata di valori.
+ */
 public class SqlQueryBuilder {
     private final String baseSql;
     private final List<String> conditions = new ArrayList<>();
@@ -50,7 +56,7 @@ public class SqlQueryBuilder {
             return baseSql;
         }
         
-        // Se la baseSql contiene già un WHERE, le nuove condizioni vanno in AND
+        // Se la baseSql contiene giÃ  un WHERE, le nuove condizioni vanno in AND
         String prefix = baseSql.toUpperCase().contains("WHERE") ? " AND " : " WHERE ";
         
         // Unisce tutte le condizioni aggiungendo " AND " solo tra di esse
@@ -61,3 +67,5 @@ public class SqlQueryBuilder {
         return params;
     }
 }
+
+

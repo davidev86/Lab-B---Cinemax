@@ -24,40 +24,44 @@ import cinemax.serverCM.dao.ProjectionDao;
 import cinemax.serverCM.dao.UserDao;
 
 
+/**
+ * Gestore per singola connessione client lato serverCM.
+ * Riceve oggetti Query/Command dal client, seleziona il DAO appropriato
+ * ed esegue l'operazione ritornando la Response corrispondente.
+ */
 public class ClientHandler implements Runnable {
 	private Socket clientSocket;
 	private String dbHost;
+	private int dbPort;
 	private String dbUser;
 	private String dbPassword;
 
-	public ClientHandler(Socket socket, String dbHost, String dbUser, String dbPassword) {
+	public ClientHandler(Socket socket, String dbHost,int dbPort, String dbUser, String dbPassword) {
 		this.clientSocket = socket;
 		this.dbHost = dbHost;
+		this.dbPort = dbPort;
 		this.dbUser = dbUser;
 		this.dbPassword = dbPassword;
 	}
 
 	@Override
 	public void run() {
-		// 1. Inizializza PRIMA ObjectOutputStream e poi ObjectInputStream per evitare deadlock sull'header
 		try (
 				ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
 				ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream())
 		) {
 			oos.flush(); // Invia l'header al client
 
-			// 2. Ciclo continuo per gestire più richieste consecutive sulla stessa socket
 			while (!clientSocket.isClosed()) {
 				Object received;
 				try {
 					received = ois.readObject();
 				} catch (EOFException | SocketException e) {
-					// Il client ha chiuso la connessione normalmente
+					// Il client ha chiuso la connessione (EOFException o SocketException ricevuta)
 					System.out.println("Client disconnesso.");
 					break;
 				}
 
-				// --- GESTIONE QUERY ---
 				if (received instanceof Query) {
 					Query request = (Query) received;
 					System.out.println("Ricevuta richiesta (Query) di tipo: " + received.getClass().getSimpleName());
@@ -75,7 +79,6 @@ public class ClientHandler implements Runnable {
 						e.printStackTrace();
 					}
 				} 
-				// --- GESTIONE COMMAND ---
 				else if (received instanceof Command) {
 					Command command = (Command) received;
 					System.out.println("Ricevuto comando (Command) di tipo: " + command.getClass().getSimpleName());
@@ -114,15 +117,21 @@ public class ClientHandler implements Runnable {
 		return null;
 	}
 	
+	private Connection getConnection() throws SQLException {
+	    String url = "jdbc:postgresql://" + dbHost + ":" + dbPort + "/Cinemax";
+	    return DriverManager.getConnection(url, dbUser, dbPassword);
+	}
 	
-
+	
+	/*
 	private Connection getConnection() throws SQLException {
 
-		//TODO:DA CAMBIARE PRIMA DI CONSEGNARE!!!
+		//FOR TESTING PURPOSE
 		String url = "jdbc:postgresql://127.0.0.1:5432/Cinemax";
 		return DriverManager.getConnection(url, "postgres", "carlotta");
 		
 		//String url = "jdbc:postgresql://" + dbHost + "/Cinemax";
 		//return DriverManager.getConnection(url, dbUser, dbPassword);
 	}
+	*/
 }

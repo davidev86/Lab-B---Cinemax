@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao;
 
 import java.sql.Connection;
@@ -28,6 +31,10 @@ import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 
+/**
+ * DAO per la gestione delle proiezioni: ricerche, inserimenti, aggiornamenti e cancellazioni.
+ * Mappa le righe del DB su {@link cinemax.contracts.dto.ProjectionDetails} e costruisce le Response corrispondenti.
+ */
 public class ProjectionDao implements Dao {
 
 	private Connection _connection; 
@@ -333,3 +340,5 @@ public class ProjectionDao implements Dao {
 	    }
 	}
 }
+
+

@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses;
 
 import java.util.List;
@@ -5,6 +8,9 @@ import java.util.List;
 import cinemax.contracts.dto.FilmDetails;
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta che incapsula una collezione di dettagli di film.
+ */
 public class GetFilmsResponse implements Response {
 
 	/**
@@ -26,3 +32,5 @@ public class GetFilmsResponse implements Response {
 		this.films = films;
 	}
 }
+
+

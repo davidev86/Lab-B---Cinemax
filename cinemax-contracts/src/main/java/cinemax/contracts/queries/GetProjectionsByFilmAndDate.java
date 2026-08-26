@@ -1,9 +1,15 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.queries;
 import java.time.LocalDate;
 
 import cinemax.contracts.interfaces.ProjectionRequest;
 import cinemax.contracts.interfaces.Query;
 
+/**
+ * Query parametrizzata per recuperare le proiezioni di un film identificato dal titolo fino a una data massima di prenotazione.
+ */
 public class GetProjectionsByFilmAndDate implements Query, ProjectionRequest  {
 
 	/**
@@ -36,3 +42,5 @@ public class GetProjectionsByFilmAndDate implements Query, ProjectionRequest  {
 	}	
 }
  
+
+

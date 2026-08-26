@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao;
 
 import java.sql.Connection;
@@ -15,13 +18,15 @@ import cinemax.contracts.queries.GetUserByCredentials;
 import cinemax.contracts.queries.GetUserDetails;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
 import cinemax.contracts.responses.GetUserDetailsResponse;
-import cinemax.contracts.responses.StoreProjectionResponse;
 import cinemax.contracts.responses.StoreUserResponse;
 import cinemax.serverCM.dao.utils.DbHelper;
 import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 
+/**
+ * DAO per la gestione delle operazioni di lettura, creazione e modifica degli utenti nel database, incluse autenticazione e recupero dati profilo.
+ */
 public class UserDao implements Dao {
 
 	private Connection _connection; 
@@ -109,15 +114,15 @@ public class UserDao implements Dao {
 	        List<UserDetails> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
 	            UserDetails dto = new UserDetails();
 	            
-	            // 1. ID (Corretto da 'id_proiezione' a 'id')
+	            
 	            dto.setId(rs.getInt("id"));
 	            
-	            // 2. Anagrafica e Credenziali
+	            
 	            dto.setNome(rs.getString("nome"));
 	            dto.setCognome(rs.getString("cognome"));
 	            dto.setUsername(rs.getString("username"));
 	            
-	            // 3. Domicilio e Ruolo
+	            
 	            dto.setDomicilio(rs.getString("domicilio"));
 	        
 	            // Ruolo (conversione da String del DB a Enum Java)
@@ -126,7 +131,7 @@ public class UserDao implements Dao {
 	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
 	            }
 	            
-	            // 4. Data di nascita (gestisce eventuali valori NULL sul DB)
+	            
 	            java.sql.Date sqlDate = rs.getDate("data_nascita");
 	            if (sqlDate != null) {
 	                dto.setDataNascita(sqlDate.toLocalDate()); // Se in UserDetails usi LocalDate
@@ -208,3 +213,5 @@ public class UserDao implements Dao {
 	    }           
 	}
 }
+
+

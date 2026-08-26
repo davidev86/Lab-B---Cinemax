@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM;
 
 import java.awt.Dimension;
@@ -15,6 +18,11 @@ import cinemax.clientCM.tabpanel.TabPanel;
 import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.dto.UserMinInfo;
 
+/**
+ * Classe di bootstrap/entry per la GUI client. Costruisce il frame principale,
+ * inizializza i pannelli di login e ricerca e coordina lo stato globale
+ * dell'utente autenticato nella sessione.
+ */
 public class Cinemaxhome {
 
 	static UserMinInfo loggedUser = null;
@@ -31,7 +39,7 @@ public class Cinemaxhome {
 		String serverIP = "127.0.0.1"; // localhost
 		int serverPort = 12345;
 
-		// Il TCP client servrà ai componenti (panel) che devono comunicare con i DAO
+		// Il TCP client servrÃ  ai componenti (panel) che devono comunicare con i DAO
 
 		TcpClient tcpClient = new TcpClient(serverIP, serverPort);
 
@@ -95,3 +103,4 @@ public class Cinemaxhome {
 	}
 
 }
+

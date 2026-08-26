@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   
@@ -10,13 +11,29 @@
   </parent>
 
   <artifactId>cinemax-gui</artifactId>
+  <packaging>jar</packaging>
   <name>cinemax-gui</name>
+  <description>Modulo GUI client Cinemax</description>
   
   <dependencies>
     <dependency>
-        <groupId>it.uninsubria.cinemax</groupId>
-        <artifactId>cinemax-application</artifactId>
-        <version>${project.version}</version>
+      <groupId>it.uninsubria.cinemax</groupId>
+      <artifactId>cinemax-application</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder per la costruzione di query SQL UPDATE con supporto dinamico per clausole SET e WHERE.
+ */
 public class SqlUpdateBuilder {
     private final String tableName;
     private final List<String> setColumns = new ArrayList<>();
@@ -73,3 +79,5 @@ public class SqlUpdateBuilder {
         return allParams;
     }
 }
+
+

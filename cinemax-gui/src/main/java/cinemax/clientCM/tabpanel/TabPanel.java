@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.tabpanel;
 
 import java.awt.Window;
@@ -26,6 +29,9 @@ import cinemax.contracts.responses.DeleteProjectionResponse;
 import cinemax.contracts.responses.StoreBookingResponse;
 import cinemax.contracts.responses.ui.GetProjectionResponse;
 
+/**
+ * Pannello con schede tabulate che si riconfigura dinamicamente in base al ruolo dell'utente autenticato, fornendo accesso alle funzionalità appropriate.
+ */
 public class TabPanel extends JPanel implements SelezioneProjectionCallBack, LoginCallBack {
 
     private final TcpClient tcpClient;
@@ -60,12 +66,10 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
 
         tabbedPane.removeAll(); // Rimuove tutte le schede precedenti per aggiornarle
 
-        // 1. SCHEDA 1: Ricerca Proiezioni (Sempre visibile a chiunque)
-        searchProjection = new SearchProjection(this, tcpClient);
+                searchProjection = new SearchProjection(this, tcpClient);
         tabbedPane.addTab("Ricerca proiezioni", searchProjection);
 
-        // 2. SCHEDE RISERVATE (Solo se l'utente è loggato)
-        if (user != null && user.getRuolo() != null) {
+                if (user != null && user.getRuolo() != null) {
 
             // Solo per BIGLIETTAIO
             if (user.getRuolo() == Ruolo.BIGLIETTAIO) {
@@ -146,7 +150,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                         parentWindow,
                         projection,
 
-                        // 1. Callback MODIFICA
+                        
                         (ProjectionDetails projModificata) -> {
                             try {
                                 projectionService.updateProjection(
@@ -167,7 +171,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                             }
                         },
 
-                        // 2. Callback CANCELLAZIONE
+                        
                         (ProjectionDetails projCancellata) -> {
                         	try {
                                 DeleteProjectionResponse res = projectionService.deleteProjection(projCancellata.getId());
@@ -218,3 +222,5 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         aggiornaTabPerRuolo();
     }
 }
+
+

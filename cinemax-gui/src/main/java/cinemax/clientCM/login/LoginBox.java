@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.login;
 
 
@@ -23,7 +26,10 @@ import cinemax.clientCM.callback.LoginCallBack;
 import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.responses.GetUserByCredentialResponse;
 
-
+/**
+ * Dialog modale per l'autenticazione dell'utente.
+ * Presenta i campi username/password e notifica il risultato tramite {@link LoginCallBack}.
+ */
 public class LoginBox extends JDialog {
     private JTextField usernameField;
     private JTextField passwordField;
@@ -106,3 +112,5 @@ public class LoginBox extends JDialog {
     }
 
 }
+
+

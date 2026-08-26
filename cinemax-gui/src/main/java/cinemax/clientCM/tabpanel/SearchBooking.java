@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.tabpanel;
 
 import java.awt.BorderLayout;
@@ -70,13 +73,17 @@ public class SearchBooking extends JPanel {
     private final JFormattedTextField dataInizio;
     private final JFormattedTextField dataFine;
 
+    /**
+     * Costruisce il pannello di ricerca delle prenotazioni.
+     * Inizializza i controlli UI, il servizio di accesso remoto e la lista dei risultati.
+     * @param tcpClient client TCP usato dal {@link BookingService} per comunicare con il server
+     */
     public SearchBooking(TcpClient tcpClient) {
         this.bookingService = new BookingService(tcpClient);
         setLayout(new BorderLayout(10, 10)); 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 1. FORM DI RICERCA (GridBagLayout)
-        JPanel panelForm = new JPanel(new GridBagLayout());
+                JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Filtri di Ricerca Prenotazioni"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 6, 4, 6);
@@ -165,6 +172,11 @@ public class SearchBooking extends JPanel {
     }
 
     // LOGICA DI RICERCA ASINCRONA
+    /**
+     * Avvia una ricerca asincrona delle prenotazioni usando i filtri correnti presenti nel form.
+     * Disabilita il bottone di ricerca e mostra il cursore di attesa durante l'operazione.
+     * I risultati aggiornano la lista dei risultati o mostrano messaggi all'utente in caso di errori.
+     */
     private void eseguiRicerca() {
         Integer codicePrenotazione = getCodicePrenotazione();
         String nome = textFieldNome.getText().trim();
@@ -223,6 +235,10 @@ public class SearchBooking extends JPanel {
         }.execute();
     }
     
+    /**
+     * Ripristina i campi del form allo stato iniziale (valori vuoti/null).
+     * Questo metodo è usato dopo il termine di una ricerca per preparare il form ad una nuova ricerca.
+     */
     private void pulisciCampi() {
         // Reset JTextField standard
         textFieldTitoloFilm.setText("");
@@ -237,6 +253,14 @@ public class SearchBooking extends JPanel {
     }
 
     // METODI AUSILIARI E PARSER
+    /**
+     * Aggiunge una riga al pannello form usando GridBagLayout: prima colonna label, seconda il field.
+     * @param panel pannello che contiene il form
+     * @param label etichetta da posizionare nella prima colonna
+     * @param field componente di input da posizionare nella seconda colonna
+     * @param gbc constraints condivisi per il layout
+     * @param riga indice di riga (gridy) nel GridBagLayout
+     */
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
         label.setFont(FONT_BASE);
@@ -246,6 +270,11 @@ public class SearchBooking extends JPanel {
         panel.add(field, gbc);
     }
 
+    /**
+     * Restituisce il codice prenotazione inserito nel campo corrispondente.
+     * Se il campo è vuoto o contiene un valore non positivo ritorna {@code null}.
+     * @return codice prenotazione valido (>0) oppure {@code null} se non presente
+     */
     public Integer getCodicePrenotazione() {
         try {
             textFieldCodicePrenotazione.commitEdit();
@@ -259,6 +288,11 @@ public class SearchBooking extends JPanel {
         return null;
     }
 
+    /**
+     * Crea e restituisce un JFormattedTextField configurato per l'inserimento di date nel formato dd/MM/yyyy.
+     * Il campo utilizza una MaskFormatter per mostrare il placeholder e gestire l'input.
+     * @return campo formattato per date
+     */
     private JFormattedTextField creaCampoData() {
         JFormattedTextField field = new JFormattedTextField();
         try {
@@ -271,6 +305,13 @@ public class SearchBooking extends JPanel {
         return field;
     }
 
+    /**
+     * Parsea il testo presente in un JFormattedTextField e tenta di convertirlo in {@link LocalDate}
+     * usando il formato definito da {@code DATE_FORMATTER} (dd/MM/yyyy).
+     * Se il campo è incompleto (contiene placeholder) o la data non è valida ritorna {@code null}.
+     * @param field campo contenente la data in formato testuale
+     * @return LocalDate parsata oppure {@code null} in caso di input invalido
+     */
     private LocalDate parseLocalDate(JFormattedTextField field) {
         String text = field.getText().trim();
         if (text.contains("_") || text.isEmpty()) {
@@ -283,11 +324,21 @@ public class SearchBooking extends JPanel {
         }
     }
 
+    /**
+     * Mostra una finestra di dialogo informativa all'utente.
+     * @param testo testo del messaggio
+     * @param titolo titolo della finestra
+     * @param tipo tipo di messaggio (es. JOptionPane.INFORMATION_MESSAGE)
+     */
     private void mostraMessaggio(String testo, String titolo, int tipo) {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }
 
     // CELL RENDERER
+    /**
+     * Renderer semplice per visualizzare gli elementi {@link BookingDetails} nella JList.
+     * Mostra la rappresentazione testuale ottenuta tramite {@code BookingDetails.toString()}.
+     */
     private static class BookingCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -300,3 +351,4 @@ public class SearchBooking extends JPanel {
         }
     }
 }
+

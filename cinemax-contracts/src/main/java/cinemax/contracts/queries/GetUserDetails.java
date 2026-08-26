@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.queries;
 
 import cinemax.contracts.interfaces.Query;
 import cinemax.contracts.interfaces.UserRequest;
 
+/**
+ * Query per recuperare i dettagli completi di un utente specifico identificato tramite il suo ID univoco.
+ */
 public class GetUserDetails implements Query, UserRequest  {
 		
 	/**
@@ -28,3 +34,5 @@ public class GetUserDetails implements Query, UserRequest  {
 	
 }
  
+
+

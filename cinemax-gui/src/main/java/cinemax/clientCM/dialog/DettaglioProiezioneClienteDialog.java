@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.dialog;
 
 import java.awt.BorderLayout;
@@ -28,6 +31,11 @@ import javax.swing.border.TitledBorder;
 
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
+/**
+ * Dialog per visualizzare i dettagli di una proiezione e consentire la prenotazione
+ * lato cliente. Mostra informazioni sul film, prezzo e fornisce il controllo per
+ * selezionare il numero di posti da prenotare.
+ */
 public class DettaglioProiezioneClienteDialog extends JDialog {
 
     public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetailsView proiezione, 
@@ -79,7 +87,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         aggiungiRiga(gridDettagli, "Genere:", proiezione.getGenere());
         aggiungiRiga(gridDettagli, "Anno di Uscita:", String.valueOf(proiezione.getAnno() != null ? proiezione.getAnno() : "-"));
         aggiungiRiga(gridDettagli, "Durata:", (proiezione.getDurataMinuti() != null ? proiezione.getDurataMinuti() : 0) + " min");
-        aggiungiRiga(gridDettagli, "Età Minima:", (proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
+        aggiungiRiga(gridDettagli, "EtÃ  Minima:", (proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
 
         cardPanel.add(gridDettagli);
 
@@ -193,3 +201,4 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         container.add(lblVal);
     }
 }
+

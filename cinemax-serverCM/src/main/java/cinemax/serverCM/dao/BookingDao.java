@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao;
 
 import java.sql.Connection;
@@ -25,6 +28,11 @@ import cinemax.serverCM.dao.utils.SqlInsertBuilder;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 
+/**
+ * DAO responsabile per le operazioni CRUD e query sulle prenotazioni.
+ * Implementa la risoluzione delle Query/Command relative alle prenotazioni
+ * e mappa i risultati in {@link BookingDetails}.
+ */
 public class BookingDao implements Dao {
 
 	private final Connection _connection;
@@ -178,3 +186,4 @@ public class BookingDao implements Dao {
 		} 
 	}
 }
+

@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao;
 
 import java.sql.Connection;
@@ -15,6 +18,10 @@ import cinemax.contracts.responses.GetFilmsResponse;
 import cinemax.serverCM.dao.utils.DbHelper;
 import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 
+/**
+ * DAO responsabile per le interrogazioni sui film nel catalogo.
+ * Supporta ricerche per titolo e per identificativo e mappa i risultati in {@link FilmDetails}.
+ */
 public class FilmDao implements Dao {
 
 	private Connection _connection; 
@@ -123,3 +130,5 @@ public class FilmDao implements Dao {
 		throw new UnsupportedOperationException("Non è possibile inserire un film!");
 	}	
 }
+
+

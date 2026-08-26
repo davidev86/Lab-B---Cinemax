@@ -1,7 +1,13 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses;
 
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta che comunica il successo dell'operazione di prenotazione con ID generato dal database.
+ */
 public class StoreBookingResponse implements Response {
 
     private static final long serialVersionUID = 1L;
@@ -41,3 +47,5 @@ public class StoreBookingResponse implements Response {
         this.success = success;
     }
 }
+
+
