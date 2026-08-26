@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
@@ -13,10 +14,12 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import cinemax.application.services.TcpClient;
 import cinemax.clientCM.RegistratiBox;
 import cinemax.clientCM.callback.LoginCallBack;
+import cinemax.clientCM.tabpanel.SearchBooking;
 import cinemax.contracts.dto.UserMinInfo;
 
 public class LoginPanel extends JPanel implements LoginCallBack {
@@ -50,7 +53,8 @@ public class LoginPanel extends JPanel implements LoginCallBack {
 		registratiBotton.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				RegistratiBox popup = new RegistratiBox(login, tcpClient);
+				Window parentWindow = SwingUtilities.getWindowAncestor(LoginPanel.this);
+				RegistratiBox popup = new RegistratiBox(parentWindow, tcpClient);
 				popup.setVisible(true);
 				popup.setLocationRelativeTo(null);
 			}
@@ -62,7 +66,8 @@ public class LoginPanel extends JPanel implements LoginCallBack {
 
 			
 			public void actionPerformed(ActionEvent e) {
-				LoginBox popup = new LoginBox(login, tcpClient); 
+				Window parentWindow = SwingUtilities.getWindowAncestor(LoginPanel.this);
+				LoginBox popup = new LoginBox(parentWindow, tcpClient); 
 				popup.Show(LoginPanel.this);
 				popup.setVisible(true);
 				popup.setLocationRelativeTo(null);

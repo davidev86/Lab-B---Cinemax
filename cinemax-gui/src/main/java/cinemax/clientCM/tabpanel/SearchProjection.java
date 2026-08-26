@@ -232,6 +232,8 @@ public class SearchProjection extends JPanel {
                 // Invocazione metodo dedicato
                 GetProjectionsResponse response = projectionService.getProjectionsByFilmAndDate(titoloFilm, maxDataPrenotazione);
                 popolaListaRisultati(response);
+                textFieldTitoloSemplice.setText("");
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
                     "Errore di comunicazione durante la ricerca per titolo: " + ex.getMessage(),
@@ -330,9 +332,10 @@ public class SearchProjection extends JPanel {
         
     }
     
-    
+    //pulisci i textfield dopo esecuzione ricerca, oppure cambiando la selezione con il radiobutton
     private void pulisciCampi() {
-        // Reset JTextField standard
+    	
+    		// Reset JTextField standard
         textFieldTitoloFilm.setText("");
         textFieldGenere.setText("");
         
@@ -382,6 +385,9 @@ public class SearchProjection extends JPanel {
         field.setValue(BigDecimal.ZERO);
         field.setColumns(10);
         field.setFont(font);
+        
+        
+        
         return field;
     }
 

@@ -4,6 +4,8 @@ package cinemax.clientCM.login;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -32,12 +34,12 @@ public class LoginBox extends JDialog {
 
 
 
-    public LoginBox(JPanel parent, TcpClient tcpClient) {
+    public LoginBox(Window owner, TcpClient tcpClient) {
         // Configurazione della finestra di dialogo
-        super();
+    	super(owner, "Entra nel tuo Account", ModalityType.APPLICATION_MODAL);
         setSize(300, 200);
         setLayout(new BorderLayout());
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(owner);
         
         this.userService = new UserService(tcpClient);
     }

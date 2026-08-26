@@ -13,9 +13,11 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -41,12 +43,14 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 import cinemax.application.services.BookingService;
+import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
 import cinemax.clientCM.callback.SelezioneBookingCallBack;
 import cinemax.clientCM.dialog.DettaglioPrenotazioneBigliettaioDialog;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.GetBookingResponse;
+import cinemax.contracts.responses.GetProjectionResponse;
 
 /**
  * Pannello di ricerca per le prenotazioni con rendering ottimizzato e query asincrone.
@@ -143,13 +147,17 @@ public class SearchBooking extends JPanel {
                     // Verifica che il click sia avvenuto effettivamente su una riga esistente
                     if (index >= 0 && cellBounds != null && cellBounds.contains(e.getPoint())) {
                         BookingDetails prenotazioneSelezionata = resultListModel.getElementAt(index);
-
+                        Integer idProiezioneSel = prenotazioneSelezionata.getIdProiezione();
+                        ProjectionService projService = new ProjectionService(tcpClient);
+                        cinemax.contracts.responses.ui.GetProjectionResponse res = projService.getProjectionById(idProiezioneSel);
+                        
                         Window parentWindow = SwingUtilities.getWindowAncestor(SearchBooking.this);
-                        ProjectionDetailsView proiezione = new ProjectionDetailsView();
+                        ProjectionDetailsView proiezione = res.getProjection();
                         DettaglioPrenotazioneBigliettaioDialog dialog = 
                                 new DettaglioPrenotazioneBigliettaioDialog(parentWindow, proiezione, prenotazioneSelezionata);
                         dialog.setVisible(true);
-                    }
+                   
+                }
                 }
             }
         });
@@ -300,3 +308,4 @@ public class SearchBooking extends JPanel {
         }
     }
 }
+    

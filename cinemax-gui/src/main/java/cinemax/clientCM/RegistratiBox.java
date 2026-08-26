@@ -14,6 +14,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -68,13 +69,15 @@ public class RegistratiBox extends JDialog {
     private final JButton btnAnnulla;
     private final UserService userService;
 
-    public RegistratiBox(JPanel parent, TcpClient tcpClient) {
-        super(SwingUtilities.getWindowAncestor(parent), "Registrazione Account", ModalityType.APPLICATION_MODAL);
+    public RegistratiBox(Window owner, TcpClient tcpClient) {
+    	
+        super(owner, "Registrazione Account", ModalityType.APPLICATION_MODAL);
         this.userService = new UserService(tcpClient);
 
         setLayout(new BorderLayout(0, 0));
         setResizable(false);
-
+        
+       
         // HEADER: Titolo e Sottotitolo
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
@@ -161,7 +164,7 @@ public class RegistratiBox extends JDialog {
         getRootPane().setDefaultButton(btnRegistrati);
 
         pack();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(owner);
     }
 
     // LOGICA DI REGISTRAZIONE ASINCRONA
