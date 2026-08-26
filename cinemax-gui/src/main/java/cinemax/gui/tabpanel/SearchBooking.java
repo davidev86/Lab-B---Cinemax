@@ -70,7 +70,7 @@ public class SearchBooking extends JPanel {
     private final JFormattedTextField dataInizio;
     private final JFormattedTextField dataFine;
 
-    public SearchBooking(SelezioneBookingCallBack selezioneBookingCallBack, TcpClient tcpClient) {
+    public SearchBooking(TcpClient tcpClient) {
         this.bookingService = new BookingService(tcpClient);
         setLayout(new BorderLayout(10, 10)); 
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -143,10 +143,6 @@ public class SearchBooking extends JPanel {
                     // Verifica che il click sia avvenuto effettivamente su una riga esistente
                     if (index >= 0 && cellBounds != null && cellBounds.contains(e.getPoint())) {
                         BookingDetails prenotazioneSelezionata = resultListModel.getElementAt(index);
-                        
-                        if (selezioneBookingCallBack != null) {
-                            selezioneBookingCallBack.onSelezione(prenotazioneSelezionata, null);
-                        }
 
                         Window parentWindow = SwingUtilities.getWindowAncestor(SearchBooking.this);
                         ProjectionDetailsView proiezione = new ProjectionDetailsView();

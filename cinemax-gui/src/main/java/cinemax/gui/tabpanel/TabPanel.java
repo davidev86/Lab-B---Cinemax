@@ -26,7 +26,7 @@ import cinemax.gui.dialog.DettaglioProiezioneClienteDialog;
 import cinemax.gui.dialog.DettaglioProiezioneDialog;
 import cinemax.gui.dialog.DettaglioProiezioneProiezionistaDialog;
 
-public class TabPanel extends JPanel implements SelezioneProjectionCallBack, LoginCallBack, SelezioneBookingCallBack {
+public class TabPanel extends JPanel implements SelezioneProjectionCallBack, LoginCallBack {
 
     private final TcpClient tcpClient;
     private UserMinInfo user;
@@ -48,7 +48,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         // Configura le schede iniziali per utente non loggato (ospite)
         aggiornaTabPerRuolo();
 
-        return tabbedPane;
+        return tabbedPane; 
     }
 
     /**
@@ -69,7 +69,7 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
 
             // Solo per BIGLIETTAIO
             if (user.getRuolo() == Ruolo.BIGLIETTAIO) {
-                searchBookings = new SearchBooking(this, tcpClient);
+                searchBookings = new SearchBooking(tcpClient);
                 tabbedPane.addTab("Ricerca prenotazioni", searchBookings);
                 SearchBookingCurrentDay searchBookingCurrentDay = new SearchBookingCurrentDay(tcpClient);
                 tabbedPane.addTab("Prenotazioni di oggi", searchBookingCurrentDay);
@@ -216,10 +216,5 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
         this.user = null;
         // Ripristina la visualizzazione per utente non autenticato
         aggiornaTabPerRuolo();
-    }
-
-    @Override
-    public void onSelezione(BookingDetails bookingDetails, Integer idPrenotazione) {   	
-     
     }
 }
