@@ -80,7 +80,7 @@ public class ProjectionDao implements Dao {
 				: null;
 		
 		LocalDateTime da = req.getDaDataProiezione() == null? null: req.getDaDataProiezione().atStartOfDay();
-		LocalDateTime a = req.getDaDataProiezione() == null? null: req.getDaDataProiezione().atTime(LocalTime.MAX);
+		LocalDateTime a = req.getaDataProiezione() == null? null: req.getaDataProiezione().atTime(LocalTime.MAX);
 		
 		sqb.and("titolofilm ILIKE ?", titoloPattern)
 		.and("genere ILIKE ?", req.getGenere())
