@@ -197,12 +197,14 @@ public class SearchBooking extends JPanel {
                         dInizio, 
                         dFine
                 );
+                
             }
 
             @Override
             protected void done() {
                 btnCerca.setEnabled(true);
                 setCursor(Cursor.getDefaultCursor());
+                pulisciCampi();
 
                 try {
                     GetBookingResponse response = get();
@@ -223,6 +225,19 @@ public class SearchBooking extends JPanel {
                 }
             }
         }.execute();
+    }
+    
+    private void pulisciCampi() {
+        // Reset JTextField standard
+        textFieldTitoloFilm.setText("");
+        textFieldNome.setText("");
+        textFieldCognome.setText("");
+
+        // Reset JFormattedTextField (date e numeri)
+        dataInizio.setValue(null);
+        dataFine.setValue(null);
+        
+        textFieldCodicePrenotazione.setValue(null);
     }
 
     // METODI AUSILIARI E PARSER
