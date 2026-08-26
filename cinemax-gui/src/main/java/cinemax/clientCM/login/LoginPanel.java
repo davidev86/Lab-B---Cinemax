@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.login;
 
 import java.awt.CardLayout;
@@ -22,6 +25,9 @@ import cinemax.clientCM.callback.LoginCallBack;
 import cinemax.clientCM.tabpanel.SearchBooking;
 import cinemax.contracts.dto.UserMinInfo;
 
+/**
+ * Pannello UI che gestisce l'interfaccia di autenticazione dell'utente, consentendo il passaggio tra gli stati di login e logout con visualizzazione del benvenuto.
+ */
 public class LoginPanel extends JPanel implements LoginCallBack {
 
 	Consumer<UserMinInfo> loginCallBack;
@@ -131,3 +137,5 @@ public class LoginPanel extends JPanel implements LoginCallBack {
 
 	}
 }
+
+

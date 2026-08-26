@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe utility che implementa il pattern Builder per costruire query SQL INSERT in modo fluente e sicuro utilizzando PreparedStatements.
+ */
 public class SqlInsertBuilder {
     private final String tableName;
     private final List<String> columns = new ArrayList<>();
@@ -54,3 +60,5 @@ public class SqlInsertBuilder {
         return params;
     }
 }
+
+

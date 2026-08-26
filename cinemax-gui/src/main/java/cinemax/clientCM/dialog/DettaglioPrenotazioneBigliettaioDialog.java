@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.dialog;
 
 import java.awt.BorderLayout;
@@ -25,6 +28,9 @@ import javax.swing.border.TitledBorder;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
+/**
+ * Dialog modale per visualizzare i dettagli di una prenotazione, incluse le informazioni sul film, sui posti prenotati e il riepilogo dei costi totali.
+ */
 public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -42,8 +48,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
 
-        // 1. SCHEDA STRUTTURATA DATI PRENOTAZIONE & SPETTACOLO
-        JPanel cardPanel = new JPanel(); 
+                JPanel cardPanel = new JPanel(); 
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         cardPanel.setBorder(new CompoundBorder(
                 new EmptyBorder(5, 5, 5, 5),
@@ -94,7 +99,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         aggiungiRiga(gridDettagli, "Genere:", proiezione != null ? proiezione.getGenere() : null);
         aggiungiRiga(gridDettagli, "Anno di Uscita:", (proiezione != null && proiezione.getAnno() != null) ? proiezione.getAnno().toString() : null);
         aggiungiRiga(gridDettagli, "Durata:", (proiezione != null && proiezione.getDurataMinuti() != null) ? proiezione.getDurataMinuti() + " min" : null);
-        aggiungiRiga(gridDettagli, "Età Minima:", (proiezione != null && proiezione.getEtaMinima() != null) ? proiezione.getEtaMinima() + " anni" : null);
+        aggiungiRiga(gridDettagli, "EtÃ  Minima:", (proiezione != null && proiezione.getEtaMinima() != null) ? proiezione.getEtaMinima() + " anni" : null);
 
         cardPanel.add(gridDettagli);
 
@@ -123,7 +128,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         pricePanel.add(conteggioPostiLiberi);
         cardPanel.add(pricePanel); 
         
-        // 2. RIEPILOGO PRENOTAZIONE E TOTALE
+        
         JPanel selectSeatsContainer = new JPanel();
         selectSeatsContainer.setLayout(new BoxLayout(selectSeatsContainer, BoxLayout.Y_AXIS));
         selectSeatsContainer.setBorder(BorderFactory.createTitledBorder("Riepilogo Costi"));
@@ -160,7 +165,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
 
         add(mainCenterPanel, BorderLayout.CENTER);
 
-        // 3. PULSANTE CHIUDI INFERIORE
+        
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         JButton btnChiudi = new JButton("Chiudi");
         btnChiudi.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -184,3 +189,5 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         container.add(lblVal);
     }
 }
+
+

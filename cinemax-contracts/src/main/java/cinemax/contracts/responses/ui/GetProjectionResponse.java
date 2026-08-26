@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses.ui;
 
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta contenente i dettagli completi di una singola proiezione cinematografica richiesta dal client.
+ */
 public class GetProjectionResponse implements Response {
 
 	/**
@@ -24,3 +30,5 @@ public class GetProjectionResponse implements Response {
 		this.projection = projection;
 	} 
 }
+
+

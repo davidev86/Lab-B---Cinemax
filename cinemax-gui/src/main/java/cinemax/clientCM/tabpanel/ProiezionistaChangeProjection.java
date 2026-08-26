@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.tabpanel;
 
 import java.awt.BorderLayout;
@@ -65,7 +68,7 @@ public class ProiezionistaChangeProjection extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // =====================================================================
-        // 1. FORM RICERCA FILM
+        
         // =====================================================================
         this.textFieldTitoloSemplice = new JTextField(20);
         this.textFieldTitoloSemplice.setFont(FONT_BASE);
@@ -174,7 +177,7 @@ public class ProiezionistaChangeProjection extends JPanel {
     private Boolean eseguiInserimentoProiezione(ProjectionDetails proiezione) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-            // Chiamata diretta (il dialog modale si occupa già dell'attesa UI)
+            // Chiamata diretta (il dialog modale si occupa giÃ  dell'attesa UI)
             projectionService.insertProjection(
                 proiezione.getIdFilm(), 
                 proiezione.getDataOraProiezione(), 
@@ -290,3 +293,4 @@ public class ProiezionistaChangeProjection extends JPanel {
         }
     }
 }
+

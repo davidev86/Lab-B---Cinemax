@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.commands;
 
 import java.time.LocalDate;
@@ -6,7 +9,11 @@ import cinemax.contracts.dto.Enums.Ruolo;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.UserRequest;
 
-public class StoreUser implements Command, UserRequest{	
+/**
+ * Command per la creazione/aggiornamento di un utente.
+ * Contiene i dati necessari lato server per inserire o modificare un record utente.
+ */
+public class StoreUser implements Command, UserRequest{ 
 	
 	/**
 	 * 
@@ -144,3 +151,5 @@ public class StoreUser implements Command, UserRequest{
 	}
 			
 }
+
+

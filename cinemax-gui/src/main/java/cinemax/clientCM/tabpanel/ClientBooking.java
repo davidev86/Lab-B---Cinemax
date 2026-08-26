@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.tabpanel;
 
 import java.awt.BorderLayout;
@@ -73,7 +76,7 @@ public class ClientBooking extends JPanel {
         this.btnCancella.setEnabled(false);
         this.btnCancella.addActionListener(e -> gestisciCancellazione());
 
-        // 2. Modello e Lista con rendering ottimizzato
+        
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -99,12 +102,12 @@ public class ClientBooking extends JPanel {
             }
         });
 
-        // 3. Viewport & Scroll
+        
         JScrollPane scrollPanel = new JScrollPane(listaRisultati);
         scrollPanel.setPreferredSize(new Dimension(800, 400));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-        // 4. Barra superiore con Titolo e Pulsanti Azione
+        
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel lblTitolo = new JLabel("Le Tue Prenotazioni Effettuate");
         lblTitolo.setFont(FONT_TITLE);
@@ -262,3 +265,4 @@ public class ClientBooking extends JPanel {
         }
     }
 }
+

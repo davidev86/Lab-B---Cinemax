@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses;
 
 import cinemax.contracts.dto.UserMinInfo;
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta che incapsula le informazioni minime di un utente ottenute dal processo di autenticazione con credenziali.
+ */
 public class GetUserByCredentialResponse  implements Response  {
 	
 	public GetUserByCredentialResponse(UserMinInfo user) {
@@ -24,3 +30,5 @@ public class GetUserByCredentialResponse  implements Response  {
 	}
 	    
 }
+
+

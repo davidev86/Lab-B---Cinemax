@@ -1,4 +1,4 @@
-/*
+/**
  *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
  */
 
@@ -102,8 +102,7 @@ public class RegistratiBox extends JDialog {
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // FORM CENTRALE: GridBagLayout
-        JPanel formPanel = new JPanel(new GridBagLayout());
+                JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(14, 18, 10, 18));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 4, 5, 4);

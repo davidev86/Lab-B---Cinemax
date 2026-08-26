@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.commands;
 
 import java.math.BigDecimal;
@@ -6,7 +9,11 @@ import java.time.LocalDateTime;
 import cinemax.contracts.interfaces.Command;
 import cinemax.contracts.interfaces.ProjectionRequest;
 
-public class StoreProjection implements Command, ProjectionRequest{	
+/**
+ * Command per creare o aggiornare una proiezione (projection).
+ * Contiene informazioni come data/ora, film associato e prezzo del biglietto.
+ */
+public class StoreProjection implements Command, ProjectionRequest{ 
 	
 	/**
 	 * 
@@ -66,3 +73,5 @@ public class StoreProjection implements Command, ProjectionRequest{
 		this.prezzoBiglietto = prezzoBiglietto;
 	}		
 }
+
+

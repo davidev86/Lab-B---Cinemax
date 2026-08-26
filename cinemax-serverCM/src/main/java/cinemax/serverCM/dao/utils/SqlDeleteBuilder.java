@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Builder per la costruzione di query SQL DELETE con supporto per condizioni WHERE combinate con AND.
+ */
 public class SqlDeleteBuilder {
 
     private final String tableName;
@@ -47,3 +53,5 @@ public class SqlDeleteBuilder {
         return params;
     }
 }
+
+

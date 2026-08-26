@@ -1,7 +1,13 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses;
 
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta che comunica l'avvenuta registrazione di un nuovo utente fornendo l'ID generato dal database.
+ */
 public class StoreUserResponse  implements Response  {
 	
 	/**
@@ -22,3 +28,5 @@ public class StoreUserResponse  implements Response  {
 		this.id = id;
 	}
 }
+
+

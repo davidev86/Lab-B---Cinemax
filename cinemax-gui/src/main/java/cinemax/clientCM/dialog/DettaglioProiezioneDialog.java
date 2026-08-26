@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.dialog;
 
 import java.awt.BorderLayout;
@@ -21,6 +24,9 @@ import javax.swing.border.TitledBorder;
 
 import cinemax.contracts.dto.ProjectionDetails;
 
+/**
+ * Dialog modale che visualizza i dettagli completi di una proiezione cinematografica con informazioni tecniche e tariffarie.
+ */
 public class DettaglioProiezioneDialog extends JDialog {
 
     public DettaglioProiezioneDialog(Window owner, ProjectionDetails proiezione) {
@@ -31,7 +37,6 @@ public class DettaglioProiezioneDialog extends JDialog {
         setLayout(new BorderLayout(15, 15));
         setResizable(false);
 
-        // --- 1. SCHEDA STRUTTURATA DATI PROIEZIONE ---
         JPanel cardPanel = new JPanel(); 
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         cardPanel.setBorder(new CompoundBorder(
@@ -66,7 +71,7 @@ public class DettaglioProiezioneDialog extends JDialog {
         aggiungiRiga(gridDettagli, "Genere:", proiezione.getGenere());
         aggiungiRiga(gridDettagli, "Anno di Uscita:", String.valueOf(proiezione.getAnno() != null ? proiezione.getAnno() : "-"));
         aggiungiRiga(gridDettagli, "Durata:", (proiezione.getDurataMinuti() != null ? proiezione.getDurataMinuti() : 0) + " min");
-        aggiungiRiga(gridDettagli, "Età Minima:", (proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
+        aggiungiRiga(gridDettagli, "EtÃ  Minima:", (proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
 
         cardPanel.add(gridDettagli);
 
@@ -90,7 +95,7 @@ public class DettaglioProiezioneDialog extends JDialog {
 
         add(cardPanel, BorderLayout.CENTER);
 
-        // --- 2. PULSANTI D'AZIONE CON LOGICA DI RUOLO 
+         
 
         JButton btnAnnulla = new JButton("Annulla");
 
@@ -116,3 +121,5 @@ public class DettaglioProiezioneDialog extends JDialog {
 	    container.add(lblVal);
 	}
 }
+
+

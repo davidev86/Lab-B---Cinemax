@@ -1,8 +1,14 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.responses;
 
 import cinemax.contracts.dto.UserDetails;
 import cinemax.contracts.interfaces.Response;
 
+/**
+ * Risposta che incapsula i dettagli completi di un utente registrato nel sistema.
+ */
 public class GetUserDetailsResponse  implements Response  {
 	
 	/**
@@ -29,3 +35,5 @@ public class GetUserDetailsResponse  implements Response  {
 	}
 	    
 }
+
+

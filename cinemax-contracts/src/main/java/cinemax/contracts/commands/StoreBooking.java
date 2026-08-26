@@ -1,8 +1,15 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.contracts.commands;
 
 import cinemax.contracts.interfaces.BookingRequest;
 import cinemax.contracts.interfaces.Command;
 
+/**
+ * Command per creare o aggiornare una prenotazione (booking).
+ * Contiene i campi necessari per l'inserimento/aggiornamento lato server.
+ */
 public class StoreBooking implements Command,BookingRequest {
 
 	private static final long serialVersionUID = 1L;
@@ -63,3 +70,4 @@ public class StoreBooking implements Command,BookingRequest {
 		this.numeroPosti = numeroPosti;
 	}
 }
+

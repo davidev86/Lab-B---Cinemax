@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.clientCM.dialog;
 
 import java.awt.BorderLayout;
@@ -34,6 +37,11 @@ import javax.swing.text.MaskFormatter;
 
 import cinemax.contracts.dto.ProjectionDetails;
 
+/**
+ * Dialog per la visualizzazione/modifica/inserimento dei dettagli di una proiezione
+ * riservata all'utente con ruolo Proiezionista. Fornisce campi formattati per data/ora
+ * e prezzo, validazione locale e callback per le operazioni di modifica/cancellazione/inserimento.
+ */
 public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
@@ -220,7 +228,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
         BigDecimal nuovoCosto = getBigDecimalFromField(textFieldCostoBiglietto);
         if (nuovoCosto.compareTo(BigDecimal.ZERO) < 0) {
-            JOptionPane.showMessageDialog(this, "Il prezzo non può essere negativo.", "Errore Prezzo", JOptionPane.WARNING_MESSAGE);
+             JOptionPane.showMessageDialog(this, "Il prezzo non può essere negativo.", "Errore Prezzo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
 
@@ -309,3 +317,4 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         return (val != null && !val.trim().isEmpty()) ? val : "N/D";
     }
 }
+

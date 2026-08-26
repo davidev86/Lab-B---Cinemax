@@ -1,3 +1,6 @@
+/**
+ *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ */
 package cinemax.serverCM.dao.utils;
 
 
@@ -9,6 +12,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe utility per l'esecuzione di operazioni CRUD (query, insert, update) sul database con mappatura generica dei risultati tramite callback RowMapper.
+ */
 public class DbHelper {
 
 	public static <T> List<T> executeQuery(Connection conn, String sql, List<Object> params, RowMapper<T> mapper) throws SQLException {
@@ -61,3 +67,5 @@ public class DbHelper {
 		}
 	}
 }
+
+
