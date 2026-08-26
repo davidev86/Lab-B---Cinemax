@@ -295,6 +295,7 @@ public class SearchProjection extends JPanel {
             // Invocazione metodo con tutti i filtri avanzati
             GetProjectionsResponse response = projectionService.getProjections(titoloFilm, genere, dInizio, dFine, prezzoMin, prezzoMax);
             popolaListaRisultati(response);
+            pulisciCampi();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this,
                 "Errore di comunicazione durante la ricerca completa: " + ex.getMessage(),
@@ -311,7 +312,7 @@ public class SearchProjection extends JPanel {
 
         if (response != null && response.getProjections() != null) {
             List<ProjectionDetailsView> projections = response.getProjections();
-
+            
             if (projections.isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                     "Nessuna proiezione trovata con i parametri indicati.",
@@ -326,6 +327,23 @@ public class SearchProjection extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Risposta nulla o non valida ricevuta dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
         }
+        
+    }
+    
+    
+    private void pulisciCampi() {
+        // Reset JTextField standard
+        textFieldTitoloFilm.setText("");
+        textFieldGenere.setText("");
+        
+        // Reset JFormattedTextField (date e numeri)
+        dataInizio.setValue(null);
+        dataFine.setValue(null);
+        
+        // Per campi valuta o numerici, reimposta il valore di default
+        textFieldCostoBigliettoMin.setValue(BigDecimal.ZERO);
+        textFieldCostoBigliettoMax.setValue(BigDecimal.ZERO);
+        
     }
  
     // METODI DI FORMATTAZIONE e GUI
