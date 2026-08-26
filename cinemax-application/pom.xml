@@ -5,7 +5,7 @@
   <parent>
     <groupId>it.uninsubria.cinemax</groupId>
     <artifactId>Lab-B-Cinemax</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>it.uninsubria.cinemax</groupId>
       <artifactId>cinemax-contracts</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 

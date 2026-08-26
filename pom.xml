@@ -6,7 +6,7 @@
 
     <groupId>it.uninsubria.cinemax</groupId>
     <artifactId>Lab-B-Cinemax</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -82,6 +82,13 @@
                             <phase>site</phase>
                         </execution>
                     </executions>
+                </plugin>
+                <!-- Maven Shade Plugin: usato dai moduli eseguibili (cinemax-serverCM e cinemax-gui)
+                     per produrre un jar "fat" con Main-Class nel manifest e tutte le dipendenze incluse -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.5.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

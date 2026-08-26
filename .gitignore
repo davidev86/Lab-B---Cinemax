@@ -2,9 +2,13 @@
 .metadata/
 
 # Escludi i file compilati di Java e build tool
-**/bin/
+# NOTA: la cartella "bin/" nella radice del repository e' tracciata
+# intenzionalmente (contiene i .jar eseguibili per la consegna).
+# Escludiamo solo le cartelle bin/ generate da Eclipse nei sotto-moduli.
+cinemax-application/bin/
 **/target/
 **/build/
+dependency-reduced-pom.xml
 
 # Escludi log ed eventuali file temporanei
 *.log

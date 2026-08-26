@@ -6,13 +6,13 @@
   <parent>
     <groupId>it.uninsubria.cinemax</groupId>
     <artifactId>Lab-B-Cinemax</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>cinemax-gui</artifactId>
+  <artifactId>clientCM</artifactId>
   <packaging>jar</packaging>
-  <name>cinemax-gui</name>
+  <name>clientCM</name>
   <description>Modulo GUI client Cinemax</description>
   
   <dependencies>
@@ -24,7 +24,7 @@
   </dependencies>
 
   <build>
-    <plugins>
+    <plugins> 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -32,6 +32,27 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <!-- Genera clientCM-<version>.jar eseguibile (fat-jar) con Main-Class impostata
+           e tutte le dipendenze incluse nel jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>cinemax.clientCM.Cinemaxhome</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

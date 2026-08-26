@@ -8,11 +8,11 @@ import java.io.Serializable;
 /**
  * DTO che rappresenta le informazioni principali di un film.
  * Usato dal server per trasferire i metadati di un film al client (titolo, genere,
- * regista, anno di uscita, durata e vincolo di etÃ ).
+ * regista, anno di uscita, durata e vincolo di età ).
  * <p>
- * Ãˆ previsto un costruttore vuoto per il meccanismo di marshalling/unmarshalling
+ * è previsto un costruttore vuoto per il meccanismo di marshalling/unmarshalling
  * usato nella comunicazione client-server via socket TCP e un costruttore completo
- * per facilitÃ  di creazione nelle parti di business logic o nei test.
+ * per facilità  di creazione nelle parti di business logic o nei test.
  */
 public class FilmDetails implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class FilmDetails implements Serializable {
      * @param regista nome del regista
      * @param anno anno di produzione/uscita
      * @param durataMinuti durata in minuti
-     * @param etaMinima etÃ  minima consigliata (VM)
+     * @param etaMinima età  minima consigliata (VM)
      */
     public FilmDetails(Integer id, String titoloFilm, String genere, String regista, Integer anno, Integer durataMinuti, Integer etaMinima) {
         this.id = id;
@@ -150,16 +150,16 @@ public class FilmDetails implements Serializable {
     }
 
     /**
-     * Limite di etÃ  consigliato/obbligatorio (es. 14, 18) per la visione del film.
-     * @return etÃ  minima consigliata
+     * Limite di età  consigliato/obbligatorio (es. 14, 18) per la visione del film.
+     * @return età  minima consigliata
      */
     public Integer getEtaMinima() {
         return etaMinima;
     }
 
     /**
-     * Imposta il vincolo di etÃ  minima per la visione.
-     * @param etaMinima etÃ  minima
+     * Imposta il vincolo di età  minima per la visione.
+     * @param etaMinima età  minima
      */
     public void setEtaMinima(Integer etaMinima) {
         this.etaMinima = etaMinima;

@@ -6,22 +6,22 @@
   <parent>
     <groupId>it.uninsubria.cinemax</groupId>
     <artifactId>Lab-B-Cinemax</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <!-- groupId e version vengono ereditati dal parent, basta l'artifactId -->
-  <artifactId>server-cm</artifactId>
+  <artifactId>serverCM</artifactId>
   <packaging>jar</packaging>
-  <name>server-cm</name>
+  <name>serverCM</name>
   <description>Modulo server Cinemax con DAO e logica di connessione</description>
   
   <dependencies>
     <!-- Dipendenza ai contratti -->
-    <dependency>
+    <dependency> 
       <groupId>it.uninsubria.cinemax</groupId>
-      <artifactId>cinemax-contracts</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <artifactId>cinemax-contracts</artifactId> 
+      <version>1.0.0</version> 
     </dependency>
     
     <!-- PostgreSQL: rimuovi la versione qui! La prende in automatico dal dependencyManagement del Parent -->
@@ -40,6 +40,27 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+      </plugin>
+      <!-- Genera serverCM-<version>.jar eseguibile (fat-jar) con Main-Class impostata
+           e tutte le dipendenze (incluso il driver JDBC PostgreSQL) incluse nel jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>cinemax.serverCM.ServerMain</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

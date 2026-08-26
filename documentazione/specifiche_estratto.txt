@@ -1,0 +1,467 @@
+Università degli Studi dell’Insubria
+Dipartimento di Scienze Teoriche e Applicate
+Laboratorio 
+Interdisciplinare
+ B
+Specifiche
+ di Progetto: 
+CineMax
+a.a.
+ 2025/2026
+Giovanni Meroni
+Corso di Studio Triennale in Informatica
+giovanni.meroni
+@uninsubria.it
+Specifiche Progetto
+Lab. Interdisciplinare
+ B
+ -
+ 2
+ -
+Laboratorio Interdisciplinare 
+-
+ Cos’è:
+• Obiettivi: mettere a fattor comune e in pratica le conoscenze acquisite 
+nei corsi di Progettazione, Sviluppo Concorrente e Distribuito, e Basi 
+Dati
+• Come: progettando e sviluppando un progetto software reale
+Il Progetto 
+–
+ CineMax
+Un sistema per piccoli
+cinema monosala da 
+200 posti, che
+permetta di:
+Gestire il proprio 
+palinsesto (quali film 
+sono disponibili ed 
+in che giorni)
+Gestire le 
+prenotazioni
+Specifiche Progetto
+Lab. Interdisciplinare B
+ -
+ 3
+ -
+Specifiche Progetto
+-
+ 4
+ -
+Lab. Interdisciplinare B
+A partire da un repository di dati (da costruire), l’applicazione
+«CineMax» permette:
+Ai proiezionisti:
+• di gestire il palinsesto (definendo quali film saranno proiettati in quali giorni)
+Ai clienti:
+• di cercare proiezioni in base alla caratteristiche desiderate: titolo del film,
+genere, data, costo biglietto
+• di prenotare posti per una proiezione
+Ai bigliettai:
+• di cercare prenotazioni
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 5
+ -
+Il Progetto 
+–
+ CineMax
+Prima di progettare l'applicazione è necessario costruire un Database con una o
+più Tabelle (normalizzate) dove memorizzare i dati sulle proiezioni, che devono
+contenere almeno le seguenti informazioni:
+• Data e ora della proiezione
+• Informazioni sul film, in particolare:
+• Titolo
+• Genere
+• Regista
+• Anno
+• Durata
+• Età minima pubblico
+• Costo del biglietto
+NOTA: un file draft da cui partire con informazioni su film e proiezioni viene
+fornito dal docente e reso disponibile sulla pagina e-learning
+dell'insegnamento (nome del file fornito: proiezioni.csv)
+Lab. Interdisciplinare B
+Specifiche Progetto
+-
+ 6
+ -
+Prima di progettare l'applicazione è necessario anche definire una Tabella
+denominata Utenti, che dovrà predisporre almeno le seguenti informazioni:
+• Nome
+• Cognome
+• Username
+• Password (cifrata)
+• Data di nascita (facoltativa)
+• Luogo del domicilio
+• Ruolo (cliente/proiezionista/bigliettaio)
+N.B. La tabella dovrà già contenere 2 proiezionisti e 5 bigliettai
+È inoltre necessario che il database memorizzi i dati delle prenotazioni. A tal
+fine, introdurre una o più Tabelle.
+Lab. Interdisciplinare B
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 7
+ -
+Lab. Interdisciplinare B
+Funzionalità principali dell’applicazione:
+• Utenti (clienti) non registrati
+• Cercare proiezioni
+• Visualizzare i dettagli delle proiezioni
+• Registrarsi all’applicazione come cliente
+• Utenti (clienti) registrati
+• Inserire una prenotazione
+• Visualizzare le proprie prenotazioni
+• Modificare e cancellare le proprie prenotazioni
+• Logout
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 8
+ -
+Lab. Interdisciplinare B
+• Utenti (proiezionisti) registrati
+• Inserire un film, e successivamente, la data ed il costo del biglietto per
+ogni proiezione
+• Modificare la data di una proiezione
+• Eliminare una proiezione
+• Logout
+• Utenti (bigliettai) registrati
+• Visualizzare le prenotazioni nella data odierna
+• Cercare una prenotazione
+• Logout
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 9
+ -
+Lab. Interdisciplinare
+ B
+Dettaglio delle funzionalità principali dell’applicazione:
+• Consultazione delle informazioni di ogni proiezione (login non
+necessario):
+a. Funzionalità di ricerca cercaProiezione()
+• Per titolo (anche parziale) del film
+• Per tipologia di film
+• Per intervallo di date (es. “dopo il 15 maggio 2026”, “tra il 20 e il 29
+maggio 2026”)
+• Per costo del biglietto (es. “minore di 10€”, “tra 5€ e 15€”)
+• Una combinazione dei precedenti criteri di ricerca
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 10
+ -
+Lab. Interdisciplinare B
+b. Funzionalità di selezione (da effettuarsi dopo la ricerca) e visualizzazione di
+una proiezione visualizzaProiezione()
+• Visualizzazione delle caratteristiche del film (titolo, genere, regista,
+anno, durata)
+• Visualizzazione della data e dell’ora di proiezione
+• Visualizzazione del costo del biglietto
+• Visualizzazione del numero di posti liberi (da ricavarsi in base al numero
+di prenotazioni per quella proiezione ed alla capacità della sala)
+• Registrazione alla piattaforma (login non necessario):
+a. Funzionalità di registrazione di un nuovo cliente registraCliente() (deve
+permettere di inserire tutti i dati di un cliente)
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 11
+ -
+Lab. Interdisciplinare B
+• Interazione con la piattaforma da parte dei bigliettai (login necessario):
+a. Funzionalità di ricerca cercaPrenotazione()
+• Per codice prenotazione
+• Per nome e cognome del cliente
+• Per titolo (anche parziale) del film
+• Per intervallo di date (es. “dopo il 15 maggio 2026”, “tra il 20 e il 29
+maggio 2026”)
+b. Funzionalità di selezione (da effettuarsi dopo la ricerca) e visualizzazione
+visualizzaPrenotazione()
+• Visualizzazione del codice prenotazione
+• Visualizzazione del nome e cognome del cliente
+• Visualizzazione della data e dell’ora di proiezione
+• Visualizzazione del numero di biglietti, del costo unitario e totale
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 12
+ -
+Lab. Interdisciplinare B
+• Interazione con la piattaforma da parte dei clienti (login necessario):
+a. Funzionalità di visualizzazione delle proprie prenotazioni
+visualizzaPrenotazione()
+b. Funzionalità di inserimento (da effettuarsi dopo la ricerca) di una
+prenotazione (a patto che il numero di posti richiesti sia minore del numero
+di posti disponibili) per una proiezione creaPrenotazione() Quando viene
+creata una prenotazione, deve essere generato un codice univoco che
+verrà memorizzato insieme ai dati della prenotazione.
+c. Funzionalità di modifica (cambio data) di una prenotazione inserita in
+precedenza (a patto che sia la vecchia che la nuova data siano successive
+alla data odierna) per una proiezione modificaPrenotazione()
+d. Funzionalità di cancellazione di una prenotazione inserita in precedenza (a
+patto che la data di proiezione sia precedente la data odierna) per una
+proiezione eliminaPrenotazione()
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 13
+ -
+Lab. Interdisciplinare B
+• Interazione con la piattaforma da parte dei proiezionisti (login necessario):
+a. Funzionalità di aggiunta di una proiezione (a patto che non si sovrapponga
+con una proiezione esistente) aggiungiProiezione()
+b. Funzionalità di modifica di una proiezione inserita in precedenza (a patto
+che non ci siano prenotazioni per quella proiezione) modificaProiezione()
+c. Funzionalità di cancellazione di una proiezione inserita in precedenza (a
+patto che non ci siano prenotazioni per quella proiezione)
+eliminaProiezione()
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 14
+ -
+Lab. Interdisciplinare
+ B
+Il Progetto – CineMax
+All’avvio l’applicazione mostra un menù iniziale in cui è possibile loggarsi o
+registrarsi alla piattaforma.
+In alternativa, è possibile proseguire come utente ‘guest’ indicando solo il nome
+(anche parziale) di un film ed accedere alla funzionalità che non richiedono di
+essere autenticati presso il sistema.
+L’applicazione deve almeno fornire:
+• Una schermata in cui è possibile visualizzare le proiezioni nei tre mesi successivi la
+data odierna del film indicato dall’utente ‘guest’
+• Una schermata di ricerca delle proiezioni
+• Una schermata che mostri i dettagli sulla proiezione selezionata
+• Una schermata che permetta ad un nuovo utente di registrarsi
+Specifiche Progetto
+-
+ 15
+ -
+Lab. Interdisciplinare
+ B
+Il Progetto – CineMax
+• Una schermata in cui un utente (cliente) registrato possa inserire una prenotazione
+per una proiezione
+• Una schermata in cui un utente (cliente) registrato possa visualizzare e gestire le
+proprie prenotazioni attive (relative ad una proiezione successiva alla data odierna)
+• Una schermata in cui un utente (proiezionista) registrato possa inserire una nuova
+proiezione
+• Una schermata in cui un utente (proiezionista) registrato possa visualizzare e gestire le
+proiezioni pianificate (relative ad una data successiva a quella odierna)
+• Una schermata in cui un utente (proiezionista) registrato possa visualizzare le
+proiezioni storiche (relative ad una data precedente a quella odierna)
+• Una schermata in cui un utente (bigliettaio) registrato possa visualizzare le
+prenotazioni in data odierna
+• Una schermata in cui un utente (bigliettaio) registrato possa cercare le prenotazioni
+esistenti
+Specifiche Progetto
+-
+ 16
+ -
+La Piattaforma CineMax (CM) consiste di:
+1. un modulo serverCM, che, interfacciandosi con un DBMS relazionale (PostgreSQL), 
+fornisce servizi di back-end
+2. un modulo clientCM, che fornisce tutti i servizi e funzionalità designate per gli 
+utilizzatori dell’applicazione
+Al lancio di serverCM deve essere richiesto di specificare:
+1. le credenziali per accedere al dbCM (database di supporto all’esecuzione dei servizi 
+della piattaforma CM)
+2. l’host del DB
+Una volta lanciato serverCM, questo dovrà rimanere in attesa di richieste di 
+connessione da parte di client clientCM
+L’applicazione CM dovrà essere realizzata in modo tale da supportare l'interazione 
+in parallelo con più utenti connessi alla piattaforma da postazioni (client) differenti
+Lab. Interdisciplinare
+ B
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 17
+ -
+• Strutture dati:
+▪ Proiezioni
+▪ Utenti (clienti, proiezionisti e bigliettai)
+▪ Prenotazioni (da creare)
+• Cosa e come memorizzare su DB (e relativa progettazione)
+• Interfaccia utente con interfaccia grafica
+• Gestione della concorrenza (i servizi dell'applicazione vengono erogati in
+parallelo a più utenti, e possono verificarsi accessi concorrenti a risorse
+condivise)
+Lab. Interdisciplinare
+ B
+Il Progetto – CineMax
+Specifiche Progetto
+-
+ 18
+ -
+1. Progettazione della Soluzione
+2. Sviluppo della Soluzione Software
+3. Documentazione di Progetto (2 documenti distinti)*
+a) Manuale Utente
+b) Manuale Tecnico
+* Ulteriori informazioni su come scrivere la documentazione le vedremo la prossima lezione
+Lab. Interdisciplinare
+ B
+Il Progetto – ToDo
+Specifiche Progetto
+-
+ 19
+ -
+Il Progetto 
+–
+ ToDo
+1. Progettazione della Soluzione
+Le attività di analisi e progettazione devono essere adeguatamente
+documentate facendo uso del linguaggio UML per l’applicazione
+software e del modello Entity-Relationship (ER) per il database.
+È richiesto di progettare l’applicazione avvalendosi dove possibile dell'uso
+di design patterns, e di realizzare l’applicazione con un’opportuna
+interfaccia grafica, usando il linguaggio Java e gli strumenti utili.
+Progettare e realizzare un database utilizzando PostgreSQL per la sua
+implementazione (http://www.postgresql.org) e JDBC per l'accesso alla
+base di dati da programma Java
+(http://jdbc.postgresql.org/download.html)
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 20
+ -
+Il Progetto 
+–
+ ToDo
+2. Sviluppo della Soluzione - Database
+Si ristrutturi, se necessario, secondo le metodologie di progettazione i requisiti descritti. Si
+scelgano le metodologie per la costruzione dello schema ER, motivando le scelte fatte.
+Sincerarsi che il database sia almeno in terza forma normale.
+Si definisca lo schema concettuale ER per il database, evidenziando le entità e le
+associazioni di interesse, nonché i vincoli di cardinalità e di identificazione, motivando le
+scelte effettuate. Altri eventuali vincoli devono essere espressi in linguaggio naturale.
+Si effettui la ristrutturazione dello schema ER motivando le scelte effettuate.
+E’ richiesto di produrre un documento di analisi dei requisiti ristrutturato e documentazione
+associata allo schema ER (ristrutturato e non), con eventuale specifica di vincoli in
+linguaggio naturale.
+Si effettui la traduzione dello schema ER ristrutturato in un equivalente schema relazionale.
+E’ richiesto di produrre la documentazione associata allo schema relazionale derivato
+dallo schema concettuale.
+Si realizzi il database utilizzando PostgreSQL, e SQL per la definizione dei dati,
+l'implementazione dei vincoli identificati, e la manipolazione dei dati, secondo le
+operazioni previste dall’applicazione.
+Documentare gli script SQL necessari alla creazione della base di dati e dei vincoli definiti
+sui dati e le query SQL a supporto dei servizi erogati da Interfacce di Programmazione.
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 21
+ -
+Il Progetto 
+–
+ Codice Sorgente
+1. Il progetto deve essere sviluppato in linguaggio Java (versione recente) e 
+deve essere multipiattaforma
+2. Il codice deve essere opportunamente commentato in formato javadoc
+3. Il package cinemax deve essere definito e deve contenere le relative 
+classi (ulteriori package sono ammessi)
+4. Sono richiesti due eseguibili (.jar) separati per l’esecuzione di Client e 
+Server
+5. L’intestazione di tutti i file *.java devono contenere nome, cognome, num. 
+matricola, sede (VA o CO) degli autori del progetto
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 22
+ -
+Il Progetto 
+–
+ ToDo
+3. Documentazione di Progetto
+• (Seguirà lezione ad hoc su come scrivere un corretto documento utente e 
+manuale tecnico)
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 23
+ -
+Il Progetto 
+–
+ Consegna
+• Il progetto deve essere consegnato come link ad un repository GitHub
+• Il repository dovrà contenere (nella cartella radice):
+• un file dal nome autori.txt contenente cognome, nome, numero di matricola e sede
+(VA o CO) di ogni membro del team; in caso di progetto svolto in gruppo, link al
+repository GitHub di progetto
+• la directory doc contenente il manuale utente, il manuale tecnico in formato .pdf, e
+tutti gli artefatti (diagrammi ER, UML) prodotti, la javadoc generata
+• la directory bin contenente i files eseguibili (.jar) dell’applicazione
+• la directory src contenente il codice sorgente del progetto
+• la directory lib contenente eventuali librerie esterne per compilazione e esecuzione
+• il file pom.xml di build di Maven (https://maven.apache.org/) per compilare il
+progetto, creare il database, creare la documentazione javadoc, etc.
+• eventuali librerie necessarie alla compilazione e/o all'esecuzione
+• il file README.txt con indicazioni precise sull’installazione e sulla compilazione,
+specificando i comandi Maven da utilizzare, ed indicazioni di particolari librerie,
+usate in modo non standard.
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 24
+ -
+Il Progetto 
+–
+ Consegna
+• La consegna viene fatta compilando una form, dove dovrà essere
+indicato il link al repository GitHub
+• Responsabile della consegna sarà il project manager
+• Le date di consegna ed il link alla form da utilizzare verranno
+comunicate di volta in volta (indicativamente 30 giorni prima della data
+di appello d’esame)
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 25
+ -
+Il Progetto 
+–
+ Valutazione
+• In fase di discussione orale verrà:
+• richiesto allo studente di saper argomentare in modo
+opportuno le scelte progettuali, algoritmiche, e
+implementative adottate
+• verificata l'effettiva padronanza delle tecniche utilizzate
+attraverso una serie di domande
+Lab. Interdisciplinare
+ B
+Specifiche Progetto
+-
+ 26
+ -
+Il Progetto 
+–
+ Valutazione
+• Nella valutazione verranno considerati questi aspetti:
+• Applicazione sviluppata:
+• Gestione architettura distribuita Client/Server e concorrenza
+• Aderenza delle funzionalità implementate ai requisiti
+• Controllo degli errori e gestione delle eccezioni
+• Implementazione e gestione del DB
+• Navigabilità della GUI
+• Struttura e completezza della consegna
+• Documentazione:
+• Struttura e completezza dei manuali
+• Linguaggio adatto per manuale tecnico e utente
+• Manuale utente: descrizione funzionalità (con screenshot)
+• Manuale tecnico: scelte architetturali, algoritmiche e strutture dati
+• Manuale tecnico: documentazione progettazione SW (con UML)
+• Manuale tecnico: documentazione progettazione DB (con ER)
+• Documentazione JavaDoc
+Lab. Interdisciplinare
+ B
