@@ -38,11 +38,17 @@ import javax.swing.text.MaskFormatter;
 import cinemax.contracts.dto.ProjectionDetails;
 
 /**
- * Dialog per la visualizzazione/modifica/inserimento dei dettagli di una proiezione
- * riservata all'utente con ruolo Proiezionista. Fornisce campi formattati per data/ora
- * e prezzo, validazione locale e callback per le operazioni di modifica/cancellazione/inserimento.
+ * Finestra di dialogo modale per la gestione (inserimento, modifica e cancellazione) 
+ * delle proiezioni cinematografiche da parte dell'utente con ruolo Proiezionista.
+ * <p>
+ * Fornisce campi di input formattati per data/ora e tariffa di ingresso, effettua
+ * la validazione locale dei vincoli temporali ed economici e inoltra le richieste
+ * al server tramite i rispettivi callback operativi.
+ * </p>
  */
 public class DettaglioProiezioneProiezionistaDialog extends JDialog {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
@@ -52,6 +58,15 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
     private final JFormattedTextField textFieldDataOra;
     private final JFormattedTextField textFieldCostoBiglietto;
 
+    /**
+     * Costruisce e visualizza la finestra modale per la gestione della proiezione.
+     *
+     * @param owner              la finestra proprietaria (parent window)
+     * @param proiezione         l'istanza {@link ProjectionDetails} da modificare/cancellare o il modello base per un nuovo inserimento
+     * @param onModificaCallback funzione di callback per il salvataggio delle modifiche su una proiezione esistente
+     * @param onCancellaCallback funzione di callback per la cancellazione di una proiezione esistente
+     * @param onInsertCallback   funzione di callback per l'inserimento a palinsesto di una nuova proiezione
+     */
     public DettaglioProiezioneProiezionistaDialog(
             Window owner, 
             ProjectionDetails proiezione,
@@ -69,9 +84,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
 
-        // =====================================================================
-        // 1. SCHEDA DATI PROIEZIONE
-        // =====================================================================
+        // SCHEDA DATI PROIEZIONE
         JPanel mainCenterPanel = new JPanel();
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
@@ -100,7 +113,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         panelTitolo.add(lblTitoloFilm, BorderLayout.CENTER);
         cardPanel.add(panelTitolo);
 
-        // Griglia Campi
+        // Griglia Campi di input e riepilogo
         JPanel formGrid = new JPanel(new GridBagLayout());
         formGrid.setBorder(new EmptyBorder(5, 10, 10, 10));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -129,9 +142,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         mainCenterPanel.add(cardPanel);
         add(mainCenterPanel, BorderLayout.CENTER);
 
-        // =====================================================================
-        // 2. BOTTONI DI AZIONE CONDIZIONATI ALL'ID
-        // =====================================================================
+        // BOTTONI DI AZIONE CONDIZIONATI ALLO STATO DELLA PROIEZIONE
         JPanel panelBottoni = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
 
         JButton btnAnnulla = new JButton("Chiudi");
@@ -139,7 +150,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         btnAnnulla.addActionListener(e -> dispose());
 
         if (exists) {
-            // Caso Proiezione Esistente (ID Presente): Modifica e Cancellazione attivi
+            // Caso Proiezione Esistente (ID Presente): Modifica e Cancellazione
             JButton btnCancella = new JButton("Annulla Proiezione");
             btnCancella.setFont(FONT_BASE);
             btnCancella.setForeground(new Color(180, 0, 0));
@@ -171,7 +182,6 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
                 );
 
                 if (conferma == JOptionPane.YES_OPTION) {
-                    // Si chiude SOLO se sia la validazione locale che l'operazione server vanno a buon fine (true)
                     if (validaEApplicaModifiche(onModificaCallback)) {
                         dispose();
                     }
@@ -181,9 +191,10 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
             panelBottoni.add(btnCancella);
             panelBottoni.add(btnAnnulla);
             panelBottoni.add(btnModifica);
+            getRootPane().setDefaultButton(btnModifica);
 
         } else {
-            // Caso Nuova Proiezione (ID Nullo): Inserimento attivo
+            // Caso Nuova Proiezione (ID Nullo): Inserimento a palinsesto
             JButton btnInserisci = new JButton("Inserisci nuova Proiezione");
             btnInserisci.setFont(FONT_BOLD);
             btnInserisci.addActionListener(e -> {
@@ -196,7 +207,6 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
                 );
 
                 if (conferma == JOptionPane.YES_OPTION) {
-                    // Si chiude SOLO se la validazione client passa E l'operazione restituisce true
                     if (validaEApplicaModifiche(onInsertCallback)) {
                         dispose();
                     }
@@ -205,15 +215,18 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
             panelBottoni.add(btnAnnulla);
             panelBottoni.add(btnInserisci);
+            getRootPane().setDefaultButton(btnInserisci);
         }
 
         add(panelBottoni, BorderLayout.SOUTH);
     }
 
-    // =========================================================================
-    // VALIDAZIONE E SALVATAGGIO
-    // =========================================================================
-
+    /**
+     * Valida i vincoli di input lato client (data futura, costo non negativo) e invoca la callback specificata.
+     *
+     * @param callback la funzione di business logic da eseguire con l'oggetto aggiornato
+     * @return {@code true} se la validazione e l'esecuzione del callback hanno avuto esito positivo, {@code false} altrimenti
+     */
     private boolean validaEApplicaModifiche(Function<ProjectionDetails, Boolean> callback) {
         LocalDateTime nuovaDataOra = parseLocalDateTime(textFieldDataOra);
         if (nuovaDataOra == null) {
@@ -228,7 +241,7 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
 
         BigDecimal nuovoCosto = getBigDecimalFromField(textFieldCostoBiglietto);
         if (nuovoCosto.compareTo(BigDecimal.ZERO) < 0) {
-             JOptionPane.showMessageDialog(this, "Il prezzo non può essere negativo.", "Errore Prezzo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Il prezzo non può essere negativo.", "Errore Prezzo", JOptionPane.WARNING_MESSAGE);
             return false;
         }
 
@@ -236,27 +249,41 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         proiezioneCorrente.setCosto(nuovoCosto);
 
         if (callback != null) {
-            // Esegue la callback e restituisce l'esito effettivo (true/false)
             return Boolean.TRUE.equals(callback.apply(proiezioneCorrente));
         }
 
         return true;
     }
 
-    // =========================================================================
-    // METODI AUSILIARI DI RENDERING E PARSING
-    // =========================================================================
-
+    /**
+     * Inserisce una riga nel contenitore con etichetta e componente formattato.
+     *
+     * @param panel il pannello con GridBagLayout
+     * @param label l'etichetta del campo
+     * @param field il componente di input o testo
+     * @param gbc   i vincoli di griglia
+     * @param riga  l'indice di riga corrente
+     */
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
-        gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
+        gbc.gridx = 0; 
+        gbc.gridy = riga; 
+        gbc.weightx = 0.0;
         label.setFont(FONT_BOLD);
         label.setForeground(Color.DARK_GRAY);
         panel.add(label, gbc);
 
-        gbc.gridx = 1; gbc.gridy = riga; gbc.weightx = 1.0;
+        gbc.gridx = 1; 
+        gbc.gridy = riga; 
+        gbc.weightx = 1.0;
         panel.add(field, gbc);
     }
 
+    /**
+     * Inizializza un campo formattato con maschera numerica per data e ora (gg/mm/aaaa hh:mm).
+     *
+     * @param valoreIniziale la stringa iniziale da visualizzare nel campo
+     * @return il componente {@link JFormattedTextField} configurato
+     */
     private JFormattedTextField creaCampoDataOra(String valoreIniziale) {
         JFormattedTextField field = new JFormattedTextField();
         try {
@@ -268,10 +295,16 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
             if (valoreIniziale != null && !valoreIniziale.isEmpty()) {
                 field.setText(valoreIniziale);
             }
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
         return field;
     }
 
+    /**
+     * Inizializza un campo formattato per la gestione monetaria in valuta locale (Euro).
+     *
+     * @return il componente {@link JFormattedTextField} configurato per importi decimali
+     */
     private JFormattedTextField creaCampoValuta() {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
         currencyFormat.setMinimumFractionDigits(2);
@@ -287,6 +320,12 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         return field;
     }
 
+    /**
+     * Esegue il parsing del testo del campo nella corrispondente istanza {@link LocalDateTime}.
+     *
+     * @param field il campo contenente la data/ora formattata
+     * @return l'oggetto {@link LocalDateTime}, oppure {@code null} se il formato è errato o incompleto
+     */
     private LocalDateTime parseLocalDateTime(JFormattedTextField field) {
         String text = field.getText().trim();
         if (text.contains("_") || text.isEmpty()) {
@@ -299,10 +338,17 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         }
     }
 
+    /**
+     * Estrae in modo sicuro un valore {@link BigDecimal} dal campo formattato di valuta.
+     *
+     * @param field il campo da cui estrarre il valore monetario
+     * @return il valore convertito in {@link BigDecimal}, o {@link BigDecimal#ZERO} se nullo o non valido
+     */
     private BigDecimal getBigDecimalFromField(JFormattedTextField field) {
         try {
             field.commitEdit();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         Object value = field.getValue();
         if (value instanceof BigDecimal) {
@@ -313,8 +359,13 @@ public class DettaglioProiezioneProiezionistaDialog extends JDialog {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * Restituisce il valore fornito se non nullo o vuoto, altrimenti una stringa di fallback ("N/D").
+     *
+     * @param val la stringa da verificare
+     * @return la stringa originale oppure "N/D"
+     */
     private String valoreODefault(String val) {
         return (val != null && !val.trim().isEmpty()) ? val : "N/D";
     }
 }
-

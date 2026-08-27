@@ -43,9 +43,17 @@ import cinemax.contracts.dto.ProjectionDetails;
 import cinemax.contracts.responses.GetFilmsResponse;
 
 /**
- * Pannello per la ricerca dei film e la creazione/gestione delle proiezioni da parte del proiezionista.
+ * Pannello per la ricerca nel catalogo film e la pianificazione/inserimento
+ * di nuove proiezioni a palinsesto riservato all'operatore proiezionista.
+ * <p>
+ * Consente la consultazione dei titoli presenti nel database e l'apertura
+ * della finestra {@link DettaglioProiezioneProiezionistaDialog} tramite doppio clic
+ * o selezione per la creazione di un nuovo evento di proiezione.
+ * </p>
  */
 public class ProiezionistaChangeProjection extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
@@ -58,8 +66,12 @@ public class ProiezionistaChangeProjection extends JPanel {
     private final JList<FilmDetails> listaRisultati;
     private final JTextField textFieldTitoloSemplice;
     private final JButton btnCerca;
-    
-    
+
+    /**
+     * Costruisce e configura il pannello di ricerca film e creazione proiezioni.
+     *
+     * @param tcpClient il client di rete per l'inoltro delle richieste verso il server
+     */
     public ProiezionistaChangeProjection(TcpClient tcpClient) {
         this.filmService = new FilmService(tcpClient);
         this.projectionService = new ProjectionService(tcpClient);
@@ -67,12 +79,10 @@ public class ProiezionistaChangeProjection extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // =====================================================================
-        
-        // =====================================================================
         this.textFieldTitoloSemplice = new JTextField(20);
         this.textFieldTitoloSemplice.setFont(FONT_BASE);
 
+        // Pannello Form per la ricerca
         JPanel panelFormTitolo = new JPanel(new GridBagLayout());
         panelFormTitolo.setBorder(BorderFactory.createTitledBorder("Ricerca Film a Catalogo"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -80,24 +90,30 @@ public class ProiezionistaChangeProjection extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Riga 0: Campo Titolo
-        gbc.gridx = 0; gbc.gridy = 0; gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx = 0; 
+        gbc.gridy = 0; 
+        gbc.fill = GridBagConstraints.NONE;
         JLabel lblTitolo = new JLabel("Titolo Film:");
         lblTitolo.setFont(FONT_BASE);
         panelFormTitolo.add(lblTitolo, gbc);
 
-        gbc.gridx = 1; gbc.gridy = 0; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        gbc.gridx = 1; 
+        gbc.gridy = 0; 
+        gbc.fill = GridBagConstraints.HORIZONTAL; 
+        gbc.weightx = 1.0;
         panelFormTitolo.add(this.textFieldTitoloSemplice, gbc);
 
-        // Riga 1: Info di supporto
-        gbc.gridx = 1; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0.0;
+        // Riga 1: Istruzioni di supporto
+        gbc.gridx = 1; 
+        gbc.gridy = 1; 
+        gbc.fill = GridBagConstraints.NONE; 
+        gbc.weightx = 0.0;
         JLabel labelInfo = new JLabel("* Doppio clic su un film per pianificare o gestire una proiezione.");
         labelInfo.setFont(FONT_SMALL_ITALIC);
         labelInfo.setForeground(Color.DARK_GRAY);
         panelFormTitolo.add(labelInfo, gbc);
 
-        // =====================================================================
-        // 2. PULSANTE AZIONE
-        // =====================================================================
+        // Pulsante di Ricerca
         this.btnCerca = new JButton("Cerca Film");
         this.btnCerca.setFont(FONT_BOLD);
         this.btnCerca.addActionListener(e -> eseguiRicerca());
@@ -110,9 +126,7 @@ public class ProiezionistaChangeProjection extends JPanel {
         topContainer.add(panelFormTitolo);
         topContainer.add(panelBottone);
 
-        // =====================================================================
-        // 3. LISTA RISULTATI (Rendering O(1) e Scroll Ottimizzato)
-        // =====================================================================
+        // Lista Risultati
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -120,6 +134,7 @@ public class ProiezionistaChangeProjection extends JPanel {
         this.listaRisultati.setFixedCellHeight(26);
         this.listaRisultati.setCellRenderer(new FilmCellRenderer());
 
+        // Gestione doppio clic per apertura form proiezione
         this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -137,21 +152,21 @@ public class ProiezionistaChangeProjection extends JPanel {
         scrollPanel.setPreferredSize(new Dimension(800, 300));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-        // =====================================================================
-        // 4. ASSEMBLAGGIO GENERALE
-        // =====================================================================
         add(topContainer, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
     }
 
-    // =========================================================================
-    // APERTURA DIALOG CON CALLBACK INTEGRATE
-    // =========================================================================
-
+    /**
+     * Istanzia e visualizza la finestra modale per la pianificazione di una nuova proiezione associata al film selezionato.
+     *
+     * @param film il film selezionato dal catalogo
+     */
     private void apriDialogProiezione(FilmDetails film) {
-        if (film == null) return;
+        if (film == null) {
+            return;
+        }
 
-        // Creazione del template ProjectionDetails associato al film (con ID nullo per attivare l'inserimento)
+        // Creazione template ProjectionDetails con ID nullo per indicare un nuovo inserimento
         ProjectionDetails nuovaProiezione = new ProjectionDetails();
         nuovaProiezione.setTitoloFilm(film.getTitoloFilm());
         nuovaProiezione.setRegista(film.getRegista());
@@ -174,50 +189,54 @@ public class ProiezionistaChangeProjection extends JPanel {
         dialog.setVisible(true);
     }
 
+    /**
+     * Esegue la richiesta di inserimento a palinsesto della proiezione configurata.
+     *
+     * @param proiezione i dati della proiezione da salvare
+     * @return {@code true} se l'inserimento è riuscito, {@code false} altrimenti
+     */
     private Boolean eseguiInserimentoProiezione(ProjectionDetails proiezione) {
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         try {
-            // Chiamata diretta (il dialog modale si occupa giÃ  dell'attesa UI)
             projectionService.insertProjection(
-                proiezione.getIdFilm(), 
-                proiezione.getDataOraProiezione(), 
-                proiezione.getCosto()
+                    proiezione.getIdFilm(),
+                    proiezione.getDataOraProiezione(),
+                    proiezione.getCosto()
             );
 
             JOptionPane.showMessageDialog(
-                this, 
-                "Proiezione inserita con successo nel palinsesto!", 
-                "Operazione Riuscita", 
-                JOptionPane.INFORMATION_MESSAGE
+                    this,
+                    "Proiezione inserita con successo nel palinsesto!",
+                    "Operazione Riuscita",
+                    JOptionPane.INFORMATION_MESSAGE
             );
-            return true; // Esito positivo
+            return true;
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
-                this, 
-                "Errore durante l'inserimento: " + ex.getMessage(), 
-                "Errore Server / Validazione", 
-                JOptionPane.ERROR_MESSAGE
+                    this,
+                    "Errore durante l'inserimento: " + ex.getMessage(),
+                    "Errore Server / Validazione",
+                    JOptionPane.ERROR_MESSAGE
             );
-            return false; // Esito negativo: impedisce il dispose()
+            return false;
         } finally {
             setCursor(Cursor.getDefaultCursor());
         }
     }
 
-    // =========================================================================
-    // LOGICA DI RICERCA ASINCRONA (SwingWorker)
-    // =========================================================================
-
+    /**
+     * Esegue la ricerca asincrona dei film filtrando per titolo.
+     */
     private void eseguiRicerca() {
         String titoloFilm = textFieldTitoloSemplice.getText().trim();
 
         if (titoloFilm.isEmpty()) {
             JOptionPane.showMessageDialog(
-                this,
-                "Inserire il titolo del film da cercare.",
-                "Titolo Mancante",
-                JOptionPane.WARNING_MESSAGE
+                    this,
+                    "Inserire il titolo del film da cercare.",
+                    "Titolo Mancante",
+                    JOptionPane.WARNING_MESSAGE
             );
             return;
         }
@@ -241,16 +260,21 @@ public class ProiezionistaChangeProjection extends JPanel {
                     popolaListaRisultati(response);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(
-                        ProiezionistaChangeProjection.this,
-                        "Errore di comunicazione durante la ricerca per titolo: " + ex.getMessage(),
-                        "Errore Server",
-                        JOptionPane.ERROR_MESSAGE
+                            ProiezionistaChangeProjection.this,
+                            "Errore di comunicazione durante la ricerca per titolo: " + ex.getMessage(),
+                            "Errore Server",
+                            JOptionPane.ERROR_MESSAGE
                     );
                 }
             }
         }.execute();
     }
 
+    /**
+     * Popola la lista dei risultati con i film restituiti dal backend.
+     *
+     * @param response la risposta contenente la lista dei film
+     */
     private void popolaListaRisultati(GetFilmsResponse response) {
         resultListModel.clear();
 
@@ -259,29 +283,31 @@ public class ProiezionistaChangeProjection extends JPanel {
 
             if (films.isEmpty()) {
                 JOptionPane.showMessageDialog(
-                    this,
-                    "Nessun film trovato con i parametri indicati.",
-                    "Nessun Risultato",
-                    JOptionPane.INFORMATION_MESSAGE
+                        this,
+                        "Nessun film trovato con i parametri indicati.",
+                        "Nessun Risultato",
+                        JOptionPane.INFORMATION_MESSAGE
                 );
             } else {
                 resultListModel.addAll(films);
             }
         } else {
             JOptionPane.showMessageDialog(
-                this,
-                "Risposta non valida ricevuta dal server.",
-                "Errore Server",
-                JOptionPane.ERROR_MESSAGE
+                    this,
+                    "Risposta non valida ricevuta dal server.",
+                    "Errore Server",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
     }
 
-    // =========================================================================
-    // CELL RENDERER
-    // =========================================================================
-
+    /**
+     * Renderer grafico per le celle della lista dei film a catalogo.
+     */
     private static class FilmCellRenderer extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -293,4 +319,3 @@ public class ProiezionistaChangeProjection extends JPanel {
         }
     }
 }
-

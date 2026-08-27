@@ -1,5 +1,5 @@
 /**
- *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ * @authors Francesca Pelizzoni, matricola 751550 (VA) e Davide Villa, matricola 701105 (VA)
  */
 package cinemax.serverCM;
 
@@ -10,12 +10,21 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * Entry point per il componente serverCM. Si occupa di leggere i parametri di
- * connessione al database da stdin e avviare il ServerSocket per accettare
- * connessioni client.
+ * Entry point per il componente server di Cinemax (serverCM).
+ * <p>
+ * Si occupa di leggere i parametri di connessione al database PostgreSQL da standard input
+ * (host, porta, username e password), validare i dati inseriti e inizializzare il 
+ * {@link ServerSocket} per l'accettazione e l'inoltro delle connessioni client verso
+ * istanze dedicate di {@link ClientHandler}.
+ * </p>
  */
 public class ServerMain {
 
+    /**
+     * Punto di ingresso principale per l'esecuzione del server Cinemax.
+     *
+     * @param args argomenti passati da riga di comando (non utilizzati)
+     */
     public static void main(String[] args) {
         String dbHost = "";
         String dbUser = "";
@@ -77,4 +86,3 @@ public class ServerMain {
         }
     }
 }
-

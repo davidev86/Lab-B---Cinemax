@@ -1,5 +1,5 @@
 /**
- *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ * @authors Francesca Pelizzoni, matricola 751550 (VA) e Davide Villa, matricola 701105 (VA)
  */
 package cinemax.serverCM.dao;
 
@@ -25,17 +25,33 @@ import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 
 /**
- * DAO per la gestione delle operazioni di lettura, creazione e modifica degli utenti nel database, incluse autenticazione e recupero dati profilo.
+ * Data Access Object (DAO) responsabile per le operazioni di lettura, registrazione
+ * e aggiornamento degli utenti nel database PostgreSQL all'interno della tabella {@code public."Utenti"}.
+ * <p>
+ * Fornisce il supporto all'autenticazione tramite credenziali (username e hash MD5 della password),
+ * al recupero del profilo dettagliato utente ({@link UserDetails}) e alla persistenza dei dati anagrafici e di ruolo.
+ * </p>
  */
 public class UserDao implements Dao {
 
 	private Connection _connection; 
 
+	/**
+	 * Costruisce il DAO per la gestione degli utenti associando la connessione JDBC attiva.
+	 *
+	 * @param connection la connessione aperta verso il database PostgreSQL
+	 */
 	public UserDao(Connection connection) {
 		_connection = connection;
 	}
 
-	//il tipo di ritorno deve essere
+	/**
+	 * Instrada ed esegue una richiesta di tipo {@link Query} relativa agli utenti.
+	 *
+	 * @param req la query da processare (es. {@link GetUserByCredentials}, {@link GetUserDetails})
+	 * @return l'istanza {@link Response} corrispondente al risultato dell'interrogazione, o {@code null} in caso di errore
+	 * @throws IllegalArgumentException se il tipo di query fornito non è riconosciuto
+	 */
 	@Override
 	public Response find(Query req){
 
@@ -43,7 +59,7 @@ public class UserDao implements Dao {
 		try {
 
 			switch (req) {
-			case GetUserByCredentials u  -> response =  Find(u);  
+			case GetUserByCredentials u  -> response = Find(u);  
 			case GetUserDetails u  -> response = Find(u);
 			default -> throw new IllegalArgumentException("Unexpected value: " + req);
 
@@ -53,12 +69,17 @@ public class UserDao implements Dao {
 			e.printStackTrace();
 		}
 
-
 		return response;
 	}
 
-
-
+	/**
+	 * Esegue l'autenticazione dell'utente ricercando la corrispondenza tra username (case-insensitive)
+	 * e hash MD5 della password memorizzata.
+	 *
+	 * @param req la richiesta {@link GetUserByCredentials} contenente username e password hashata
+	 * @return l'oggetto {@link GetUserByCredentialResponse} con le informazioni minime dell'utente ({@link UserMinInfo}),
+	 *         oppure {@code null} se le credenziali non sono valide o in caso di errore SQL
+	 */
 	private Response Find(GetUserByCredentials req) {	
 
 		String baseQuery = "SELECT * FROM public.\"Utenti\"";
@@ -79,7 +100,6 @@ public class UserDao implements Dao {
 				dto.setCognome(rs.getString("cognome"));		
 				
 				// Ruolo (conversione da String del DB a Enum Java)
-
 	            String ruoloStr = rs.getString("ruolo");
 	            if (ruoloStr != null) {
 	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
@@ -101,6 +121,12 @@ public class UserDao implements Dao {
 		return null;
 	}
 	
+	/**
+	 * Recupera la scheda anagrafica e di profilo completa di un utente a partire dal suo identificativo univoco.
+	 *
+	 * @param req la richiesta {@link GetUserDetails} contenente l'identificativo numerico dell'utente
+	 * @return l'oggetto {@link GetUserDetailsResponse} con i dettagli anagrafici ({@link UserDetails}), o {@code null} in caso di errore SQL
+	 */
 	private Response Find(GetUserDetails req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Utenti\"";
@@ -114,15 +140,10 @@ public class UserDao implements Dao {
 	        List<UserDetails> users = DbHelper.executeQuery(_connection, sqb.getSql(), sqb.getParams(), rs -> {
 	            UserDetails dto = new UserDetails();
 	            
-	            
 	            dto.setId(rs.getInt("id"));
-	            
-	            
 	            dto.setNome(rs.getString("nome"));
 	            dto.setCognome(rs.getString("cognome"));
 	            dto.setUsername(rs.getString("username"));
-	            
-	            
 	            dto.setDomicilio(rs.getString("domicilio"));
 	        
 	            // Ruolo (conversione da String del DB a Enum Java)
@@ -131,19 +152,15 @@ public class UserDao implements Dao {
 	                dto.setRuolo(Ruolo.fromDbValue(ruoloStr)); 
 	            }
 	            
-	            
 	            java.sql.Date sqlDate = rs.getDate("data_nascita");
 	            if (sqlDate != null) {
-	                dto.setDataNascita(sqlDate.toLocalDate()); // Se in UserDetails usi LocalDate
-	                // dto.setDataNascita(sqlDate);             // Se in UserDetails usi java.util.Date / java.sql.Date
+	                dto.setDataNascita(sqlDate.toLocalDate());
 	            }
 	            
 	            return dto;
 	        });
 
 	        return new GetUserDetailsResponse(users.getFirst());
-
-	    	
 
 		}
 		catch (SQLException e) {
@@ -154,7 +171,13 @@ public class UserDao implements Dao {
 		return null;
 	}
 
-	
+	/**
+	 * Esegue un comando transazionale ({@link Command}) distinguendo tra operazione di registrazione
+	 * di un nuovo utente (ID nullo) o modifica anagrafica di un utente esistente.
+	 *
+	 * @param cmd il comando da processare (istanza di {@link StoreUser})
+	 * @return l'istanza {@link Response} risultante dall'esecuzione del comando
+	 */
 	@Override
 	public Response execute(Command cmd) {	
 		
@@ -164,6 +187,12 @@ public class UserDao implements Dao {
 		else return updateUser((StoreUser)cmd);
 	}	
 	
+	/**
+	 * Aggiorna le informazioni anagrafiche, di sicurezza e di ruolo di un utente esistente nella tabella {@code public."Utenti"}.
+	 *
+	 * @param req il comando {@link StoreUser} contenente i campi aggiornati e l'ID dell'utente
+	 * @return l'oggetto {@link StoreUserResponse} con l'ID dell'utente modificato, o {@code null} in caso di errore SQL
+	 */
 	private Response updateUser(StoreUser req) {
 	    SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Utenti\"");
 	    
@@ -189,6 +218,12 @@ public class UserDao implements Dao {
 	    }       
 	}
 
+	/**
+	 * Inserisce un nuovo record utente nella tabella {@code public."Utenti"} a seguito della registrazione.
+	 *
+	 * @param req il comando {@link StoreUser} con tutti i parametri anagrafici e credenziali del nuovo account
+	 * @return l'oggetto {@link StoreUserResponse} contenente l'ID generato dal database PostgreSQL, o {@code null} in caso di errore SQL
+	 */
 	private Response insertUser(StoreUser req) {
 	    SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Utenti\"");
 
@@ -213,5 +248,3 @@ public class UserDao implements Dao {
 	    }           
 	}
 }
-
-

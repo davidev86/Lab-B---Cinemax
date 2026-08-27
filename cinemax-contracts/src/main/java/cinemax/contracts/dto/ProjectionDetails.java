@@ -7,54 +7,98 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 /**
- * DTO che rappresenta i dettagli di una proiezione: collega i metadati del film
- * alle informazioni di scheduling (data/ora), costo e posti prenotati.
+ * Data Transfer Object (DTO) che rappresenta i dettagli completi di una proiezione cinematografica.
  * <p>
- * Utilizzato sia dal server per inviare informazioni al client sia internamente
- * per la logica di business relativa alla gestione delle proiezioni.
+ * Aggrega i metadati del film (titolo, genere, regista, durata, limiti di età) alle informazioni
+ * di programmazione in sala (data e ora, costo del biglietto e posti attualmente prenotati).
+ * Utilizzato per la comunicazione client-server via TCP e per la logica di business.
+ * </p>
  */
 public class ProjectionDetails implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Identificatore univoco della proiezione nel database.
+     */
     private Integer id;
+
+    /**
+     * Identificatore univoco del film proiettato.
+     */
     private Integer idFilm;
+
+    /**
+     * Data e ora pianificate per lo svolgimento della proiezione.
+     */
     private LocalDateTime dataOraProiezione;
+
+    /**
+     * Titolo dell'opera cinematografica proiettata.
+     */
     private String titoloFilm;
+
+    /**
+     * Genere cinematografico del film.
+     */
     private String genere;
+
+    /**
+     * Nome e cognome del regista del film.
+     */
     private String regista;
+
+    /**
+     * Anno di uscita o produzione del film.
+     */
     private Integer anno;
+
+    /**
+     * Durata complessiva del film espressa in minuti.
+     */
     private Integer durataMinuti;
+
+    /**
+     * Soglia di età minima raccomandata o vincolante per la visione.
+     */
     private Integer etaMinima;
+
+    /**
+     * Prezzo unitario del biglietto per la proiezione.
+     */
     private BigDecimal costo;
+
+    /**
+     * Numero complessivo di posti già prenotati per la proiezione.
+     */
     private Integer totalePostiPrenotati;
 
     /**
-     * Costruttore vuoto per consentire la serializzazione dell'oggetto via TCP.
+     * Costruttore predefinito senza argomenti.
      */
     public ProjectionDetails() {
     }
 
     /**
-     * Costruisce un ProjectionDetails completo con i campi principali.
+     * Costruisce un'istanza completa di {@code ProjectionDetails} valorizzando tutti i dettagli operativi e descrittivi.
      *
-     * @param id identificatore della proiezione
-     * @param idFilm identificatore del film proiettato
-     * @param dataOraProiezione data e ora della proiezione
-     * @param titoloFilm titolo del film
-     * @param genere genere del film
-     * @param regista regista del film
-     * @param anno anno di uscita
-     * @param durataMinuti durata del film in minuti
-     * @param etaMinima etÃ  minima consigliata
-     * @param totalePostiPrenotati numero di posti giÃ  prenotati per la proiezione
-     * @param costo costo unitario del biglietto per la proiezione
+     * @param id                   l'identificatore univoco della proiezione
+     * @param idFilm               l'identificatore univoco del film proiettato
+     * @param dataOraProiezione    la data e l'ora fissate per la proiezione
+     * @param titoloFilm           il titolo del film
+     * @param genere               il genere cinematografico
+     * @param regista              il nome del regista
+     * @param anno                 l'anno di uscita del film
+     * @param durataMinuti         la durata della pellicola in minuti
+     * @param etaMinima            la soglia di età minima per la visione
+     * @param totalePostiPrenotati il numero totale di posti già riservati
+     * @param costo                il prezzo unitario del biglietto
      */
     public ProjectionDetails(Integer id, Integer idFilm, LocalDateTime dataOraProiezione, String titoloFilm, String genere, 
-                                    String regista, Integer anno, Integer durataMinuti, Integer etaMinima, Integer totalePostiPrenotati, BigDecimal costo ) {
-    	this.id = id;
-    	this.idFilm = idFilm;
+                             String regista, Integer anno, Integer durataMinuti, Integer etaMinima, Integer totalePostiPrenotati, BigDecimal costo) {
+        this.id = id;
+        this.idFilm = idFilm;
         this.dataOraProiezione = dataOraProiezione;
         this.titoloFilm = titoloFilm;
         this.genere = genere;
@@ -66,26 +110,28 @@ public class ProjectionDetails implements Serializable {
         this.costo = costo;
     }
 
-    // Getter e Setter
     /**
-     * Data e ora della proiezione.
-     * @return data/ora come {@link LocalDateTime}
+     * Restituisce la data e l'ora della proiezione.
+     *
+     * @return la data e ora come {@link LocalDateTime}
      */
     public LocalDateTime getDataOraProiezione() {
         return dataOraProiezione;
     }
 
     /**
-     * Imposta la data e ora della proiezione.
-     * @param dataOraProiezione data e ora
+     * Imposta la data e l'ora della proiezione.
+     *
+     * @param dataOraProiezione
      */
     public void setDataOraProiezione(LocalDateTime dataOraProiezione) {
         this.dataOraProiezione = dataOraProiezione;
     }
 
     /**
-     * Titolo del film associato alla proiezione.
-     * @return titolo del film
+     * Restituisce il titolo del film associato alla proiezione.
+     *
+     * @return il titolo del film
      */
     public String getTitoloFilm() {
         return titoloFilm;
@@ -93,62 +139,70 @@ public class ProjectionDetails implements Serializable {
 
     /**
      * Imposta il titolo del film per questa proiezione.
-     * @param titoloFilm titolo
+     *
+     * @param titoloFilm
      */
     public void setTitoloFilm(String titoloFilm) {
         this.titoloFilm = titoloFilm;
     }
 
     /**
-     * Genere del film per questa proiezione.
-     * @return genere
+     * Restituisce il genere cinematografico del film proiettato.
+     *
+     * @return la categoria o genere del film
      */
     public String getGenere() {
         return genere;
     }
 
     /**
-     * Imposta il genere del film.
-     * @param genere genere
+     * Imposta il genere cinematografico del film.
+     *
+     * @param genere
      */
     public void setGenere(String genere) {
         this.genere = genere;
     }
 
     /**
-     * Regista del film.
-     * @return nome del regista
+     * Restituisce il nome del regista del film.
+     *
+     * @return il nome del regista
      */
     public String getRegista() {
         return regista;
     }
 
     /**
-     * Imposta il regista.
-     * @param regista nome del regista
+     * Imposta il nome del regista del film.
+     *
+     * @param regista
      */
     public void setRegista(String regista) {
         this.regista = regista;
     }
 
     /**
-     * Anno di produzione/uscita.
-     * @return anno
+     * Restituisce l'anno di uscita o produzione del film.
+     *
+     * @return l'anno del film, oppure null se non disponibile
      */
     public Integer getAnno() {
         return anno;
     }
 
     /**
-     * Imposta l'anno di produzione/uscita.
-     * @param anno anno
+     * Imposta l'anno di uscita o produzione del film.
+     *
+     * @param anno
      */
     public void setAnno(Integer anno) {
         this.anno = anno;
     }
 
     /**
-     * Durata del film in minuti.
+     * Restituisce la durata complessiva del film in minuti.
+     *
      * @return durata in minuti
      */
     public Integer getDurataMinuti() {
@@ -156,94 +210,114 @@ public class ProjectionDetails implements Serializable {
     }
 
     /**
-     * Imposta la durata in minuti.
-     * @param durataMinuti durata
+     * Imposta la durata complessiva del film in minuti.
+     *
+     * @param durataMinuti
      */
     public void setDurataMinuti(Integer durataMinuti) {
         this.durataMinuti = durataMinuti;
     }
 
     /**
-     * EtÃ  minima consigliata/obbligatoria per la proiezione.
-     * @return etÃ  minima
+     * Restituisce l'età minima consigliata o obbligatoria per la visione.
+     *
+     * @return la soglia di età minima
      */
     public Integer getEtaMinima() {
         return etaMinima;
     }
 
     /**
-     * Imposta l'etÃ  minima consigliata/obbligatoria.
-     * @param etaMinima etÃ  minima
+     * Imposta la soglia di età minima per la visione della proiezione.
+     *
+     * @param etaMinima
      */
     public void setEtaMinima(Integer etaMinima) {
         this.etaMinima = etaMinima;
     }
 
     /**
-     * Identificatore della proiezione.
-     * @return id proiezione
+     * Restituisce l'identificatore univoco della proiezione.
+     *
+     * @return l'identificatore numerico della proiezione
      */
     public Integer getId() {
         return id;
     }
 
     /**
-     * Imposta l'identificatore della proiezione.
-     * @param id id proiezione
+     * Imposta l'identificatore univoco della proiezione.
+     *
+     * @param idProiezione
      */
     public void setId(Integer id) {
         this.id = id;
     }
 
     /**
-     * Identificatore del film associato alla proiezione.
-     * @return id film
+     * Restituisce l'identificatore del film associato alla proiezione.
+     *
+     * @return l'identificatore del film
      */
     public Integer getIdFilm() {
         return idFilm;
     }
 
     /**
-     * Imposta l'identificatore del film.
-     * @param idFilm id film
+     * Imposta l'identificatore del film associato alla proiezione.
+     *
+     * @param idFilm
      */
     public void setIdFilm(Integer idFilm) {
         this.idFilm = idFilm;
     }
 
     /**
-     * Costo del biglietto per la proiezione.
-     * @return costo come {@link BigDecimal}
+     * Restituisce il costo unitario del biglietto per la proiezione.
+     *
+     * @return il prezzo del biglietto come {@link BigDecimal}
      */
     public BigDecimal getCosto() {
         return costo;
     }
 
     /**
-     * Imposta il costo del biglietto.
-     * @param costo costo
+     * Imposta il costo unitario del biglietto per la proiezione.
+     *
+     * @param costo
      */
     public void setCosto(BigDecimal costo) {
         this.costo = costo;
     }
-	
+    
     /**
-     * Numero totale di posti giÃ  prenotati per la proiezione.
-     * @return numero di posti prenotati
+     * Restituisce il totale dei posti attualmente prenotati per la proiezione.
+     *
+     * @return il conteggio dei posti prenotati
      */
     public Integer getTotalePostiPrenotati() {
         return totalePostiPrenotati;
     }
 
     /**
-     * Imposta il numero totale di posti prenotati.
-     * @param totalePostiPrenotati numero di posti
+     * Imposta il conteggio totale dei posti prenotati per la proiezione.
+     *
+     * @param totalePostiPrenotati
      */
     public void setTotalePostiPrenotati(Integer totalePostiPrenotati) {
         this.totalePostiPrenotati = totalePostiPrenotati;
     }
-	
-	@Override
+    
+    /**
+     * Restituisce una rappresentazione testuale formattata della proiezione.
+     * <p>
+     * La stringa risultante segue il pattern:
+     * {@code "Titolo (Anno) | dd/MM/yyyy HH:mm | X min | €Y.YY"}.
+     * </p>
+     *
+     * @return una stringa formattata contenente i dati essenziali della proiezione
+     */
+    @Override
     public String toString() {
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
@@ -256,7 +330,5 @@ public class ProjectionDetails implements Serializable {
             durataMinuti != null ? durataMinuti : 0, 
             costoVal);
     }
-	
 }
-
 

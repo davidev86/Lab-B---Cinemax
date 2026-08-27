@@ -18,15 +18,43 @@ public class UserDetails implements Serializable  {
 
 
 	/**
-	 * 
+	 * Identificatore di versione per la serializzazione della classe.
 	 */
 	private static final long serialVersionUID = 1L;
+
+	/**
+	 * Identificatore univoco dell'utente nel database.
+	 */
 	private Integer id;
+
+	/**
+	 * Nome anagrafico dell'utente.
+	 */
 	private String nome;
+
+	/**
+	 * Cognome anagrafico dell'utente.
+	 */
 	private String cognome;
+
+	/**
+	 * Nome utente (username) univoco utilizzato per l'accesso e l'autenticazione.
+	 */
 	private String username;
+
+	/**
+	 * Data di nascita dell'utente.
+	 */
 	private LocalDate dataNascita;
+
+	/**
+	 * Indirizzo di domicilio del cliente.
+	 */
 	private String domicilio;
+
+	/**
+	 * Ruolo autorizzativo assegnato all'utente all'interno del sistema (es. {@link Ruolo}).
+	 */
 	private Ruolo ruolo;
 
 	/**

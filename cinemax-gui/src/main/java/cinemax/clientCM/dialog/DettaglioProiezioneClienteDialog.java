@@ -32,12 +32,29 @@ import javax.swing.border.TitledBorder;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
 /**
- * Dialog per visualizzare i dettagli di una proiezione e consentire la prenotazione
- * lato cliente. Mostra informazioni sul film, prezzo e fornisce il controllo per
- * selezionare il numero di posti da prenotare.
+ * Finestra di dialogo modale per la consultazione e prenotazione di una proiezione cinematografica da parte del cliente.
+ * <p>
+ * Mostra la scheda dettagliata dell'opera (titolo, regia, genere, durata, costi e posti disponibili),
+ * fornisce un selettore numerico interattivo per la quantità di posti desiderata con ricalcolo in tempo reale
+ * del costo totale ed esegue la validazione della disponibilità prima di invocare il callback di salvataggio.
+ * </p>
  */
 public class DettaglioProiezioneClienteDialog extends JDialog {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Formattatore per la rappresentazione testuale di data e ora dello spettacolo (gg/mm/aaaa hh:mm).
+     */
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    /**
+     * Costruisce e inizializza la finestra modale per la prenotazione posti da parte del cliente.
+     *
+     * @param owner                la finestra proprietaria (parent window)
+     * @param proiezione           l'istanza {@link ProjectionDetailsView} contenente i dettagli della proiezione selezionata
+     * @param storeBookingCallback il callback che accetta il numero di posti prenotati confermati dall'utente
+     */
     public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetailsView proiezione, 
             Consumer<Integer> storeBookingCallback) {
         super(owner, "Dettagli Proiezione", ModalityType.APPLICATION_MODAL);
@@ -67,7 +84,9 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         ));
 
         // Intestazione Titolo Film
-        JLabel lblTitolo = new JLabel(proiezione.getTitoloFilm() != null ? proiezione.getTitoloFilm() : "Senza Titolo");
+        String titolo = (proiezione != null && proiezione.getTitoloFilm() != null) 
+                ? proiezione.getTitoloFilm() : "Senza Titolo";
+        JLabel lblTitolo = new JLabel(titolo);
         lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 18));
         lblTitolo.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblTitolo.setBorder(new EmptyBorder(10, 0, 15, 0));
@@ -77,17 +96,16 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         JPanel gridDettagli = new JPanel(new GridLayout(6, 2, 10, 8));
         gridDettagli.setBorder(new EmptyBorder(5, 15, 10, 15));
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String dataOra = (proiezione.getDataOraProiezione() != null) 
-                ? proiezione.getDataOraProiezione().format(formatter) 
+        String dataOra = (proiezione != null && proiezione.getDataOraProiezione() != null) 
+                ? proiezione.getDataOraProiezione().format(DATE_TIME_FORMATTER) 
                 : "N/D";
 
         aggiungiRiga(gridDettagli, "Data & Ora:", dataOra);
-        aggiungiRiga(gridDettagli, "Regista:", proiezione.getRegista());
-        aggiungiRiga(gridDettagli, "Genere:", proiezione.getGenere());
-        aggiungiRiga(gridDettagli, "Anno di Uscita:", String.valueOf(proiezione.getAnno() != null ? proiezione.getAnno() : "-"));
-        aggiungiRiga(gridDettagli, "Durata:", (proiezione.getDurataMinuti() != null ? proiezione.getDurataMinuti() : 0) + " min");
-        aggiungiRiga(gridDettagli, "EtÃ  Minima:", (proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
+        aggiungiRiga(gridDettagli, "Regista:", proiezione != null ? proiezione.getRegista() : null);
+        aggiungiRiga(gridDettagli, "Genere:", proiezione != null ? proiezione.getGenere() : null);
+        aggiungiRiga(gridDettagli, "Anno di Uscita:", (proiezione != null && proiezione.getAnno() != null) ? proiezione.getAnno().toString() : "-");
+        aggiungiRiga(gridDettagli, "Durata:", (proiezione != null && proiezione.getDurataMinuti() != null ? proiezione.getDurataMinuti() : 0) + " min");
+        aggiungiRiga(gridDettagli, "Età Minima:", (proiezione != null && proiezione.getEtaMinima() != null ? proiezione.getEtaMinima() : 0) + " anni");
 
         cardPanel.add(gridDettagli);
 
@@ -97,7 +115,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         JLabel lblPrezzoTag = new JLabel("Prezzo Unitario: ");
         lblPrezzoTag.setFont(new Font("SansSerif", Font.PLAIN, 14));
         
-        BigDecimal costoUnitario = proiezione.getCosto() != null ? proiezione.getCosto() : BigDecimal.ZERO;
+        BigDecimal costoUnitario = (proiezione != null && proiezione.getCosto() != null) ? proiezione.getCosto() : BigDecimal.ZERO;
         String costoFormattato = String.format("€ %.2f", costoUnitario);
         
         JLabel lblPrezzoValore = new JLabel(costoFormattato);
@@ -106,7 +124,10 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
 
         JLabel postiLiberi = new JLabel(" | Posti liberi: ");
         postiLiberi.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        JLabel conteggioPostiLiberi = new JLabel(proiezione.getTotalePostiLiberi() != null ? proiezione.getTotalePostiLiberi().toString() : "0");
+        
+        String postiLiberiStr = (proiezione != null && proiezione.getTotalePostiLiberi() != null) 
+                ? proiezione.getTotalePostiLiberi().toString() : "0";
+        JLabel conteggioPostiLiberi = new JLabel(postiLiberiStr);
         conteggioPostiLiberi.setFont(new Font("SansSerif", Font.BOLD, 14));
         
         pricePanel.add(lblPrezzoTag);
@@ -143,6 +164,7 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         totalPanel.add(lblTotaleTag);
         totalPanel.add(lblTotaleValore);
 
+        // Ricalcolo del totale al variare dello spinner
         reservedSeats.addChangeListener(e -> {
             int posti = (Integer) reservedSeats.getValue();
             BigDecimal totale = costoUnitario.multiply(BigDecimal.valueOf(posti));
@@ -152,12 +174,11 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         selectSeatsContainer.add(spinnerPanel);
         selectSeatsContainer.add(totalPanel);
 
-        // Assembla i pannelli centrali nel contenitore unico
+        // Assembla i pannelli centrali nel contenitore principale
         mainCenterPanel.add(cardPanel);
         mainCenterPanel.add(Box.createRigidArea(new Dimension(0, 10)));
         mainCenterPanel.add(selectSeatsContainer);
 
-        // Unica aggiunta a BorderLayout.CENTER
         add(mainCenterPanel, BorderLayout.CENTER);
 
         // BOTTONI DI AZIONE
@@ -168,12 +189,12 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
             if (storeBookingCallback != null) {
                 int postiSelezionati = (Integer) reservedSeats.getValue();
                 
-                if (proiezione.getTotalePostiLiberi() != null && postiSelezionati > proiezione.getTotalePostiLiberi()) {
-                     JOptionPane.showMessageDialog(this, 
-                             "Il numero di posti inserito è superiore al numero di posti disponibili.", 
-                             "Numero posti non valido", 
-                             JOptionPane.ERROR_MESSAGE);
-                     return;              
+                if (proiezione != null && proiezione.getTotalePostiLiberi() != null && postiSelezionati > proiezione.getTotalePostiLiberi()) {
+                    JOptionPane.showMessageDialog(this, 
+                            "Il numero di posti inserito è superiore al numero di posti disponibili.", 
+                            "Numero posti non valido", 
+                            JOptionPane.ERROR_MESSAGE);
+                    return;             
                 }
                     
                 storeBookingCallback.accept(postiSelezionati);  
@@ -187,18 +208,26 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         panelBottoni.add(btnAnnulla);
         panelBottoni.add(btnAzione);
         add(panelBottoni, BorderLayout.SOUTH);
+
+        getRootPane().setDefaultButton(btnAzione);
     }   
 
+    /**
+     * Aggiunge una riga di dettaglio (coppia etichetta-valore) al contenitore con layout a griglia.
+     *
+     * @param container il pannello contenitore della griglia
+     * @param etichetta l'etichetta identificativa della proprietà
+     * @param valore    la stringa rappresentante il valore associato
+     */
     private void aggiungiRiga(JPanel container, String etichetta, String valore) {
         JLabel lblChiave = new JLabel(etichetta);
         lblChiave.setFont(new Font("SansSerif", Font.BOLD, 12));
         lblChiave.setForeground(Color.DARK_GRAY);
     
-        JLabel lblVal = new JLabel(valore != null && !valore.isEmpty() ? valore : "N/D");
+        JLabel lblVal = new JLabel(valore != null && !valore.trim().isEmpty() ? valore : "N/D");
         lblVal.setFont(new Font("SansSerif", Font.PLAIN, 12));
     
         container.add(lblChiave);
         container.add(lblVal);
     }
 }
-

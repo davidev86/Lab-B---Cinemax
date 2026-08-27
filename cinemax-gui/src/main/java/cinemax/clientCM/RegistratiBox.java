@@ -31,7 +31,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -43,14 +42,16 @@ import cinemax.application.services.TcpClient;
 import cinemax.application.services.UserService;
 
 /**
- * Finestra di dialogo modale per la registrazione di un nuovo utente.
+ * Finestra di dialogo modale per la registrazione di un nuovo utente nel sistema Cinemax.
  * <p>
- * Gestisce l'acquisizione dei dati anagrafici e di accesso, la validazione 
- * dell'input lato client e l'invio asincrono delle informazioni al server 
- * per evitare blocchi dell'Event Dispatch Thread (EDT).
+ * Gestisce l'acquisizione dei dati anagrafici e di accesso, la validazione dei campi obbligatori
+ * lato client e l'invio asincrono al server tramite {@link UserService} e {@link SwingWorker}
+ * per preservare la reattività dell'Event Dispatch Thread (EDT).
+ * </p>
  */
-
 public class RegistratiBox extends JDialog {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
@@ -69,15 +70,19 @@ public class RegistratiBox extends JDialog {
     private final JButton btnAnnulla;
     private final UserService userService;
 
+    /**
+     * Costruisce la finestra modale di registrazione account.
+     *
+     * @param owner     la finestra proprietaria (parent window) per il posizionamento e la modalità
+     * @param tcpClient il client di rete per l'inoltro delle richieste al server
+     */
     public RegistratiBox(Window owner, TcpClient tcpClient) {
-    	
         super(owner, "Registrazione Account", ModalityType.APPLICATION_MODAL);
         this.userService = new UserService(tcpClient);
 
         setLayout(new BorderLayout(0, 0));
         setResizable(false);
-        
-       
+
         // HEADER: Titolo e Sottotitolo
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
@@ -102,7 +107,8 @@ public class RegistratiBox extends JDialog {
 
         add(headerPanel, BorderLayout.NORTH);
 
-                JPanel formPanel = new JPanel(new GridBagLayout());
+        // FORM: Campi di input con GridBagLayout
+        JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(14, 18, 10, 18));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 4, 5, 4);
@@ -125,10 +131,10 @@ public class RegistratiBox extends JDialog {
         int riga = 0;
         aggiungiRigaForm(formPanel, "Username *:", usernameField, gbc, riga++);
         aggiungiRigaForm(formPanel, "Password *:", passwordField, gbc, riga++);
-        aggiungiRigaForm(formPanel, "Nome: *", nomeField, gbc, riga++);
-        aggiungiRigaForm(formPanel, "Cognome: *", cognomeField, gbc, riga++);
+        aggiungiRigaForm(formPanel, "Nome *:", nomeField, gbc, riga++);
+        aggiungiRigaForm(formPanel, "Cognome *:", cognomeField, gbc, riga++);
         aggiungiRigaForm(formPanel, "Data di Nascita:", dataNascitaField, gbc, riga++);
-        aggiungiRigaForm(formPanel, "Domicilio: *", domicilioField, gbc, riga++);
+        aggiungiRigaForm(formPanel, "Domicilio *:", domicilioField, gbc, riga++);
 
         // Nota sui campi obbligatori
         gbc.gridx = 1;
@@ -141,7 +147,7 @@ public class RegistratiBox extends JDialog {
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Pulsanti Azione
+        // FOOTER: Pulsanti di conferma e annullamento
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 12));
         footerPanel.setBorder(new MatteBorder(1, 0, 0, 0, new Color(230, 232, 235)));
 
@@ -159,15 +165,16 @@ public class RegistratiBox extends JDialog {
         footerPanel.add(btnRegistrati);
         add(footerPanel, BorderLayout.SOUTH);
 
-        // Associa il tasto Invio (Enter) al pulsante Registrati
+        // Associazione tasto Invio (Enter) al pulsante di registrazione
         getRootPane().setDefaultButton(btnRegistrati);
 
         pack();
         setLocationRelativeTo(owner);
     }
 
-    // LOGICA DI REGISTRAZIONE ASINCRONA
-
+    /**
+     * Valida i campi inseriti e avvia la registrazione asincrona dell'utente tramite {@link SwingWorker}.
+     */
     private void eseguiRegistrazione() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
@@ -175,8 +182,8 @@ public class RegistratiBox extends JDialog {
         String cognome = cognomeField.getText().trim();
         String domicilio = domicilioField.getText().trim();
 
-        if (username.isEmpty() || password.isEmpty() || nome.isEmpty() ||cognome.isEmpty() || domicilio.isEmpty()) {
-            mostraMessaggio("Completa i campi obbligatori per completare la registrazione.", 
+        if (username.isEmpty() || password.isEmpty() || nome.isEmpty() || cognome.isEmpty() || domicilio.isEmpty()) {
+            mostraMessaggio("Compila tutti i campi obbligatori per completare la registrazione.", 
                     "Campi Mancanti", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -209,8 +216,7 @@ public class RegistratiBox extends JDialog {
                             "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
                 } catch (Exception ex) {
-                	
-                	Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+                    Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
                     mostraMessaggio("Errore durante la registrazione: " + cause.getMessage(), 
                             "Errore Server", JOptionPane.ERROR_MESSAGE);
                 }
@@ -218,11 +224,18 @@ public class RegistratiBox extends JDialog {
         }.execute();
     }
 
-    // UTILITY DI LAYOUT E PARSING
+    /**
+     * Inserisce una riga etichetta-campo nel pannello del form con allineamento uniforme.
+     *
+     * @param panel     il contenitore a griglia
+     * @param labelText il testo descrittivo dell'etichetta
+     * @param field     il componente di input
+     * @param gbc       i vincoli di layout
+     * @param riga      l'indice di riga corrente
+     */
     private void aggiungiRigaForm(JPanel panel, String labelText, JComponent field, GridBagConstraints gbc, int riga) {
         gbc.gridy = riga;
 
-        // Label a larghezza naturale, allineata a destra verso il campo
         gbc.gridx = 0;
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.LINE_END;
@@ -230,13 +243,17 @@ public class RegistratiBox extends JDialog {
         label.setFont(FONT_BASE);
         panel.add(label, gbc);
 
-        // Campo di input espanso orizzontalmente
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.anchor = GridBagConstraints.LINE_START;
         panel.add(field, gbc);
     }
 
+    /**
+     * Inizializza un campo formattato con maschera numerica per la data (gg/mm/aaaa).
+     *
+     * @return l'istanza configurata di {@link JFormattedTextField}
+     */
     private JFormattedTextField creaCampoData() {
         JFormattedTextField field = new JFormattedTextField();
         try {
@@ -245,17 +262,30 @@ public class RegistratiBox extends JDialog {
             field.setFormatterFactory(new DefaultFormatterFactory(mask));
             field.setFont(FONT_BASE);
             field.setColumns(18);
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
         return field;
     }
 
+    /**
+     * Verifica se il campo data è privo di input da parte dell'utente.
+     *
+     * @return {@code true} se il campo contiene solo segnaposti o spazi vuoti, {@code false} altrimenti
+     */
     private boolean isDataFieldEmpty() {
         String text = dataNascitaField.getText().replace("_", "").replace("/", "").trim();
         return text.isEmpty();
     }
 
+    /**
+     * Effettua il parsing della data inserita nel formato dd/MM/yyyy.
+     *
+     * @return l'istanza {@link LocalDate} corrispondente, oppure {@code null} se il campo è vuoto o non valido
+     */
     private LocalDate parseDataNascita() {
-        if (isDataFieldEmpty()) return null;
+        if (isDataFieldEmpty()) {
+            return null;
+        }
         try {
             return LocalDate.parse(dataNascitaField.getText().trim(), DATE_FORMATTER);
         } catch (DateTimeParseException e) {
@@ -263,6 +293,11 @@ public class RegistratiBox extends JDialog {
         }
     }
 
+    /**
+     * Abilita o disabilita interattivamente i componenti del form durante le chiamate di rete.
+     *
+     * @param enabled {@code true} per abilitare i controlli, {@code false} per disabilitarli
+     */
     private void setStatoControlli(boolean enabled) {
         btnRegistrati.setEnabled(enabled);
         btnAnnulla.setEnabled(enabled);
@@ -274,6 +309,13 @@ public class RegistratiBox extends JDialog {
         domicilioField.setEnabled(enabled);
     }
 
+    /**
+     * Visualizza un messaggio di dialogo informativo, di avviso o di errore.
+     *
+     * @param testo  il messaggio descrittivo
+     * @param titolo il titolo della finestra modale
+     * @param tipo   il tipo di messaggio (es. {@link JOptionPane#INFORMATION_MESSAGE})
+     */
     private void mostraMessaggio(String testo, String titolo, int tipo) {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }

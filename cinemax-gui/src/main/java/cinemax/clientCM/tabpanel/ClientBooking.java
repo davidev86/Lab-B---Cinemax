@@ -12,13 +12,13 @@ import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;  
-import javax.swing.JDialog;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -32,7 +32,6 @@ import javax.swing.SwingWorker;
 import cinemax.application.services.BookingService;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
-import cinemax.clientCM.callback.SelezioneBookingCallBack;
 import cinemax.clientCM.dialog.DettaglioProiezioneClienteDialog;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.UserMinInfo;
@@ -41,12 +40,20 @@ import cinemax.contracts.responses.GetBookingResponse;
 import cinemax.contracts.responses.ui.GetProjectionResponse;
 
 /**
- * Pannello per la visualizzazione e gestione (modifica / cancellazione) delle prenotazioni utente.
+ * Pannello per la consultazione e la gestione (modifica e cancellazione) delle prenotazioni effettuate dal cliente.
+ * <p>
+ * Recupera in modo asincrono lo storico delle prenotazioni associate all'utente autenticato tramite {@link SwingWorker},
+ * consentendo l'aggiornamento dei posti riservati mediante {@link DettaglioProiezioneClienteDialog} e la cancellazione
+ * previa conferma dell'utente con aggiornamento reattivo dell'interfaccia.
+ * </p>
  */
 public class ClientBooking extends JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_TITLE = new Font("Tahoma", Font.BOLD, 14);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final BookingService bookingService;
     private final UserMinInfo user;
@@ -57,7 +64,13 @@ public class ClientBooking extends JPanel {
     private final JButton btnModifica;
     private final JButton btnCancella;
 
-    public ClientBooking(UserMinInfo user, TcpClient tcpClient){ 
+    /**
+     * Costruisce e inizializza il pannello per la consultazione delle prenotazioni del cliente.
+     *
+     * @param user      le informazioni sintetiche dell'utente autenticato
+     * @param tcpClient il client di rete per l'inoltro delle richieste verso il backend
+     */
+    public ClientBooking(UserMinInfo user, TcpClient tcpClient) { 
         this.user = user;
         this.tcpClient = tcpClient;
         this.bookingService = new BookingService(tcpClient);
@@ -65,7 +78,7 @@ public class ClientBooking extends JPanel {
         setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // 1. Inizializzazione preliminare dei pulsanti (risolve l'errore di inizializzazione nel listener)
+        // 1. Inizializzazione pulsanti di controllo
         this.btnModifica = new JButton("Modifica Prenotazione");
         this.btnModifica.setFont(FONT_BASE);
         this.btnModifica.setEnabled(false);
@@ -76,7 +89,7 @@ public class ClientBooking extends JPanel {
         this.btnCancella.setEnabled(false);
         this.btnCancella.addActionListener(e -> gestisciCancellazione());
 
-        
+        // 2. Configurazione modello e lista risultati
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -84,7 +97,7 @@ public class ClientBooking extends JPanel {
         this.listaRisultati.setFixedCellHeight(26);
         this.listaRisultati.setCellRenderer(new BookingCellRenderer());
 
-        // Abilita i pulsanti solo se una riga è effettivamente selezionata
+        // Abilitazione dei controlli condizionata alla presenza di una selezione attiva
         this.listaRisultati.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 boolean hasSelection = !listaRisultati.isSelectionEmpty();
@@ -93,6 +106,7 @@ public class ClientBooking extends JPanel {
             }
         });
 
+        // Doppio clic per modifica rapida
         this.listaRisultati.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -102,12 +116,12 @@ public class ClientBooking extends JPanel {
             }
         });
 
-        
+        // 3. Pannello di scorrimento
         JScrollPane scrollPanel = new JScrollPane(listaRisultati);
         scrollPanel.setPreferredSize(new Dimension(800, 400));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-        
+        // 4. Intestazione superiore con titolo e bottoni di azione
         JPanel topPanel = new JPanel(new BorderLayout());
         JLabel lblTitolo = new JLabel("Le Tue Prenotazioni Effettuate");
         lblTitolo.setFont(FONT_TITLE);
@@ -119,51 +133,106 @@ public class ClientBooking extends JPanel {
         topPanel.add(lblTitolo, BorderLayout.WEST);
         topPanel.add(panelAzioni, BorderLayout.EAST);
 
-        // 5. Assemblaggio layout
+        // 5. Assemblaggio componenti nel pannello
         add(topPanel, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
 
-        // 6. Caricamento iniziale
+        // 6. Caricamento iniziale dei dati
         visualizzaBooking();
     }
 
-    // GESTIONE AZIONI SULLA PRENOTAZIONE SELEZIONATA
-     private void gestisciModifica() {
+    /**
+     * Recupera in modo asincrono i dettagli della proiezione e apre la finestra modale per la modifica dei posti prenotati.
+     */
+    private void gestisciModifica() {
         BookingDetails selected = listaRisultati.getSelectedValue();
-        Window parentWindow = SwingUtilities.getWindowAncestor(ClientBooking.this);
-        JDialog dialog = null;
-        BookingService bkgService = new BookingService(tcpClient);
-        
-        if (selected != null) {
-
-            ProjectionService projectionService = new ProjectionService(this.tcpClient);
-            	GetProjectionResponse projection = projectionService.getProjectionById(selected.getIdProiezione()) ;
-            
-            	dialog = new DettaglioProiezioneClienteDialog(
-                    parentWindow, 
-                    projection.getProjection(),
-                    (Integer seats) -> {
-                        bkgService.updateBooking(selected.getIdPrenotazione(), user.getId(), selected.getIdProiezione(), seats);
-                        visualizzaBooking();
-                    }); 
-            	
-            	dialog.setVisible(true);
+        if (selected == null) {
+            return;
         }
+
+        setBottoniAbilitati(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        new SwingWorker<GetProjectionResponse, Void>() {
+            @Override
+            protected GetProjectionResponse doInBackground() throws Exception {
+                ProjectionService projectionService = new ProjectionService(tcpClient);
+                return projectionService.getProjectionById(selected.getIdProiezione());
+            }
+
+            @Override
+            protected void done() {
+                setCursor(Cursor.getDefaultCursor());
+                setBottoniAbilitati(!listaRisultati.isSelectionEmpty());
+
+                try {
+                    GetProjectionResponse response = get();
+                    if (response != null && response.getProjection() != null) {
+                        Window parentWindow = SwingUtilities.getWindowAncestor(ClientBooking.this);
+                        DettaglioProiezioneClienteDialog dialog = new DettaglioProiezioneClienteDialog(
+                                parentWindow,
+                                response.getProjection(),
+                                (Integer seats) -> eseguiAggiornamentoAsync(selected, seats)
+                        );
+                        dialog.setVisible(true);
+                    } else {
+                        mostraMessaggio("Impossibile recuperare i dettagli della proiezione.", "Errore", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    mostraMessaggio("Errore durante il recupero della proiezione: " + ex.getMessage(), "Errore di Rete", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
     }
 
+    /**
+     * Invia la richiesta asincrona di aggiornamento dei posti per la prenotazione selezionata.
+     *
+     * @param booking  la prenotazione da modificare
+     * @param newSeats il nuovo quantitativo di posti richiesto
+     */
+    private void eseguiAggiornamentoAsync(BookingDetails booking, int newSeats) {
+        setBottoniAbilitati(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                bookingService.updateBooking(booking.getIdPrenotazione(), user.getId(), booking.getIdProiezione(), newSeats);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                setCursor(Cursor.getDefaultCursor());
+                try {
+                    get();
+                    mostraMessaggio("Prenotazione aggiornata con successo.", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
+                    visualizzaBooking();
+                } catch (Exception ex) {
+                    mostraMessaggio("Errore durante l'aggiornamento della prenotazione: " + ex.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
+                    setBottoniAbilitati(!listaRisultati.isSelectionEmpty());
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Richiede conferma all'utente e avvia la procedura asincrona di cancellazione della prenotazione selezionata.
+     */
     private void gestisciCancellazione() {
         BookingDetails selected = listaRisultati.getSelectedValue();
-        if (selected == null) return;
+        if (selected == null) {
+            return;
+        }
 
-        // Estrazione dinamica dell'ID dalla prenotazione selezionata
-        var idPrenotazione = selected.getIdPrenotazione();
-
-		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-		String dataFormattata = (selected.getDataOraProiezione() != null) ? selected.getDataOraProiezione().format(formatter) : "Data non disponibile";
+        String dataFormattata = (selected.getDataOraProiezione() != null) 
+                ? selected.getDataOraProiezione().format(DATE_TIME_FORMATTER) 
+                : "Data non disponibile";
         
         int conferma = JOptionPane.showConfirmDialog(
             this,
-            "Sei sicuro di voler cancellare la prenotazione in data: " + dataFormattata + "?",
+            "Sei sicuro di voler cancellare la prenotazione per la proiezione del " + dataFormattata + "?",
             "Conferma Cancellazione",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE
@@ -174,15 +243,19 @@ public class ClientBooking extends JPanel {
         }
     }
 
+    /**
+     * Esegue la cancellazione asincrona della prenotazione tramite {@link SwingWorker}.
+     *
+     * @param booking la prenotazione da eliminare
+     */
     private void eseguiCancellazioneAsync(BookingDetails booking) {
-        setBottoniAbilitati(true);
+        setBottoniAbilitati(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-        
         new SwingWorker<DeleteBookingResponse, Void>() {
             @Override
             protected DeleteBookingResponse doInBackground() throws Exception {
-            return bookingService.deleteBooking(booking.getIdPrenotazione());
+                return bookingService.deleteBooking(booking.getIdPrenotazione());
             }
 
             @Override
@@ -190,11 +263,11 @@ public class ClientBooking extends JPanel {
                 setCursor(Cursor.getDefaultCursor());
                 try {
                     DeleteBookingResponse response = get();
-                    if (response.isSuccess()) {
+                    if (response != null && response.isSuccess()) {
                         mostraMessaggio("Prenotazione cancellata con successo.", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                         visualizzaBooking();
                     } else {
-                        mostraMessaggio("Impossibile cancellare la prenotazione.", "Errore", JOptionPane.ERROR_MESSAGE);
+                        mostraMessaggio("Impossibile cancellare la prenotazione selezionata.", "Errore", JOptionPane.ERROR_MESSAGE);
                         setBottoniAbilitati(!listaRisultati.isSelectionEmpty());
                     }
                 } catch (Exception ex) {
@@ -205,12 +278,13 @@ public class ClientBooking extends JPanel {
         }.execute();
     }
 
-    // =========================================================================
-    // CARICAMENTO DATI ASINCRONO
-    // =========================================================================
-
+    /**
+     * Ricarica in modo asincrono l'elenco delle prenotazioni relative all'utente corrente.
+     */
     public void visualizzaBooking() {
-        if (this.user == null) return;
+        if (this.user == null) {
+            return;
+        }
 
         setBottoniAbilitati(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -231,10 +305,10 @@ public class ClientBooking extends JPanel {
                     if (response != null && response.getBookings() != null) {
                         List<BookingDetails> bookings = response.getBookings();
                         if (!bookings.isEmpty()) {
-                        	 resultListModel.addAll(bookings);
+                            resultListModel.addAll(bookings);
                         }
                     } else {
-                        mostraMessaggio("Risposta non valida dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
+                        mostraMessaggio("Risposta non valida ricevuta dal server.", "Errore Server", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (Exception ex) {
                     mostraMessaggio("Errore di comunicazione con il server: " + ex.getMessage(), "Errore di Rete", JOptionPane.ERROR_MESSAGE);
@@ -243,17 +317,34 @@ public class ClientBooking extends JPanel {
         }.execute();
     }
 
+    /**
+     * Abilita o disabilita contemporaneamente i pulsanti di azione.
+     *
+     * @param stato {@code true} per abilitare i pulsanti, {@code false} altrimenti
+     */
     private void setBottoniAbilitati(boolean stato) {
         btnModifica.setEnabled(stato);
         btnCancella.setEnabled(stato);
     }
 
+    /**
+     * Mostra una finestra di dialogo standard per messaggi di notifica, avviso o errore.
+     *
+     * @param testo  il messaggio da visualizzare
+     * @param titolo il titolo della finestra di dialogo
+     * @param tipo   la tipologia del messaggio (es. {@link JOptionPane#INFORMATION_MESSAGE})
+     */
     private void mostraMessaggio(String testo, String titolo, int tipo) {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }
 
-    // CELL RENDERER
+    /**
+     * Renderer personalizzato per le celle della lista delle prenotazioni.
+     */
     private static class BookingCellRenderer extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -265,4 +356,3 @@ public class ClientBooking extends JPanel {
         }
     }
 }
-

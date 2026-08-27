@@ -1,5 +1,5 @@
 /**
- *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ * @authors Francesca Pelizzoni, matricola 751550 (VA) e Davide Villa, matricola 701105 (VA)
  */
 package cinemax.serverCM.dao;
 
@@ -32,18 +32,35 @@ import cinemax.serverCM.dao.utils.SqlQueryBuilder;
 import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
 
 /**
- * DAO per la gestione delle proiezioni: ricerche, inserimenti, aggiornamenti e cancellazioni.
- * Mappa le righe del DB su {@link cinemax.contracts.dto.ProjectionDetails} e costruisce le Response corrispondenti.
+ * Data Access Object (DAO) responsabile per la gestione delle proiezioni cinematografiche.
+ * <p>
+ * Esegue operazioni di lettura ({@link Query}) sulle viste {@code public."Proiezioni_pianificate"}
+ * e {@code public."Proiezioni_storiche"}, supportando ricerche per ID, titolo, genere, date,
+ * range di prezzo e storico. Gestisce inoltre le transazioni di modifica stato ({@link Command})
+ * per inserimento, aggiornamento ed eliminazione fisica/logica sulla tabella {@code public."Proiezioni"}.
+ * </p>
  */
 public class ProjectionDao implements Dao {
 
 	private Connection _connection; 
 
+	/**
+	 * Costruisce il DAO per la gestione delle proiezioni associando la connessione JDBC attiva.
+	 *
+	 * @param connection la connessione aperta verso il database PostgreSQL
+	 */
 	public ProjectionDao(Connection connection) {
 		_connection = connection;
 	}
 
-	//il tipo di ritorno deve essere
+	/**
+	 * Instrada ed esegue una richiesta di tipo {@link Query} relativa alle proiezioni.
+	 *
+	 * @param req la query specifica da processare (es. {@link GetProjections}, {@link GetProjectionsByFilmAndDate},
+	 *            {@link GetProjectionById}, {@link GetProjectionsByRangeDate}, {@link GetProjectionHistory})
+	 * @return l'istanza {@link Response} risultante, oppure {@code null} in caso di errore
+	 * @throws IllegalArgumentException se il tipo di query fornito non è riconosciuto
+	 */
 	@Override
 	public Response find(Query req){
 
@@ -67,8 +84,12 @@ public class ProjectionDao implements Dao {
 		return response;
 	}
 
-
-
+	/**
+	 * Esegue la ricerca avanzata e filtrata delle proiezioni pianificate.
+	 *
+	 * @param req la richiesta {@link GetProjections} contenente i filtri per titolo, genere, date e costi
+	 * @return l'istanza {@link GetProjectionsResponse} con l'elenco delle proiezioni individuate, o {@code null} in caso di errore SQL
+	 */
 	private Response find(GetProjections req) {
 	
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
@@ -118,6 +139,12 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 	
+	/**
+	 * Recupera le proiezioni pianificate filtrando per titolo e data massima di programmazione.
+	 *
+	 * @param req la richiesta {@link GetProjectionsByFilmAndDate} con il titolo del film e il limite temporale
+	 * @return l'istanza {@link GetProjectionsResponse} contenente le proiezioni trovate, o {@code null} in caso di errore SQL
+	 */
 	private Response find(GetProjectionsByFilmAndDate req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
@@ -160,7 +187,12 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 
-	
+	/**
+	 * Recupera i dettagli completi di una singola proiezione individuata tramite il suo identificativo univoco.
+	 *
+	 * @param req la richiesta {@link GetProjectionById} contenente l'ID della proiezione
+	 * @return l'oggetto {@link GetProjectionResponse} contenente la proiezione, o {@code null} in caso di errore SQL
+	 */
 	private Response find(GetProjectionById req) {		
 
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
@@ -199,6 +231,12 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 
+	/**
+	 * Recupera l'elenco delle proiezioni pianificate all'interno di uno specifico intervallo temporale.
+	 *
+	 * @param req la richiesta {@link GetProjectionsByRangeDate} contenente la data/ora di inizio e di fine
+	 * @return l'istanza {@link GetProjectionsResponse} con l'elenco delle proiezioni comprese nel range
+	 */
 	private Response find(GetProjectionsByRangeDate req) {
 		
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_pianificate\"";
@@ -238,6 +276,12 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 	
+	/**
+	 * Recupera lo storico completo di tutte le proiezioni passate dalla vista {@code public."Proiezioni_storiche"}.
+	 *
+	 * @param req la richiesta {@link GetProjectionHistory} per il recupero dello storico
+	 * @return l'istanza {@link GetProjectionsResponse} contenente le proiezioni storiche archiviate
+	 */
 	private Response find(GetProjectionHistory req) {
 		
 		String baseQuery = "SELECT * FROM public.\"Proiezioni_storiche\"";
@@ -273,7 +317,12 @@ public class ProjectionDao implements Dao {
 		return null;
 	}
 	
-	
+	/**
+	 * Esegue un comando transazionale ({@link Command}) di inserimento, aggiornamento o eliminazione di una proiezione.
+	 *
+	 * @param req il comando da elaborare ({@link StoreProjection} o {@link DeleteProjection})
+	 * @return l'istanza {@link Response} corrispondente all'esito dell'operazione, oppure {@code null} se non gestito
+	 */
 	@Override
 	public Response execute(Command req) {
 
@@ -286,6 +335,12 @@ public class ProjectionDao implements Dao {
 	    };
 	}
 
+	/**
+	 * Aggiorna i dati di una proiezione esistente all'interno della tabella {@code public."Proiezioni"}.
+	 *
+	 * @param req il comando {@link StoreProjection} con i parametri aggiornati e l'ID della proiezione
+	 * @return l'oggetto {@link StoreProjectionResponse} con l'ID della proiezione modificata, o {@code null} in caso di errore SQL
+	 */
 	private Response updateProjection(StoreProjection req) {
 		SqlUpdateBuilder sub = new SqlUpdateBuilder("public.\"Proiezioni\"");
 		
@@ -307,12 +362,18 @@ public class ProjectionDao implements Dao {
 		}		
 	}
 
+	/**
+	 * Inserisce una nuova proiezione a palinsesto nella tabella {@code public."Proiezioni"}.
+	 *
+	 * @param req il comando {@link StoreProjection} con le informazioni della proiezione da registrare
+	 * @return l'oggetto {@link StoreProjectionResponse} contenente l'ID generato dal database, o {@code null} in caso di errore SQL
+	 */
 	private Response insertProjection(StoreProjection req) {
 		SqlInsertBuilder sib = new SqlInsertBuilder("public.\"Proiezioni\"");
 
 		sib.set("data_ora_proiezione", req.getDataOraProiezione())
 		.set("prezzo_biglietto", req.getPrezzoBiglietto())
-		.set("id_film", req.getIdFilm());	       
+		.set("id_film", req.getIdFilm());        
 
 		try {
 			// Esegue l'insert e recupera l'ID generato da PostgreSQL
@@ -327,6 +388,12 @@ public class ProjectionDao implements Dao {
 		}
 	}
 	 
+	/**
+	 * Elimina una proiezione registrata nella tabella {@code public."Proiezioni"} in base al suo identificativo.
+	 *
+	 * @param req il comando {@link DeleteProjection} contenente l'ID della proiezione da rimuovere
+	 * @return l'oggetto {@link DeleteProjectionResponse} indicante l'esito dell'eliminazione
+	 */
 	private Response deleteProjection(DeleteProjection req) {
 	    SqlDeleteBuilder sdb = new SqlDeleteBuilder("public.\"Proiezioni\"");
 	    sdb.where("id = ?", req.getId());
@@ -340,5 +407,3 @@ public class ProjectionDao implements Dao {
 	    }
 	}
 }
-
-

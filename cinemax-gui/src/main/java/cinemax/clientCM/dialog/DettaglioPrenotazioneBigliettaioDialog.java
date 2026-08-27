@@ -29,12 +29,28 @@ import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 
 /**
- * Dialog modale per visualizzare i dettagli di una prenotazione, incluse le informazioni sul film, sui posti prenotati e il riepilogo dei costi totali.
+ * Finestra di dialogo modale per la visualizzazione dettagliata di una prenotazione da parte dell'operatore (biglietteria).
+ * <p>
+ * Mostra il riepilogo completo della prenotazione, inclusi i dati identificativi dell'ordine, l'intestatario,
+ * le informazioni tecniche ed artistiche del film in proiezione, il numero di posti riservati e il calcolo del costo complessivo.
+ * </p>
  */
 public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
 
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Formattatore per la visualizzazione standard di data e ora dello spettacolo (gg/mm/aaaa hh:mm).
+     */
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    /**
+     * Costruisce e inizializza la finestra di dialogo modale con il dettaglio della prenotazione.
+     *
+     * @param owner        la finestra proprietaria (parent window)
+     * @param proiezione   l'oggetto {@link ProjectionDetailsView} contenente i dettagli della proiezione
+     * @param prenotazione l'oggetto {@link BookingDetails} contenente le informazioni della prenotazione
+     */
     public DettaglioPrenotazioneBigliettaioDialog(Window owner, ProjectionDetailsView proiezione, BookingDetails prenotazione) {
         super(owner, "Dettagli Prenotazione", ModalityType.APPLICATION_MODAL);
          
@@ -48,7 +64,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
 
-                JPanel cardPanel = new JPanel(); 
+        JPanel cardPanel = new JPanel(); 
         cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
         cardPanel.setBorder(new CompoundBorder(
                 new EmptyBorder(5, 5, 5, 5),
@@ -99,7 +115,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         aggiungiRiga(gridDettagli, "Genere:", proiezione != null ? proiezione.getGenere() : null);
         aggiungiRiga(gridDettagli, "Anno di Uscita:", (proiezione != null && proiezione.getAnno() != null) ? proiezione.getAnno().toString() : null);
         aggiungiRiga(gridDettagli, "Durata:", (proiezione != null && proiezione.getDurataMinuti() != null) ? proiezione.getDurataMinuti() + " min" : null);
-        aggiungiRiga(gridDettagli, "EtÃ  Minima:", (proiezione != null && proiezione.getEtaMinima() != null) ? proiezione.getEtaMinima() + " anni" : null);
+        aggiungiRiga(gridDettagli, "Età Minima:", (proiezione != null && proiezione.getEtaMinima() != null) ? proiezione.getEtaMinima() + " anni" : null);
 
         cardPanel.add(gridDettagli);
 
@@ -128,7 +144,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         pricePanel.add(conteggioPostiLiberi);
         cardPanel.add(pricePanel); 
         
-        
+        // Pannello Riepilogo Costi e Posti Prenotati
         JPanel selectSeatsContainer = new JPanel();
         selectSeatsContainer.setLayout(new BoxLayout(selectSeatsContainer, BoxLayout.Y_AXIS));
         selectSeatsContainer.setBorder(BorderFactory.createTitledBorder("Riepilogo Costi"));
@@ -165,7 +181,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
 
         add(mainCenterPanel, BorderLayout.CENTER);
 
-        
+        // FOOTER: Pulsante di Chiusura
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         JButton btnChiudi = new JButton("Chiudi");
         btnChiudi.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -177,6 +193,13 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         getRootPane().setDefaultButton(btnChiudi);
     }
       
+    /**
+     * Inserisce una riga descrittiva (coppia etichetta-valore) all'interno del pannello a griglia.
+     *
+     * @param container il pannello contenitore con layout a griglia
+     * @param etichetta l'etichetta descrittiva del campo
+     * @param valore    il valore testuale associato (sostituito con "N/D" se nullo o vuoto)
+     */
     private void aggiungiRiga(JPanel container, String etichetta, String valore) {
         JLabel lblChiave = new JLabel(etichetta);
         lblChiave.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -189,5 +212,3 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
         container.add(lblVal);
     }
 }
-
-

@@ -182,9 +182,6 @@ public class ProjectionService {
         return tcpClient.sendRequest(request, StoreProjectionResponse.class);    
     }
 
-    // =========================================================================
-    // METODI DI MAPPING E CALCOLO DISPONIBILITÀ
-    // =========================================================================
 
     /**
      * Converte una lista di DTO di dominio {@link ProjectionDetails} nei rispettivi modelli per la vista UI.

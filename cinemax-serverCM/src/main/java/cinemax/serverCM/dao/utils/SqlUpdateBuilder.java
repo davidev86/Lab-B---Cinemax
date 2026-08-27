@@ -1,5 +1,5 @@
 /**
- *  @Authors: Francesca Pelizzoni, matricola 751550 (VA) e da Davide Villa, matricola 701105 (VA) 
+ * @authors Francesca Pelizzoni, matricola 751550 (VA) e Davide Villa, matricola 701105 (VA)
  */
 package cinemax.serverCM.dao.utils;
 
@@ -7,21 +7,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder per la costruzione di query SQL UPDATE con supporto dinamico per clausole SET e WHERE.
+ * Costruttore fluente (builder) per la composizione dinamica e parametrizzata di query SQL {@code UPDATE}.
+ * <p>
+ * Permette di configurare le coppie colonna-valore per la clausola {@code SET} e le condizioni di uguaglianza
+ * per la clausola {@code WHERE}, gestendo automaticamente l'esclusione di parametri nulli o stringhe vuote
+ * e ordinando i parametri posizionali nell'ordine esatto richiesto da {@link java.sql.PreparedStatement}.
+ * </p>
  */
 public class SqlUpdateBuilder {
+
     private final String tableName;
     private final List<String> setColumns = new ArrayList<>();
     private final List<Object> setParams = new ArrayList<>();
     private final List<String> whereClauses = new ArrayList<>();
     private final List<Object> whereParams = new ArrayList<>();
 
+    /**
+     * Inizializza il builder specificando la tabella target dell'aggiornamento.
+     *
+     * @param tableName il nome della tabella del database (es. {@code public."Utenti"})
+     */
     public SqlUpdateBuilder(String tableName) {
         this.tableName = tableName;
     }
 
     /**
-     * Aggiunge una colonna da aggiornare e il relativo valore solo se non nullo/vuoto.
+     * Aggiunge una colonna da aggiornare e il relativo valore alla clausola {@code SET}
+     * solo se il valore non è nullo o non corrisponde a una stringa vuota.
+     *
+     * @param column il nome della colonna da modificare
+     * @param value  il nuovo valore da assegnare alla colonna
+     * @return l'istanza corrente del builder per supportare il method chaining
      */
     public SqlUpdateBuilder set(String column, Object value) {
         if (value != null) {
@@ -35,7 +51,11 @@ public class SqlUpdateBuilder {
     }
 
     /**
-     * Aggiunge una condizione WHERE con uguaglianza (es. "id", 5 -> "id = ?").
+     * Aggiunge una condizione di uguaglianza alla clausola {@code WHERE} (es. {@code "id = ?"}).
+     *
+     * @param column il nome della colonna su cui applicare la condizione di filtro
+     * @param value  il valore del vincolo di uguaglianza
+     * @return l'istanza corrente del builder
      */
     public SqlUpdateBuilder where(String column, Object value) {
         if (value != null) {
@@ -45,6 +65,12 @@ public class SqlUpdateBuilder {
         return this;
     }
 
+    /**
+     * Compone e restituisce la stringa SQL finale dell'istruzione {@code UPDATE}.
+     *
+     * @return la query SQL formattata completa di assegnazioni {@code SET} e condizioni {@code WHERE}
+     * @throws IllegalStateException se non è specificata alcuna colonna da modificare o manca la clausola {@code WHERE}
+     */
     public String getSql() {
         if (setColumns.isEmpty()) {
             throw new IllegalStateException("Impossibile costruire una UPDATE senza campi da aggiornare.");
@@ -70,8 +96,10 @@ public class SqlUpdateBuilder {
     }
 
     /**
-     * Ritorna tutti i parametri unificati nell'ordine esatto richiesto dal PreparedStatement:
-     * prima i parametri del SET, poi quelli della clausola WHERE.
+     * Restituisce la lista completa e ordinata dei parametri associati ai segnaposto posizionali ({@code ?}):
+     * include prima i parametri della clausola {@code SET} e successivamente quelli della clausola {@code WHERE}.
+     *
+     * @return la lista combinata dei valori dei parametri da passare al {@link java.sql.PreparedStatement}
      */
     public List<Object> getParams() {
         List<Object> allParams = new ArrayList<>(setParams);
@@ -79,5 +107,3 @@ public class SqlUpdateBuilder {
         return allParams;
     }
 }
-
-

@@ -62,129 +62,189 @@ public class BookingDetails implements Serializable {
 		this.totale = totale;
 	}
 
+	/**
+	 * Identificatore della prenotazione.
+	 * @return id della prenotazione oppure null se non disponibile
+	 */
+	
 	public Integer getIdPrenotazione() {
 		return idPrenotazione;
 	}
 	/**
-	 * Identificatore della prenotazione.
-	 * @return id della prenotazione oppure null se non disponibile
+	 * Identificatore della prenotazione
+	 * @param idPrenotazione il nuovo identificatore univoco della prenotazione.
 	 */
 	public void setIdPrenotazione(Integer idPrenotazione) {
 		this.idPrenotazione = idPrenotazione;
 	}
 
+	/**
+	 * Identificatore della proiezione associata.
+	 * @return id della proiezione
+	 */
+	
 	public Integer getIdProiezione() {
 		return idProiezione;
 	}
 	/**
 	 * Identificatore della proiezione associata.
-	 * @return id della proiezione
+	 * @param id della proiezione
 	 */
 	public void setIdProiezione(Integer idProiezione) {
 		this.idProiezione = idProiezione;
 	}
 
+	/**
+	 * Identificatore dell'utente che ha effettuato la prenotazione.
+	 * @return id utente
+	 */
+	
 	public Integer getIdUtente() {
 		return idUtente;
 	}
 	/**
 	 * Identificatore dell'utente che ha effettuato la prenotazione.
-	 * @return id utente
+	 * @param id utente
 	 */
+	
 	public void setIdUtente(Integer idUtente) {
 		this.idUtente = idUtente;
 	}
 
+	/**
+	 * Nome del cliente associato alla prenotazione.
+	 * @return nome del cliente o null
+	 */
+	
 	public String getNomeCliente() {
 		return nomeCliente;
 	}
 	/**
 	 * Nome del cliente associato alla prenotazione.
-	 * @return nome del cliente o null
+	 * @param nome del cliente
 	 */
 	public void setNomeCliente(String nomeCliente) {
 		this.nomeCliente = nomeCliente;
 	}
 
+	/**
+	 * Cognome del cliente associato alla prenotazione.
+	 * @return cognome del cliente o null
+	 */
+	
 	public String getCognomeCliente() {
 		return cognomeCliente;
 	}
 	/**
 	 * Cognome del cliente associato alla prenotazione.
-	 * @return cognome del cliente o null
+	 * @param cognome del cliente
 	 */
 	public void setCognomeCliente(String cognomeCliente) {
 		this.cognomeCliente = cognomeCliente;
 	}
 
+	/**
+	 * Titolo del film prenotato.
+	 * @return titolo del film o null
+	 */
+	
 	public String getTitoloFilm() {
 		return titoloFilm;
 	}
 	/**
 	 * Titolo del film prenotato.
-	 * @return titolo del film o null
+	 * @param titolo del film
 	 */
 	public void setTitoloFilm(String titoloFilm) {
 		this.titoloFilm = titoloFilm;
-	}
-
-	public LocalDateTime getDataOraProiezione() {
-		return dataOraProiezione;
 	}
 	/**
 	 * Data e ora della proiezione.
 	 * @return data e ora come {@link LocalDateTime} o null
 	 */
+	
+	public LocalDateTime getDataOraProiezione() {
+		return dataOraProiezione;
+	}
+	/**
+	 * Data e ora della proiezione.
+	 * @param data e ora come {@link LocalDateTime}
+	 */
 	public void setDataOraProiezione(LocalDateTime dataOraProiezione) {
 		this.dataOraProiezione = dataOraProiezione;
-	}
-
-	public Integer getNumeroPosti() {
-		return numeroPosti;
 	}
 	/**
 	 * Numero di posti prenotati.
 	 * @return numero di posti (null se non specificato)
 	 */
+	
+	public Integer getNumeroPosti() {
+		return numeroPosti;
+	}
+	/**
+	 * Numero di posti prenotati.
+	 * @param numero di posti
+	 */
 	public void setNumeroPosti(Integer numeroPosti) {
 		this.numeroPosti = numeroPosti;
 	}
 
+	/**
+	 * Costo unitario del biglietto per la proiezione.
+	 * @return costo come {@link BigDecimal}
+	 */
 	public BigDecimal getCosto() {
 		return costo;
 	}
 	/**
 	 * Costo unitario del biglietto per la proiezione.
-	 * @return costo come {@link BigDecimal}
+	 * @param costo come {@link BigDecimal}
 	 */
 	public void setCosto(BigDecimal costo) {
 		this.costo = costo;
 	}
 
+	/**
+	 * Importo totale della prenotazione (costo * numeroPosti).
+	 * @return totale come {@link BigDecimal}
+	 */	
 	public BigDecimal getTotale() {
 		return totale;
 	}
 	/**
 	 * Importo totale della prenotazione (costo * numeroPosti).
-	 * @return totale come {@link BigDecimal}
+	 * @param totale come {@link BigDecimal}
 	 */
 	public void setTotale(BigDecimal totale) {
 		this.totale = totale;
 	}
 	
+	/**
+	 * Restituisce una rappresentazione testuale riassuntiva della prenotazione.
+	 * <p>
+	 * La stringa generata include la data e l'ora della proiezione formattate ({@code dd/MM/yyyy HH:mm}), 
+	 * il titolo del film, il numero di posti e il totale monetario con due cifre decimali 
+	 * (es. {@code "26/08/2026 21:00 | Inception | 2 posti | €15.00"}).
+	 * In caso di valori nulli, vengono applicati testi e valori di default (es. "Data non disponibile", "N/D", 0).
+	 * </p>
+	 *
+	 * @return una stringa formattata contenente i dettagli principali della prenotazione
+	 */
+	
 	@Override
 	public String toString() {
-		java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-		String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
-		BigDecimal totaleVal = (totale != null) ? totale : BigDecimal.ZERO;
-		int posti = (numeroPosti != null) ? numeroPosti : 0;
+	    java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+	    String dataFormattata = (dataOraProiezione != null) ? dataOraProiezione.format(formatter) : "Data non disponibile";
+	    BigDecimal totaleVal = (totale != null) ? totale : BigDecimal.ZERO;
+	    int posti = (numeroPosti != null) ? numeroPosti : 0;
 
-		return String.format("%s | %s | %d posti | €%.2f", 
-			dataFormattata, 
-			titoloFilm != null ? titoloFilm : "N/D",	
-			posti, 
-			totaleVal);
+	    return String.format("%s | %s | %d posti | €%.2f", 
+	        dataFormattata, 
+	        titoloFilm != null ? titoloFilm : "N/D",	
+	        posti, 
+	        totaleVal);
 	}
 	
+
 }
 

@@ -16,11 +16,9 @@ import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -48,28 +46,36 @@ import javax.swing.text.MaskFormatter;
 import cinemax.application.services.BookingService;
 import cinemax.application.services.ProjectionService;
 import cinemax.application.services.TcpClient;
-import cinemax.clientCM.callback.SelezioneBookingCallBack;
 import cinemax.clientCM.dialog.DettaglioPrenotazioneBigliettaioDialog;
 import cinemax.contracts.dto.BookingDetails;
 import cinemax.contracts.dto.ui.ProjectionDetailsView;
 import cinemax.contracts.responses.GetBookingResponse;
-import cinemax.contracts.responses.GetProjectionResponse;
+import cinemax.contracts.responses.ui.GetProjectionResponse;
 
 /**
- * Pannello di ricerca per le prenotazioni con rendering ottimizzato e query asincrone.
+ * Pannello di ricerca avanzata delle prenotazioni per l'operatore di biglietteria.
+ * <p>
+ * Consente il filtraggio multi-parametro (codice prenotazione, anagrafica cliente, titolo film e intervallo temporale),
+ * l'esecuzione di query asincrone verso il backend e la consultazione dettagliata della prenotazione
+ * selezionata tramite {@link DettaglioPrenotazioneBigliettaioDialog}.
+ * </p>
  */
 public class SearchBooking extends JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Font FONT_BASE = new Font("Tahoma", Font.PLAIN, 12);
     private static final Font FONT_BOLD = new Font("Tahoma", Font.BOLD, 12);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final BookingService bookingService;
+    private final TcpClient tcpClient;
+
     private final DefaultListModel<BookingDetails> resultListModel;
     private final JList<BookingDetails> listaRisultati;
     private final JButton btnCerca;
-    
-    // Controlli Form
+
+    // Controlli Form di Ricerca
     private final JFormattedTextField textFieldCodicePrenotazione;
     private final JTextField textFieldNome;
     private final JTextField textFieldCognome;
@@ -79,15 +85,21 @@ public class SearchBooking extends JPanel {
 
     /**
      * Costruisce il pannello di ricerca delle prenotazioni.
-     * Inizializza i controlli UI, il servizio di accesso remoto e la lista dei risultati.
-     * @param tcpClient client TCP usato dal {@link BookingService} per comunicare con il server
+     * <p>
+     * Inizializza i controlli UI, i filtri di input e la lista dei risultati con supporto al doppio clic.
+     * </p>
+     *
+     * @param tcpClient il client TCP utilizzato per la comunicazione con il server di backend
      */
     public SearchBooking(TcpClient tcpClient) {
+        this.tcpClient = tcpClient;
         this.bookingService = new BookingService(tcpClient);
-        setLayout(new BorderLayout(10, 10)); 
+
+        setLayout(new BorderLayout(10, 10));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-                JPanel panelForm = new JPanel(new GridBagLayout());
+        // PANNELLO FORM FILTRI
+        JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Filtri di Ricerca Prenotazioni"));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 6, 4, 6);
@@ -97,7 +109,6 @@ public class SearchBooking extends JPanel {
         NumberFormat integerFormat = NumberFormat.getIntegerInstance();
         integerFormat.setGroupingUsed(false);
 
-        // Campo codice prenotazione (inizialmente vuoto/null per non forzare il filtro)
         this.textFieldCodicePrenotazione = new JFormattedTextField(integerFormat);
         this.textFieldCodicePrenotazione.setValue(null);
         this.textFieldCodicePrenotazione.setColumns(15);
@@ -135,8 +146,7 @@ public class SearchBooking extends JPanel {
         topContainer.add(panelForm);
         topContainer.add(panelBottone);
 
-
-        //LISTA RISULTATI
+        // LISTA DEI RISULTATI
         this.resultListModel = new DefaultListModel<>();
         this.listaRisultati = new JList<>(resultListModel);
         this.listaRisultati.setFont(FONT_BASE);
@@ -151,20 +161,10 @@ public class SearchBooking extends JPanel {
                     int index = listaRisultati.locationToIndex(e.getPoint());
                     Rectangle cellBounds = listaRisultati.getCellBounds(index, index);
                     
-                    // Verifica che il click sia avvenuto effettivamente su una riga esistente
                     if (index >= 0 && cellBounds != null && cellBounds.contains(e.getPoint())) {
                         BookingDetails prenotazioneSelezionata = resultListModel.getElementAt(index);
-                        Integer idProiezioneSel = prenotazioneSelezionata.getIdProiezione();
-                        ProjectionService projService = new ProjectionService(tcpClient);
-                        cinemax.contracts.responses.ui.GetProjectionResponse res = projService.getProjectionById(idProiezioneSel);
-                        
-                        Window parentWindow = SwingUtilities.getWindowAncestor(SearchBooking.this);
-                        ProjectionDetailsView proiezione = res.getProjection();
-                        DettaglioPrenotazioneBigliettaioDialog dialog = 
-                                new DettaglioPrenotazioneBigliettaioDialog(parentWindow, proiezione, prenotazioneSelezionata);
-                        dialog.setVisible(true);
-                   
-                }
+                        apriDettaglioPrenotazione(prenotazioneSelezionata);
+                    }
                 }
             }
         });
@@ -173,17 +173,12 @@ public class SearchBooking extends JPanel {
         scrollPanel.setPreferredSize(new Dimension(800, 300));
         scrollPanel.getViewport().setScrollMode(JViewport.BLIT_SCROLL_MODE);
 
-
-        //ASSEMBLAGGIO GENERALE
         add(topContainer, BorderLayout.NORTH);
         add(scrollPanel, BorderLayout.CENTER);
     }
 
-    // LOGICA DI RICERCA ASINCRONA
     /**
-     * Avvia una ricerca asincrona delle prenotazioni usando i filtri correnti presenti nel form.
-     * Disabilita il bottone di ricerca e mostra il cursore di attesa durante l'operazione.
-     * I risultati aggiornano la lista dei risultati o mostrano messaggi all'utente in caso di errori.
+     * Esegue la ricerca asincrona delle prenotazioni filtrando in base ai valori inseriti nel form.
      */
     private void eseguiRicerca() {
         Integer codicePrenotazione = getCodicePrenotazione();
@@ -206,14 +201,13 @@ public class SearchBooking extends JPanel {
             @Override
             protected GetBookingResponse doInBackground() throws Exception {
                 return bookingService.getBookings(
-                        codicePrenotazione, 
-                        nome.isEmpty() ? null : nome, 
-                        cognome.isEmpty() ? null : cognome, 
-                        titoloFilm.isEmpty() ? null : titoloFilm, 
-                        dInizio, 
+                        codicePrenotazione,
+                        nome.isEmpty() ? null : nome,
+                        cognome.isEmpty() ? null : cognome,
+                        titoloFilm.isEmpty() ? null : titoloFilm,
+                        dInizio,
                         dFine
                 );
-                
             }
 
             @Override
@@ -242,51 +236,91 @@ public class SearchBooking extends JPanel {
             }
         }.execute();
     }
-    
+
     /**
-     * Ripristina i campi del form allo stato iniziale (valori vuoti/null).
-     * Questo metodo è usato dopo il termine di una ricerca per preparare il form ad una nuova ricerca.
+     * Recupera in modo asincrono i dettagli della proiezione e visualizza la scheda di riepilogo della prenotazione.
+     *
+     * @param prenotazione i dettagli della prenotazione selezionata
+     */
+    private void apriDettaglioPrenotazione(BookingDetails prenotazione) {
+        if (prenotazione == null || prenotazione.getIdProiezione() == null) {
+            return;
+        }
+
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        new SwingWorker<GetProjectionResponse, Void>() {
+            @Override
+            protected GetProjectionResponse doInBackground() throws Exception {
+                ProjectionService projService = new ProjectionService(tcpClient);
+                return projService.getProjectionById(prenotazione.getIdProiezione());
+            }
+
+            @Override
+            protected void done() {
+                setCursor(Cursor.getDefaultCursor());
+                try {
+                    GetProjectionResponse response = get();
+                    if (response != null && response.getProjection() != null) {
+                        Window parentWindow = SwingUtilities.getWindowAncestor(SearchBooking.this);
+                        ProjectionDetailsView proiezione = response.getProjection();
+                        DettaglioPrenotazioneBigliettaioDialog dialog = 
+                                new DettaglioPrenotazioneBigliettaioDialog(parentWindow, proiezione, prenotazione);
+                        dialog.setVisible(true);
+                    } else {
+                        mostraMessaggio("Impossibile caricare le informazioni della proiezione associata.", "Errore", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    mostraMessaggio("Errore durante il recupero dei dettagli: " + ex.getMessage(), "Errore di Rete", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Ripristina i campi del form allo stato iniziale per preparare una nuova interrogazione.
      */
     private void pulisciCampi() {
-        // Reset JTextField standard
         textFieldTitoloFilm.setText("");
         textFieldNome.setText("");
         textFieldCognome.setText("");
-
-        // Reset JFormattedTextField (date e numeri)
         dataInizio.setValue(null);
         dataFine.setValue(null);
-        
         textFieldCodicePrenotazione.setValue(null);
     }
 
-    // METODI AUSILIARI E PARSER
     /**
-     * Aggiunge una riga al pannello form usando GridBagLayout: prima colonna label, seconda il field.
-     * @param panel pannello che contiene il form
-     * @param label etichetta da posizionare nella prima colonna
-     * @param field componente di input da posizionare nella seconda colonna
-     * @param gbc constraints condivisi per il layout
-     * @param riga indice di riga (gridy) nel GridBagLayout
+     * Inserisce una riga nel contenitore del form associando etichetta e campo di input.
+     *
+     * @param panel il pannello con GridBagLayout
+     * @param label l'etichetta del campo
+     * @param field il componente di input
+     * @param gbc   i vincoli di griglia
+     * @param riga  l'indice di riga corrente
      */
     private void aggiungiRigaForm(JPanel panel, JLabel label, JComponent field, GridBagConstraints gbc, int riga) {
-        gbc.gridx = 0; gbc.gridy = riga; gbc.weightx = 0.0;
+        gbc.gridx = 0; 
+        gbc.gridy = riga; 
+        gbc.weightx = 0.0;
         label.setFont(FONT_BASE);
         panel.add(label, gbc);
 
-        gbc.gridx = 1; gbc.gridy = riga; gbc.weightx = 1.0;
+        gbc.gridx = 1; 
+        gbc.gridy = riga; 
+        gbc.weightx = 1.0;
         panel.add(field, gbc);
     }
 
     /**
-     * Restituisce il codice prenotazione inserito nel campo corrispondente.
-     * Se il campo è vuoto o contiene un valore non positivo ritorna {@code null}.
-     * @return codice prenotazione valido (>0) oppure {@code null} se non presente
+     * Restituisce l'identificativo numerico della prenotazione inserito nel campo formattato.
+     *
+     * @return il codice prenotazione valido (> 0), oppure {@code null} se non valorizzato
      */
     public Integer getCodicePrenotazione() {
         try {
             textFieldCodicePrenotazione.commitEdit();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         Object value = textFieldCodicePrenotazione.getValue();
         if (value instanceof Number) {
@@ -297,9 +331,9 @@ public class SearchBooking extends JPanel {
     }
 
     /**
-     * Crea e restituisce un JFormattedTextField configurato per l'inserimento di date nel formato dd/MM/yyyy.
-     * Il campo utilizza una MaskFormatter per mostrare il placeholder e gestire l'input.
-     * @return campo formattato per date
+     * Crea un campo formattato per l'inserimento delle date con maschera gg/mm/aaaa.
+     *
+     * @return l'istanza configurata di {@link JFormattedTextField}
      */
     private JFormattedTextField creaCampoData() {
         JFormattedTextField field = new JFormattedTextField();
@@ -309,16 +343,16 @@ public class SearchBooking extends JPanel {
             field.setFormatterFactory(new DefaultFormatterFactory(mask));
             field.setColumns(10);
             field.setFont(FONT_BASE);
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
         return field;
     }
 
     /**
-     * Parsea il testo presente in un JFormattedTextField e tenta di convertirlo in {@link LocalDate}
-     * usando il formato definito da {@code DATE_FORMATTER} (dd/MM/yyyy).
-     * Se il campo è incompleto (contiene placeholder) o la data non è valida ritorna {@code null}.
-     * @param field campo contenente la data in formato testuale
-     * @return LocalDate parsata oppure {@code null} in caso di input invalido
+     * Converte il valore testuale del campo data nell'istanza {@link LocalDate} corrispondente.
+     *
+     * @param field il campo contenente la data formattata
+     * @return la data parsata, oppure {@code null} se il campo è incompleto o non valido
      */
     private LocalDate parseLocalDate(JFormattedTextField field) {
         String text = field.getText().trim();
@@ -333,21 +367,23 @@ public class SearchBooking extends JPanel {
     }
 
     /**
-     * Mostra una finestra di dialogo informativa all'utente.
-     * @param testo testo del messaggio
-     * @param titolo titolo della finestra
-     * @param tipo tipo di messaggio (es. JOptionPane.INFORMATION_MESSAGE)
+     * Visualizza una finestra di messaggio standard.
+     *
+     * @param testo  il testo descrittivo del messaggio
+     * @param titolo il titolo della finestra
+     * @param tipo   la tipologia del messaggio (es. {@link JOptionPane#INFORMATION_MESSAGE})
      */
     private void mostraMessaggio(String testo, String titolo, int tipo) {
         JOptionPane.showMessageDialog(this, testo, titolo, tipo);
     }
 
-    // CELL RENDERER
     /**
-     * Renderer semplice per visualizzare gli elementi {@link BookingDetails} nella JList.
-     * Mostra la rappresentazione testuale ottenuta tramite {@code BookingDetails.toString()}.
+     * Renderer personalizzato per gli elementi {@link BookingDetails} all'interno della {@link JList}.
      */
     private static class BookingCellRenderer extends DefaultListCellRenderer {
+
+        private static final long serialVersionUID = 1L;
+
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);

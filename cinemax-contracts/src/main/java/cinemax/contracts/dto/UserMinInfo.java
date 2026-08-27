@@ -14,15 +14,38 @@ import cinemax.contracts.dto.Enums.Ruolo;
  */
 public class UserMinInfo implements Serializable  {
 
-    /**
-	 * 
+	/**
+	 * Identificatore di versione per la serializzazione della classe.
 	 */
 	private static final long serialVersionUID = 1L;
-	private Integer id; // Integer per supportare il valore null prima dell'inserimento nel DB
-    private String nome;
-    private String cognome;
-    private String username;   
-    private Ruolo ruolo;
+
+	/**
+	 * Identificatore univoco nel database.
+	 * <p>
+	 * È di tipo {@link Integer} per consentire il valore {@code null} prima della persistenza nel database.
+	 * </p>
+	 */
+	private Integer id;
+
+	/**
+	 * Nome anagrafico dell'utente.
+	 */
+	private String nome;
+
+	/**
+	 * Cognome anagrafico dell'utente.
+	 */
+	private String cognome;
+
+	/**
+	 * Nome utente (username) univoco per l'autenticazione nel sistema.
+	 */
+	private String username;
+
+	/**
+	 * Ruolo autorizzativo assegnato all'utente nel sistema (es. {@link Ruolo}).
+	 */
+	private Ruolo ruolo;
 
     /**
      * Costruttore vuoto per consentire la serializzazione dell'oggetto via TCP.

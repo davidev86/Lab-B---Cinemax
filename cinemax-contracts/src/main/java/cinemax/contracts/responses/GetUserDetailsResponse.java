@@ -34,6 +34,6 @@ public class GetUserDetailsResponse  implements Response  {
 		this.user = user;
 	}
 	    
-}
+} 
 
 

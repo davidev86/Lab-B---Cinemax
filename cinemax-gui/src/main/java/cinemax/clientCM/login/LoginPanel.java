@@ -8,8 +8,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.function.Consumer;
 
 import javax.swing.Box;
@@ -22,120 +20,132 @@ import javax.swing.SwingUtilities;
 import cinemax.application.services.TcpClient;
 import cinemax.clientCM.RegistratiBox;
 import cinemax.clientCM.callback.LoginCallBack;
-import cinemax.clientCM.tabpanel.SearchBooking;
 import cinemax.contracts.dto.UserMinInfo;
 
 /**
- * Pannello UI che gestisce l'interfaccia di autenticazione dell'utente, consentendo il passaggio tra gli stati di login e logout con visualizzazione del benvenuto.
+ * Pannello UI che gestisce l'interfaccia di autenticazione e sessione dell'utente.
+ * <p>
+ * Implementa {@link LoginCallBack} e utilizza un layout a schede ({@link CardLayout}) per commutare dinamicamente
+ * la vista tra lo stato disconnesso (pulsanti "Registrati" e "Accedi") e lo stato autenticato
+ * (messaggio di benvenuto personalizzato e pulsante "Esci").
+ * </p>
  */
 public class LoginPanel extends JPanel implements LoginCallBack {
 
-	Consumer<UserMinInfo> loginCallBack;
-	Runnable logoutCallBack;
-	CardLayout cardLayout;
-	JPanel panel;
-	JLabel labelUser;
-	TcpClient tcpClient;
-	RegistratiBox popup;
+	private static final long serialVersionUID = 1L;
 
+	private static final String CARD_LOGIN = "login";
+	private static final String CARD_LOGGED = "logged";
+	private static final Font FONT_WELCOME = new Font("Monospaced", Font.PLAIN, 20);
+
+	private final TcpClient tcpClient;
+	private final Consumer<UserMinInfo> loginCallBack;
+	private final Runnable logoutCallBack;
+
+	private CardLayout cardLayout;
+	private JPanel containerPanel;
+	private JLabel labelUser;
+
+	/**
+	 * Costruisce il pannello di gestione dell'autenticazione.
+	 *
+	 * @param tcpClient      il client TCP per l'inoltro delle richieste di autenticazione e registrazione
+	 * @param loginCallBack  callback invocato al completamento con successo del login
+	 * @param logoutCallBack callback invocato alla disconnessione dell'utente
+	 */
 	public LoginPanel(TcpClient tcpClient, Consumer<UserMinInfo> loginCallBack, Runnable logoutCallBack) {
+		this.tcpClient = tcpClient;
 		this.loginCallBack = loginCallBack;
 		this.logoutCallBack = logoutCallBack;
-		this.tcpClient = tcpClient;
 	}
 
+	/**
+	 * Costruisce e assembla la gerarchia dei componenti grafici del pannello di login.
+	 *
+	 * @return il componente {@link JPanel} configurato con il layout a schede
+	 */
 	public JPanel build() {
+		cardLayout = new CardLayout();
+		containerPanel = new JPanel(cardLayout);
+		containerPanel.setMaximumSize(new Dimension(1000, 100));
 
-		//Creazione pannello generale
-		panel = new JPanel(cardLayout = new CardLayout());
-		panel.setMaximumSize(new Dimension(1000, 100));
+		// Pannello stato: Utente Non Autenticato (Login)
+		JPanel unloggedPanel = new JPanel();
+		unloggedPanel.setLayout(new BoxLayout(unloggedPanel, BoxLayout.X_AXIS));
 
-		// Creazione pannello login
-		JPanel login = new JPanel();
-		login.setLayout(new BoxLayout(login, BoxLayout.X_AXIS));
-
-		//Creazione del bottone registrati
-		JButton registratiBotton = new JButton("Registrati");
-		registratiBotton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				Window parentWindow = SwingUtilities.getWindowAncestor(LoginPanel.this);
-				RegistratiBox popup = new RegistratiBox(parentWindow, tcpClient);
-				popup.setVisible(true);
-				popup.setLocationRelativeTo(null);
-			}
+		JButton btnRegistrati = new JButton("Registrati");
+		btnRegistrati.addActionListener(e -> {
+			Window parentWindow = SwingUtilities.getWindowAncestor(containerPanel);
+			RegistratiBox popup = new RegistratiBox(parentWindow, tcpClient);
+			popup.setVisible(true);
 		});
 
-		//Creazione del bottone login
-		JButton loginBotton = new JButton("Accedi");
-		loginBotton.addActionListener(new ActionListener() {
-
-			
-			public void actionPerformed(ActionEvent e) {
-				Window parentWindow = SwingUtilities.getWindowAncestor(LoginPanel.this);
-				LoginBox popup = new LoginBox(parentWindow, tcpClient); 
-				popup.Show(LoginPanel.this);
-				popup.setVisible(true);
-				popup.setLocationRelativeTo(null);
-			}
+		JButton btnLogin = new JButton("Accedi");
+		btnLogin.addActionListener(e -> {
+			Window parentWindow = SwingUtilities.getWindowAncestor(containerPanel);
+			LoginBox popup = new LoginBox(parentWindow, tcpClient);
+			popup.show(LoginPanel.this);
 		});
 
-		//composizione pannello login
-		login.add(Box.createHorizontalGlue());
-		login.add(registratiBotton);
-		login.add(Box.createRigidArea(new Dimension(5, 10)));
-		login.add(loginBotton);
-		login.add(Box.createRigidArea(new Dimension(5, 10)));
-		login.setVisible(true);
+		unloggedPanel.add(Box.createHorizontalGlue());
+		unloggedPanel.add(btnRegistrati);
+		unloggedPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+		unloggedPanel.add(btnLogin);
+		unloggedPanel.add(Box.createRigidArea(new Dimension(5, 10)));
 
-		//Creazione pannello logged
-		JPanel logged = new JPanel();
-		logged.setLayout(new BoxLayout(logged, BoxLayout.X_AXIS));
+		// Pannello stato: Utente Autenticato (Logged)
+		JPanel loggedPanel = new JPanel();
+		loggedPanel.setLayout(new BoxLayout(loggedPanel, BoxLayout.X_AXIS));
 
-		//Creazione del bottone registrati
-		JButton esciButton = new JButton("Esci");
-		esciButton.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-			
-				if (logoutCallBack != null) {
-					logoutCallBack.run(); // Avvisa il listener di logout
-				}				
-				
-				cardLayout.show(panel, "login");
-			}
-			
-			
-		});
-
-		//Creazione della label di benvenuto
 		labelUser = new JLabel();
-		labelUser.setFont(new Font("Monospaced", Font.PLAIN, 20));
+		labelUser.setFont(FONT_WELCOME);
 		labelUser.setForeground(Color.BLUE);
-		logged.add(Box.createHorizontalGlue());
-		logged.add(labelUser);
-		logged.add(Box.createRigidArea(new Dimension(5, 10)));
-		logged.add(esciButton);
-		logged.add(Box.createRigidArea(new Dimension(5, 10)));
 
-		//aggiunta pannelli login e logged al panel principale
-		panel.add(login,"login");
-		panel.add(logged, "logged");
+		JButton btnEsci = new JButton("Esci");
+		btnEsci.addActionListener(e -> {
+			if (logoutCallBack != null) {
+				logoutCallBack.run();
+			}
+			cardLayout.show(containerPanel, CARD_LOGIN);
+		});
 
-		return panel;
+		loggedPanel.add(Box.createHorizontalGlue());
+		loggedPanel.add(labelUser);
+		loggedPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+		loggedPanel.add(btnEsci);
+		loggedPanel.add(Box.createRigidArea(new Dimension(5, 10)));
+
+		containerPanel.add(unloggedPanel, CARD_LOGIN);
+		containerPanel.add(loggedPanel, CARD_LOGGED);
+
+		return containerPanel;
 	}
 
-	
+	/**
+	 * Notifica l'avvenuto login con successo aggiornando l'interfaccia utente e invocando il listener associato.
+	 *
+	 * @param user l'istanza {@link UserMinInfo} contenente le informazioni minime dell'utente autenticato
+	 */
+	@Override
 	public void onLoginSuccess(UserMinInfo user) {
-		labelUser.setText("Ciao " + user.getNome());
-		cardLayout.show(panel, "logged");
-			this.loginCallBack.accept(user);
+		if (user != null) {
+			labelUser.setText("Ciao " + (user.getNome() != null ? user.getNome() : ""));
+		}
+		cardLayout.show(containerPanel, CARD_LOGGED);
+
+		if (loginCallBack != null) {
+			loginCallBack.accept(user);
+		}
 	}
 
-	
+	/**
+	 * Notifica il fallimento dell'autenticazione con il relativo messaggio di errore.
+	 *
+	 * @param errorMessage il messaggio descrittivo dell'errore
+	 */
+	@Override
 	public void onLoginFailed(String errorMessage) {
-
+		// Eventuale gestione centralizzata errori di autenticazione
 	}
 }
-
 
