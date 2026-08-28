@@ -32,7 +32,7 @@ import cinemax.serverCM.dao.utils.SqlUpdateBuilder;
  * DAO responsabile per le operazioni CRUD e query sulle prenotazioni.
  * Implementa la risoluzione delle Query/Command relative alle prenotazioni
  * e mappa i risultati in {@link BookingDetails}.
- */
+ */ 
 public class BookingDao implements Dao {
 
 	private final Connection _connection;
