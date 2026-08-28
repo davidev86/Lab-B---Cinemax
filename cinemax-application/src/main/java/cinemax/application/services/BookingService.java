@@ -79,7 +79,7 @@ public class BookingService {
     }
 
     /**
-     * Aggiorna i dati di una prenotazione precedentemente salvata.
+     * Aggiorna i dati di una prenotazione precedentemente salvata dopo aver validato la disponibilità dei posti.
      *
      * @param id           Codice identificativo della prenotazione da modificare.
      * @param idUtente     Identificativo dell'utente di tipo cliente.
@@ -89,12 +89,17 @@ public class BookingService {
      */
     public StoreBookingResponse updateBooking(Integer id, Integer idUtente, Integer idProiezione, Integer numeroPosti) {
         
+        // Validazione: verifica disponibilità posti
+        if (!isBookingValid(idProiezione, numeroPosti)) {
+            return new StoreBookingResponse(null, false);
+        }
+        
         StoreBooking request = new StoreBooking(id, idUtente, idProiezione, numeroPosti);
         return tcpClient.sendRequest(request, StoreBookingResponse.class);
     }
 
     /**
-     * Inserisce una nuova prenotazione nel sistema.
+     * Inserisce una nuova prenotazione nel sistema dopo aver validato la disponibilità dei posti.
      *
      * @param idUtente     Identificativo dell'utente di tipo cliente che effettua la prenotazione.
      * @param idProiezione Identificativo della proiezione da prenotare.
@@ -102,6 +107,11 @@ public class BookingService {
      * @return Oggetto {@link StoreBookingResponse} con l'esito della creazione e i dati associati.
      */
     public StoreBookingResponse insertBooking(Integer idUtente, Integer idProiezione, Integer numeroPosti) {
+        
+        // Validazione: verifica disponibilità posti
+        if (!isBookingValid(idProiezione, numeroPosti)) {
+            return new StoreBookingResponse(null, false);
+        }
         
         StoreBooking request = new StoreBooking(idUtente, idProiezione, numeroPosti);
         return tcpClient.sendRequest(request, StoreBookingResponse.class);
@@ -117,5 +127,20 @@ public class BookingService {
         
         DeleteBooking request = new DeleteBooking(idPrenotazione);
         return tcpClient.sendRequest(request, DeleteBookingResponse.class);
+    }
+    
+    public boolean isBookingValid(Integer idProiezione, Integer numeroPosti) {
+    	
+    	ProjectionService projectionService = new ProjectionService(tcpClient);
+    	var projection = projectionService.getProjectionById(idProiezione);
+    	
+    	if (projection == null) {
+			throw new IllegalArgumentException("Proiezione non trovata.");
+		}
+    	
+    	int postiDisponibili = projection.getProjection().getTotalePostiLiberi();
+		
+		return numeroPosti <= postiDisponibili;
+    	
     }
 }

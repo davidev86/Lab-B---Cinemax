@@ -173,6 +173,11 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                                     if (this.searchProjection != null) {
                                         this.searchProjection.eseguiRicerca();
                                     }
+                                } else {
+                                    JOptionPane.showMessageDialog(parentWindow,
+                                            "Posti non disponibili per questa prenotazione.",
+                                            "Prenotazione non valida",
+                                            JOptionPane.ERROR_MESSAGE);
                                 }
                             }
                     );

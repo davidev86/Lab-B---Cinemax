@@ -32,7 +32,7 @@ public class UserService {
      * Costruisce il servizio associando il client TCP per la comunicazione di rete.
      *
      * @param tcpClient Il client di rete configurato per inoltrare le richieste.
-     */
+     */ 
     public UserService(TcpClient tcpClient) {
         this.tcpClient = tcpClient;
     }
@@ -86,9 +86,17 @@ public class UserService {
         try {
             String md5Password = HashBuilder.convertToMD5(password);
             StoreUser request = new StoreUser(id, username, md5Password, nome, cognome, dataNascita, domicilio, ruolo);
-            return tcpClient.sendRequest(request, StoreUserResponse.class);
+            
+            StoreUserResponse response = tcpClient.sendRequest(request, StoreUserResponse.class);
+            
+            // Verifica se la risposta è valida e se l'operazione ha restituito l'ID
+            if (response == null || response.getId() == null) {
+                throw new RuntimeException("Errore in aggiornamento: Username già in uso o dati non validi!");
+            }
+            
+            return response;
         } catch (NoSuchAlgorithmException e) {
-            return null;
+            throw new RuntimeException("Errore nell'algoritmo di hashing della password.", e);
         }
     }
 
@@ -124,4 +132,3 @@ public class UserService {
         }
     }
 }
-

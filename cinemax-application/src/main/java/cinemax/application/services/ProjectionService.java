@@ -144,7 +144,7 @@ public class ProjectionService {
      * @throws IllegalArgumentException Se l'orario scelto si sovrappone a una proiezione già esistente.
      */
     public StoreProjectionResponse insertProjection(Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {        
-        if (IsTheProjectionOverlap(idFilm, dataOraProiezione)) {
+        if (isProjectionOverlap(idFilm, dataOraProiezione, null)) {
             throw new IllegalArgumentException("Orario non disponibile: si sovrappone a un'altra proiezione in palinsesto.");
         }
         
@@ -174,7 +174,7 @@ public class ProjectionService {
      * @throws IllegalArgumentException Se il nuovo orario va in conflitto con altre proiezioni.
      */
     public StoreProjectionResponse updateProjection(Integer id, Integer idFilm, LocalDateTime dataOraProiezione, BigDecimal prezzoBiglietto) {
-        if (IsTheProjectionOverlap(idFilm, dataOraProiezione)) {
+        if (isProjectionOverlap(idFilm, dataOraProiezione, id)) {
             throw new IllegalArgumentException("Orario non disponibile: si sovrappone a un'altra proiezione in palinsesto.");
         }
         
@@ -253,19 +253,43 @@ public class ProjectionService {
      * @param dataOraProiezione Orario di avvio della proiezione proposta.
      * @return {@code true} se esiste un conflitto di programmazione nell'intervallo, {@code false} altrimenti.
      */
-    private Boolean IsTheProjectionOverlap(Integer idFilm, LocalDateTime dataOraProiezione) {
-        // Recupera la durata del film dal servizio FilmService
+    private Boolean isProjectionOverlap(Integer idFilm, LocalDateTime dataOraProiezione, Integer idProiezioneDaEscludere) {
         FilmService filmService = new FilmService(tcpClient);
         GetFilmResponse response = filmService.getFilmById(idFilm);
-         
-        Integer durata = response.getFilm().getDurataMinuti(); 
-        
-        // Calcola l'intervallo occupato considerando un buffer di 30 minuti pre e post spettacolo
-        LocalDateTime from = dataOraProiezione.minusMinutes(30);
-        LocalDateTime to = dataOraProiezione.plusMinutes(durata + 30);
-        
-        GetProjectionsResponse res = getProjectionsByDateRange(from, to);
-        
-        return res != null && !res.getProjections().isEmpty();
+
+        Integer durataNuovaProiezione = response.getFilm().getDurataMinuti();
+
+        LocalDateTime nuovaInizio = dataOraProiezione;
+        LocalDateTime nuovaFineConPulizia = dataOraProiezione.plusMinutes(durataNuovaProiezione + 30);
+
+        // Le proiezioni vengono pianificate nella stessa giornata (niente fascia notturna)
+        LocalDateTime ricercaDa = dataOraProiezione.toLocalDate().atStartOfDay();
+        LocalDateTime ricercaA = dataOraProiezione.toLocalDate().atTime(23, 59, 59);
+
+        GetProjectionsResponse res = getProjectionsByDateRange(ricercaDa, ricercaA);
+        if (res == null || res.getProjections() == null) {
+            return false;
+        }
+
+        for (ProjectionDetailsView projection : res.getProjections()) {
+            if (idProiezioneDaEscludere != null && idProiezioneDaEscludere.equals(projection.getId())) {
+                continue;
+            }
+            if (projection.getDataOraProiezione() == null || projection.getDurataMinuti() == null) {
+                continue;
+            }
+
+            LocalDateTime esistenteInizio = projection.getDataOraProiezione();
+            LocalDateTime esistenteFineConPulizia = esistenteInizio.plusMinutes(projection.getDurataMinuti() + 30);
+
+            boolean nonSiSovrappongono = !esistenteFineConPulizia.isAfter(nuovaInizio)
+                    || !nuovaFineConPulizia.isAfter(esistenteInizio);
+
+            if (!nonSiSovrappongono) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

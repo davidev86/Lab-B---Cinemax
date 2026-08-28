@@ -1,0 +1,43 @@
+@startuml
+title Diagramma dei Package - Cinemax
+
+' Definizione dei package principali
+package "cinemax-gui (Client)" {
+    [cinemax.gui]
+    [cinemax.gui.controllers]
+}
+
+package "cinemax-application" {
+    [cinemax.application.services]
+    [cinemax.application.client]
+}
+
+package "cinemax-contracts" {
+    [cinemax.contracts.commands]
+    [cinemax.contracts.queries]
+    [cinemax.contracts.dto]
+    [cinemax.contracts.responses]
+}
+
+package "cinemax-serverCM (Server)" {
+    [cinemax.server.network]
+    [cinemax.server.handlers]
+    [cinemax.server.repositories]
+    [cinemax.server.domain]
+}
+
+' Relazioni di dipendenza tra i package
+[cinemax.gui.controllers] ..> [cinemax.application.services] : usa
+[cinemax.application.services] ..> [cinemax.contracts.commands] : invia
+[cinemax.application.services] ..> [cinemax.contracts.queries] : invia
+[cinemax.application.services] ..> [cinemax.contracts.dto] : usa
+[cinemax.application.services] ..> [cinemax.contracts.responses] : riceve
+[cinemax.application.client] ..> [cinemax.server.network] : TCP/IP
+[cinemax.server.network] ..> [cinemax.server.handlers] : delega
+[cinemax.server.handlers] ..> [cinemax.contracts.commands] : elabora
+[cinemax.server.handlers] ..> [cinemax.contracts.queries] : elabora
+[cinemax.server.handlers] ..> [cinemax.server.repositories] : interroga
+[cinemax.server.domain] <.. [cinemax.server.repositories] : mappa da/a DB
+[cinemax.server.domain] ..> [cinemax.contracts.dto] : converte in
+
+@enduml

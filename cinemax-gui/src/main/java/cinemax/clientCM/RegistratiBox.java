@@ -211,7 +211,7 @@ public class RegistratiBox extends JDialog {
                 setCursor(Cursor.getDefaultCursor()); 
 
                 try {
-                    get();
+                    Void response = get();
                     mostraMessaggio("Registrazione completata con successo!", 
                             "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
