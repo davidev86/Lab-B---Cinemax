@@ -167,6 +167,10 @@ public class TabPanel extends JPanel implements SelezioneProjectionCallBack, Log
                             (Integer seats) -> {
                                 StoreBookingResponse res = bkgService.insertBooking(user.getId(), projection.getId(), seats);
                                 if (res != null && res.isSuccess()) {
+                                    JOptionPane.showMessageDialog(parentWindow,
+                                            "Prenotazione avvenuta con successo.\nCodice prenotazione: " + res.getId(),
+                                            "Operazione Riuscita",
+                                            JOptionPane.INFORMATION_MESSAGE);
                                     if (this.clientBooking != null) {
                                         this.clientBooking.visualizzaBooking();
                                     }

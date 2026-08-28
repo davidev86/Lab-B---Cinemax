@@ -207,7 +207,7 @@ public class ClientBooking extends JPanel {
                 setCursor(Cursor.getDefaultCursor());
                 try {
                     get();
-                    mostraMessaggio("Prenotazione aggiornata con successo.", "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
+                    mostraMessaggio("Prenotazione aggiornata con successo.\nCodice prenotazione: " + booking.getIdPrenotazione(), "Operazione Riuscita", JOptionPane.INFORMATION_MESSAGE);
                     visualizzaBooking();
                 } catch (Exception ex) {
                     mostraMessaggio("Errore durante l'aggiornamento della prenotazione: " + ex.getMessage(), "Errore Server", JOptionPane.ERROR_MESSAGE);
