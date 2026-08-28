@@ -1,0 +1,46 @@
+@startuml
+skinparam state {
+  BackgroundColor LightBlue
+  BorderColor DarkBlue
+  FontName Arial
+}
+
+title Booking Cinemax State Diagram
+
+[*] --> In_Selezione : Inizio prenotazione
+
+state In_Selezione {
+  In_Selezione : L'utente seleziona proiezione e posti
+}
+
+In_Selezione --> In_Attesa_Conferma : Invia richiesta (StoreBooking)
+In_Selezione --> Annullata : Utente chiude dialog
+In_Selezione --> Modifica : Invia richiesta
+
+state In_Attesa_Conferma {
+  In_Attesa_Conferma : Application verifica disponibilità sul server
+}
+
+In_Attesa_Conferma --> Confermata : Verifica OK (StoreBookingResponse: success=true)
+In_Attesa_Conferma --> In_Selezione : Verifica KO (posti occupati)
+
+state Confermata {
+  Confermata : Prenotazione registrata nel DB
+}
+
+Confermata --> [*] : Fine ciclo vita
+Confermata --> Modifica : Utente modifica (UpdateBooking)
+Confermata --> Annullata : Utente disdice (DeleteBooking)
+
+state Annullata {
+  Annullata : Posti liberati nel DB
+}
+
+state Modifica {
+Modifica : Modifica posti nel DB
+}
+
+Annullata --> [*] : Fine ciclo vita
+Modifica --> [*] : Fine ciclo vita
+
+@enduml
