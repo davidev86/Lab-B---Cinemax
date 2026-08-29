@@ -172,6 +172,7 @@ public class ClientBooking extends JPanel {
                         DettaglioProiezioneClienteDialog dialog = new DettaglioProiezioneClienteDialog(
                                 parentWindow,
                                 response.getProjection(),
+                                selected.getIdPrenotazione(),
                                 (Integer seats) -> eseguiAggiornamentoAsync(selected, seats)
                         );
                         dialog.setVisible(true);

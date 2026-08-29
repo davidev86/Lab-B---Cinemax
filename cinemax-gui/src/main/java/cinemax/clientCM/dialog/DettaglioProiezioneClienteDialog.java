@@ -57,9 +57,14 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
      */
     public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetailsView proiezione, 
             Consumer<Integer> storeBookingCallback) {
+        this(owner, proiezione, null, storeBookingCallback);
+    }
+
+    public DettaglioProiezioneClienteDialog(Window owner, ProjectionDetailsView proiezione, Integer idPrenotazione,
+            Consumer<Integer> storeBookingCallback) {
         super(owner, "Dettagli Proiezione", ModalityType.APPLICATION_MODAL);
          
-        setSize(480, 590);
+        setSize(480, 620);
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout(10, 10));
         setResizable(false);
@@ -68,6 +73,15 @@ public class DettaglioProiezioneClienteDialog extends JDialog {
         JPanel mainCenterPanel = new JPanel();
         mainCenterPanel.setLayout(new BoxLayout(mainCenterPanel, BoxLayout.Y_AXIS));
         mainCenterPanel.setBorder(new EmptyBorder(10, 15, 5, 15));
+
+        if (idPrenotazione != null) {
+            JLabel lblIdPrenotazione = new JLabel("Codice prenotazione: " + idPrenotazione);
+            lblIdPrenotazione.setFont(new Font("SansSerif", Font.BOLD, 14));
+            lblIdPrenotazione.setForeground(new Color(0, 102, 204));
+            lblIdPrenotazione.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblIdPrenotazione.setBorder(new EmptyBorder(0, 0, 10, 0));
+            mainCenterPanel.add(lblIdPrenotazione);
+        }
 
         // SCHEDA STRUTTURATA DATI PROIEZIONE
         JPanel cardPanel = new JPanel(); 

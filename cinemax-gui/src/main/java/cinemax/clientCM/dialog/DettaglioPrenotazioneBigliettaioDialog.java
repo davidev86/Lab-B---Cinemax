@@ -79,7 +79,7 @@ public class DettaglioPrenotazioneBigliettaioDialog extends JDialog {
 
         // Intestazione: Codice, Intestatario, Data Spettacolo
         String idText = (prenotazione != null && prenotazione.getIdPrenotazione() != null) 
-                ? "Prenotazione #" + prenotazione.getIdPrenotazione() : "Prenotazione N/D";
+                ? "Codice prenotazione: " + prenotazione.getIdPrenotazione() : "Codice prenotazione: N/D";
         JLabel lblIdPrenotazione = new JLabel(idText);
         lblIdPrenotazione.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblIdPrenotazione.setAlignmentX(Component.CENTER_ALIGNMENT);
