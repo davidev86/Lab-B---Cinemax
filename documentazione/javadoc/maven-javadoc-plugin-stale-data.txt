@@ -1,0 +1,67 @@
+@options
+@packages
+--class-path
+'C:/gitDesktop/Lab-B---Cinemax/target/classes;C:/gitDesktop/Lab-B---Cinemax/cinemax-contracts/target/classes;C:/gitDesktop/Lab-B---Cinemax/cinemax-gui/target/classes;C:/gitDesktop/Lab-B---Cinemax/cinemax-serverCM/target/classes;C:/gitDesktop/Lab-B---Cinemax/cinemax-application/target/classes;C:/Users/franc/.m2/repository/org/postgresql/postgresql/42.7.3/postgresql-42.7.3.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+25
+-sourcepath
+'C:/gitDesktop/Lab-B---Cinemax/cinemax-contracts/src/main/java;C:/gitDesktop/Lab-B---Cinemax/cinemax-contracts/target/generated-sources/annotations;C:/gitDesktop/Lab-B---Cinemax/cinemax-gui/src/main/java;C:/gitDesktop/Lab-B---Cinemax/cinemax-gui/target/generated-sources/annotations;C:/gitDesktop/Lab-B---Cinemax/cinemax-serverCM/src/main/java;C:/gitDesktop/Lab-B---Cinemax/cinemax-serverCM/target/generated-sources/annotations;C:/gitDesktop/Lab-B---Cinemax/cinemax-application/src/main/java;C:/gitDesktop/Lab-B---Cinemax/cinemax-application/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'C:/gitDesktop/Lab-B---Cinemax/target/site/apidocs'
+-docencoding
+'UTF-8'
+-Xdoclint:none
+-doctitle
+'Lab-B-Cinemax 1.0.0 API'
+-use
+-version
+-windowtitle
+'Lab-B-Cinemax 1.0.0 API'
+cinemax.contracts.commands
+cinemax.contracts.dto
+cinemax.contracts.dto.ui
+cinemax.contracts.interfaces
+cinemax.contracts.queries
+cinemax.contracts.responses
+cinemax.contracts.responses.ui
+cinemax.clientCM.callback
+cinemax.clientCM
+cinemax.clientCM.dialog
+cinemax.clientCM.login
+cinemax.clientCM.tabpanel
+cinemax.serverCM
+cinemax.serverCM.dao
+cinemax.serverCM.dao.utils
+cinemax.application.services
+cinemax.application.services.utils
+C:\gitDesktop\Lab-B---Cinemax\cinemax-contracts\src\main\java = 1786290685130
+C:\gitDesktop\Lab-B---Cinemax\cinemax-contracts\target\generated-sources\annotations = 1787993523750
+C:\gitDesktop\Lab-B---Cinemax\cinemax-gui\src\main\java = 1787852236819
+C:\gitDesktop\Lab-B---Cinemax\cinemax-gui\target\generated-sources\annotations = 1787993525683
+C:\gitDesktop\Lab-B---Cinemax\cinemax-serverCM\src\main\java = 1786378917721
+C:\gitDesktop\Lab-B---Cinemax\cinemax-serverCM\target\generated-sources\annotations = 1787993527100
+C:\gitDesktop\Lab-B---Cinemax\cinemax-application\src\main\java = 1786893062972
+C:\gitDesktop\Lab-B---Cinemax\cinemax-application\target\generated-sources\annotations = 1787993525273
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\allclasses-index.html = 1787993565949
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\allpackages-index.html = 1787993565952
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\element-list = 1787993565286
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\help-doc.html = 1787993566015
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\index-all.html = 1787993566005
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\index.html = 1787993565898
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\member-search-index.js = 1787993565962
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\module-search-index.js = 1787993565954
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\overview-summary.html = 1787993566011
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\overview-tree.html = 1787993565893
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\package-search-index.js = 1787993565956
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\search.html = 1787993566008
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\serialized-form.html = 1787993565505
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\tag-search-index.js = 1787993565964
+C:\gitDesktop\Lab-B---Cinemax\target\site\apidocs\type-search-index.js = 1787993565959

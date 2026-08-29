@@ -1,0 +1,17 @@
+cinemax.application.services
+cinemax.application.services.utils
+cinemax.clientCM
+cinemax.clientCM.callback
+cinemax.clientCM.dialog
+cinemax.clientCM.login
+cinemax.clientCM.tabpanel
+cinemax.contracts.commands
+cinemax.contracts.dto
+cinemax.contracts.dto.ui
+cinemax.contracts.interfaces
+cinemax.contracts.queries
+cinemax.contracts.responses
+cinemax.contracts.responses.ui
+cinemax.serverCM
+cinemax.serverCM.dao
+cinemax.serverCM.dao.utils
